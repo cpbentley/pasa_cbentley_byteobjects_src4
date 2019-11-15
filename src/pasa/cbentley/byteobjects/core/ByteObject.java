@@ -341,7 +341,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param ito
     * @param refs Global reference list. only take new objects.
     */
-   private void addFlatLine(IntToObjects ito, IntToObjects refs) {
+   void addFlatLine(IntToObjects ito, IntToObjects refs) {
       int pos = refs.findObjectRef(this);
       if (pos != -1) {
          //cross reference 
@@ -749,7 +749,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * Adds all byte values to each other
     * @return a positive value
     */
-   private int getBOHash() {
+   int getBOHash() {
       int len = getLength();
       int val2 = 0;
       for (int i = A_OBJECT_BASIC_SIZE; i < len; i++) {
@@ -1154,7 +1154,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @return
     */
    public ByteObject getSubAtIndexNull(int index) {
-      if (param != null && index < param.length) {
+      if (param != null && index >= 0 && index < param.length) {
          return param[index];
       }
       return null;
@@ -2504,7 +2504,7 @@ public class ByteObject implements ITechByteObject, IStringable {
       }
       return bytes;
    }
-   
+
    public void toggleFlag(int index, int flag) {
       if (hasFlag(index, flag)) {
          setFlag(index, flag, false);
@@ -2512,8 +2512,7 @@ public class ByteObject implements ITechByteObject, IStringable {
          setFlag(index, flag, true);
       }
    }
-   
-   
+
    //#mdebug
    public IDLog toDLog() {
       return boc.toDLog();

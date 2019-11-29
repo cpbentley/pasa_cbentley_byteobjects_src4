@@ -84,6 +84,11 @@ public interface IBOTypesBOC {
    public static final int TYPE_016_REFERENCE_64         = 16;
 
    /**
+    * 
+    */
+   public static final int TYPE_017_REFERENCE_OBJECT     = 17;
+
+   /**
     * Object storing 4 bytes
     */
    public static final int TYPE_002_LIT_INT              = 2;
@@ -205,6 +210,8 @@ public interface IBOTypesBOC {
     * 
     */
    public static final int TYPE_029_ARRAY_MAP            = 14;
+
+   public static final int TYPE_019_RELATIONSHIP         = 19;
 
    public static final int TYPE_020_PARAMATERS           = 20;
 

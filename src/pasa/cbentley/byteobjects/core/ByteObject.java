@@ -106,6 +106,8 @@ public class ByteObject implements ITechByteObject, IStringable {
 
    public static final int MINUS_SIGN_16BITS_FLAG = 32768;
 
+   public static final int MINUS_SIGN_24BITS_FLAG = 1 << 23;
+
    /**
     * {@link BOCtx} provides the application context to {@link UCtx}.
     * 
@@ -690,15 +692,45 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Unsigned value
+    * Unsigned value according to {@link ByteObject#getValue(int, int)} convention
     * @param index
     * @return
     */
    public int get1(int index) {
-      return getByteInt(index);
+      return get1Unsigned(index);
+   }
+
+   public int get1Unsigned(int index) {
+      /*
+       * Provided we have 1100 1000 at index
+       * Will return a positive int 200 because bitwise AND with 0xFF will
+       * zero all the 24 most significant bits that:
+       * a) were added during upcasting to int which took place silently
+       *    just before evaluating the bitwise AND operator.
+       *    So the `b & 0xFF` is equivalent with `((int) b) & 0xFF`.
+       * b) were set to 1s because of "sign extension" during the upcasting
+       *
+       * 1111 1111 1111 1111 1111 1111 1100 1000 (the int)
+       * &
+       * 0000 0000 0000 0000 0000 0000 1111 1111 (the 0xFF)
+       * =======================================
+       * 0000 0000 0000 0000 0000 0000 1100 1000 (200)
+       */
+      return data[this.index + index] & 0xFF;
    }
 
    /**
+    * Get byte as signed value
+    * @param index
+    * @return
+    */
+   public int get1Signed(int index) {
+      return data[this.index + index];
+   }
+
+   /**
+    * Gets a value according to {@link ByteObject#getValue(int, int)} convention
+    * Legacy.. signed
     * Signed 2 bytes value
     * 16 bit is the sign bit.
     * 
@@ -709,34 +741,119 @@ public class ByteObject implements ITechByteObject, IStringable {
       return getShortInt(index);
    }
 
+   public int get2Signed(int index) {
+      return getShortInt(index);
+   }
+
+   /**
+    * Unsigned data
+    * @param index
+    * @return
+    */
+   public int get2Unsigned(int index) {
+      return ShortUtils.readShortBEUnsigned(data, this.index + index);
+   }
+
+   /**
+    * Reading a single byte, gets the unsigned value of the 87654321 21 bits
+    * @param index
+    * @return
+    */
    public int get2Bits1(int index) {
       return data[this.index + index] & 0x03;
    }
 
+   /**
+    * Reading a single byte, gets the unsigned value of the 87654321 43 bits
+    * @param index
+    * @return
+    */
    public int get2Bits2(int index) {
       return data[this.index + index] >> 2 & 0x03;
    }
 
+   /**
+    * Reading a single byte, gets the unsigned value of the 87654321 65 bits
+    * @param index
+    * @return
+    */
    public int get2Bits3(int index) {
       return data[this.index + index] >> 4 & 0x03;
    }
 
+   /**
+    * Reading a single byte, gets the unsigned value of the 87654321 87 bits
+    * @param index
+    * @return
+    */
    public int get2Bits4(int index) {
       return data[this.index + index] >> 6 & 0x03;
    }
 
+   /**
+    * Gets a value according to {@link ByteObject#getValue(int, int)} convention
+    * Legacy.. unsigned
+    * @param index
+    * @return
+    */
    public int get3(int index) {
+      return IntUtils.readInt24BE(data, this.index + index);
+   }
+
+   public int get3Signed(int index) {
+      int v = IntUtils.readInt24BE(data, this.index + index);
+      if ((v & MINUS_SIGN_24BITS_FLAG) == MINUS_SIGN_24BITS_FLAG) {
+         v &= ~MINUS_SIGN_24BITS_FLAG;
+         v = -v;
+      }
+      return v;
+   }
+
+   /**
+    * Reads 3 bytes with latest bit being 
+    * @param index
+    * @return
+    */
+   public int get3Unsigned(int index) {
       return getInt24(index);
    }
 
    public int get4(int index) {
-      return getInt(index);
+      return get4Signed(index);
    }
 
+   public int get4Signed(int index) {
+      return IntUtils.readIntBE(data, this.index + index);
+   }
+
+   /**
+    * Returns a long because Java int literral is signed 
+    * @param index
+    * @return
+    */
+   public long get4Unsigned(int index) {
+      return IntUtils.readIntBEUnsigned(data, this.index + index);
+   }
+
+   /**
+    * Reading a single byte, gets the unsigned value of the 87654321 4321 bits
+    * 
+    * 10000111 returns 0111
+    * @param index
+    * @return
+    */
    public int get4Bits1(int index) {
       return data[this.index + index] & 0x0F;
    }
 
+   /**
+    * Reading a single byte, gets the unsigned value of the 87654321 8765 bits
+    * 
+    * 10000111 returns 1000
+    * 
+    * @param index
+    * @return
+    */
    public int get4Bits2(int index) {
       return data[this.index + index] >> 4 & 0x0F;
    }
@@ -773,7 +890,27 @@ public class ByteObject implements ITechByteObject, IStringable {
       return out;
    }
 
+   /**
+    * Unsigned byte as integer.
+    * @param index
+    * @return
+    */
    int getByteInt(int index) {
+      /*
+       * Provided we have 1100 1000 at index
+       * Will return a positive int 200 because bitwise AND with 0xFF will
+       * zero all the 24 most significant bits that:
+       * a) were added during upcasting to int which took place silently
+       *    just before evaluating the bitwise AND operator.
+       *    So the `b & 0xFF` is equivalent with `((int) b) & 0xFF`.
+       * b) were set to 1s because of "sign extension" during the upcasting
+       *
+       * 1111 1111 1111 1111 1111 1111 1100 1000 (the int)
+       * &
+       * 0000 0000 0000 0000 0000 0000 1111 1111 (the 0xFF)
+       * =======================================
+       * 0000 0000 0000 0000 0000 0000 1100 1000 (200)
+       */
       return data[this.index + index] & 0xFF;
    }
 
@@ -1194,6 +1331,38 @@ public class ByteObject implements ITechByteObject, IStringable {
       return p;
    }
 
+   public ByteObject getSubFirst(int type, int index, int size, int value) {
+      return getSub(type, index, size, value, 0);
+   }
+
+   /**
+    * Returns the first object whose type is type, and whose value at index of size size is equal
+    * to the given value
+    * @param type
+    * @param index
+    * @param size
+    * @param value
+    * @param num
+    * @return
+    */
+   public ByteObject getSub(int type, int index, int size, int value, int num) {
+      if (param == null)
+         return null;
+      int count = 0;
+      for (int i = 0; i < param.length; i++) {
+         ByteObject subObject = param[i];
+         if (subObject != null && subObject.getType() == type) {
+            if (subObject.getValue(index, size) == value) {
+               if (count == num) {
+                  return subObject;
+               }
+               count++;
+            }
+         }
+      }
+      return null;
+   }
+
    /**
     * Returns a flat view of all {@link ByteObject}. Breaks any loops.
     * @return
@@ -1517,7 +1686,9 @@ public class ByteObject implements ITechByteObject, IStringable {
 
    /**
     * 32 bits values.
-    * Returns
+    * Because Java int are signed.. and usually we don't want signed single bytes
+    * {@link ByteObject}s follow this convention
+    * 
     * <li> 1 - unsigned 0-255 values
     * <li> 2 - signed -
     * <li> 3 - unsigned
@@ -1528,12 +1699,12 @@ public class ByteObject implements ITechByteObject, IStringable {
     */
    public int getValue(int index, int size) {
       if (size == 1)
-         return getByteInt(index);
+         return get1(index);
       if (size == 2)
-         return getShortInt(index);
+         return get2Signed(index);
       if (size == 3)
-         return getInt24(index);
-      return getInt(index);
+         return get3Unsigned(index);
+      return get4(index);
    }
 
    /**
@@ -1824,8 +1995,22 @@ public class ByteObject implements ITechByteObject, IStringable {
       dos.write(data); //write without anything else
    }
 
+   /**
+    * Does not save the sign
+    * @param index
+    * @param value
+    */
    public void set1(int index, int value) {
-      setValue(index, value, 1);
+      data[this.index + index] = (byte) value;
+   }
+
+   /**
+    * 
+    * @param index
+    * @param value
+    */
+   public void set1Signed(int index, int value) {
+      data[this.index + index] = (byte) value;
    }
 
    /**
@@ -1849,20 +2034,69 @@ public class ByteObject implements ITechByteObject, IStringable {
       }
    }
 
+   /**
+    * if(index <= equality) then set index=value
+    * @param equality
+    * @param index
+    * @param value
+    */
    public void set2IfSmallerOrEqual(int equality, int index, int value) {
       if (get2(index) <= equality) {
          set2(index, value);
       }
    }
 
+   /**
+    * if(index >= equality) then set index=value
+    * @param equality
+    * @param index
+    * @param value
+    */
+   public void set2IfBiggerOrEqual(int equality, int index, int value) {
+      if (get2(index) >= equality) {
+         set2(index, value);
+      }
+   }
+
+   /**
+    * Write value without its sign. 2 bytes at index 
+    * @param index
+    * @param value
+    */
    public void set2Unsigned(int index, int value) {
       ShortUtils.writeShortBEUnsigned(data, this.index + index, value);
    }
 
+   /**
+    * Sets 3 bytes unsigned according the Java ByteObject convention.
+    * @param index
+    * @param value
+    */
    public void set3(int index, int value) {
       setValue(index, value, 3);
    }
 
+   /**
+    * Sets the value on 3 bytes.. saving the sign as bit.
+    * 
+    * Sign must be read with {@link ByteObject#get3Signed(int)}
+    * 
+    * @param index
+    * @param value
+    */
+   public void set3Signed(int index, int value) {
+      if (value < 0) {
+         value = -value;
+         value |= (MINUS_SIGN_24BITS_FLAG);
+      }
+      IntUtils.writeInt24BE(data, this.index + index, value);
+   }
+
+   /**
+    * Set according to the convention
+    * @param index
+    * @param value
+    */
    public void set4(int index, int value) {
       setValue(index, value, 4);
    }

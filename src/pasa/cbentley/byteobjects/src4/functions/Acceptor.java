@@ -106,7 +106,7 @@ public class Acceptor implements ITechAcceptor {
             return accept(value);
          case ACC_TYPE_3_STRING:
             return boc.getAcceptorStatic().checkString(inputStr, op, operandStr);
-         case ACC_TYPE_5_EXPRESSION:
+         case ACC_TYPE_7_EXPRESSION:
             return acceptExpression();
          default:
             break;

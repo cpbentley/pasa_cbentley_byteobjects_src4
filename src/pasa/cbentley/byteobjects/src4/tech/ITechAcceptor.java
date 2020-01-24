@@ -83,6 +83,9 @@ public interface ITechAcceptor extends ITechByteObject {
     * <li> {@link ITechAcceptor#ACC_TYPE_0_INT}
     * <li> {@link ITechAcceptor#ACC_TYPE_1_ARRAY}
     * <li> {@link ITechAcceptor#ACC_TYPE_2_BYTEOBJECT}
+    * <li> {@link ITechAcceptor#ACC_TYPE_3_STRING}
+    * <li> {@link ITechAcceptor#ACC_TYPE_4_INT_DATE}
+    * <li> {@link ITechAcceptor#ACC_TYPE_7_EXPRESSION}
     * 
     */
    public static final int ACC_OFFSET_03_TYPE1       = A_OBJECT_BASIC_SIZE + 2;
@@ -122,9 +125,14 @@ public interface ITechAcceptor extends ITechByteObject {
    public static final int ACC_TYPE_4_INT_DATE       = 4;
 
    /**
+    * Consider integer input value as a date years/month/day/minutes.
+    */
+   public static final int ACC_TYPE_5_DATE_LONG      = 5;
+
+   /**
     * Acceptor is a composite of 2 Acceptor + 
     */
-   public static final int ACC_TYPE_5_EXPRESSION     = 5;
+   public static final int ACC_TYPE_7_EXPRESSION     = 7;
 
    public static final int ACC_TYPE_6_STRING_POINTER = 6;
 
@@ -133,6 +141,8 @@ public interface ITechAcceptor extends ITechByteObject {
    public static final int OP_COMP_1_SMALLER         = 1;
 
    public static final int OP_COMP_2_BIGGER          = 2;
+
+   public static final int OP_COMP_3_DIFFERENT       = 3;
 
    /**
     * is input date in the same day as operand.

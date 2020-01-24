@@ -14,9 +14,9 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class BOByteObjectModule extends BOAbstractModule implements IDebugStringable {
+public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, IBOTypesBOC {
 
-   public BOByteObjectModule(BOCtx boc) {
+   public BOModuleCore(BOCtx boc) {
       super(boc);
    }
 
@@ -37,7 +37,7 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
       if (merge == null)
          return root;
 
-      if (merge.getType() == IBOTypesBOC.TYPE_025_ACTION && root.getType() != IBOTypesBOC.TYPE_025_ACTION) {
+      if (merge.getType() == TYPE_025_ACTION && root.getType() != TYPE_025_ACTION) {
          return boc.getAction().doActionFunctorClone(merge, root);
       }
       if (!merge.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_1_INCOMPLETE)) {
@@ -48,7 +48,7 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
          switch (type) {
             //            case IBaseTypes.TYPE_000_EXTENSION:
             //               return module.mergeByteObject(merge);
-            case IBOTypesBOC.TYPE_025_ACTION:
+            case TYPE_025_ACTION:
                return boc.getAction().mergeAction(root, merge);
             default:
                //not found here
@@ -94,6 +94,16 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
       }
    }
 
+   public void toString(Dctx dc) {
+      dc.root(this, "BOModuleCore");
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+      
+      dc.appendVarWithNewLine(toStringType(TYPE_002_LIT_INT), TYPE_002_LIT_INT);
+      dc.appendVarWithNewLine(toStringType(TYPE_015_REFERENCE_32), TYPE_015_REFERENCE_32);
+      
+   }
+
    /**
     * Main entry points to Stringing a {@link ByteObject}.
     * @param dc
@@ -102,48 +112,54 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
    public boolean toString(Dctx dc, ByteObject bo) {
       int type = bo.getType();
       switch (type) {
-         case IBOTypesBOC.TYPE_015_REFERENCE_32:
+         case TYPE_015_REFERENCE_32:
             dc.append("Reference ");
             break;
-         case IBOTypesBOC.TYPE_002_LIT_INT:
+         case TYPE_002_LIT_INT:
             boc.getLitteralIntFactory().toStringLitteralInt(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_003_LIT_STRING:
+         case TYPE_003_LIT_STRING:
             boc.getLitteralStringFactory().toStringLitteralString(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_007_LIT_ARRAY_INT:
+         case TYPE_007_LIT_ARRAY_INT:
             boc.getLitteralIntFactory().toStringLitteralIntArray(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_006_LIT_NAME:
+         case TYPE_006_LIT_NAME:
             boc.getLitteralStringFactory().toStringLitteralName(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_012_MODULE_SETTINGS:
+         case TYPE_012_MODULE_SETTINGS:
             break;
-         case IBOTypesBOC.TYPE_011_MERGE_MASK:
+         case TYPE_011_MERGE_MASK:
             boc.getMergeMaskFactory().toStringMergeMask(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_021_FUNCTION:
+         case TYPE_021_FUNCTION:
             boc.getFunctionFactory().toStringFunction(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_022_ACCEPTOR:
+         case TYPE_022_ACCEPTOR:
             boc.getAcceptorFactory().toStringAcceptor(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_025_ACTION:
+         case TYPE_025_ACTION:
             boc.getActionFactory().toStringAction(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_010_POINTER:
+         case TYPE_010_POINTER:
             boc.getPointerOperator().toStringPointer(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_035_OBJECT_MANAGED:
+         case TYPE_035_OBJECT_MANAGED:
             dc.append("Struct");
             break;
-         case IBOTypesBOC.TYPE_036_BYTE_CONTROLLER:
+         case TYPE_036_BYTE_CONTROLLER:
             boc.getByteControllerFactory().toStringByteController(dc, bo);
             break;
          default:
             return false;
       }
       return true;
+   }
+
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, "BOModuleCore");
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    /**
@@ -154,43 +170,43 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
    public boolean toString1Line(Dctx dc, ByteObject bo) {
       int type = bo.getType();
       switch (type) {
-         case IBOTypesBOC.TYPE_015_REFERENCE_32:
+         case TYPE_015_REFERENCE_32:
             dc.append("Reference ");
             break;
-         case IBOTypesBOC.TYPE_002_LIT_INT:
+         case TYPE_002_LIT_INT:
             boc.getLitteralIntFactory().toStringLitteralInt(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_003_LIT_STRING:
+         case TYPE_003_LIT_STRING:
             boc.getLitteralStringFactory().toStringLitteralString(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_007_LIT_ARRAY_INT:
+         case TYPE_007_LIT_ARRAY_INT:
             boc.getLitteralIntFactory().toStringLitteralIntArray1Line(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_006_LIT_NAME:
+         case TYPE_006_LIT_NAME:
             boc.getLitteralStringFactory().toStringLitteralName(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_010_POINTER:
+         case TYPE_010_POINTER:
             boc.getPointerOperator().toStringPointer(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_011_MERGE_MASK:
+         case TYPE_011_MERGE_MASK:
             boc.getMergeMaskFactory().toStringMergeMask(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_012_MODULE_SETTINGS:
+         case TYPE_012_MODULE_SETTINGS:
             break;
-         case IBOTypesBOC.TYPE_021_FUNCTION:
+         case TYPE_021_FUNCTION:
             boc.getFunctionFactory().toStringFunction(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_022_ACCEPTOR:
+         case TYPE_022_ACCEPTOR:
             boc.getAcceptorFactory().toStringAcceptor(dc, bo);
             break;
-         case IBOTypesBOC.TYPE_025_ACTION:
+         case TYPE_025_ACTION:
             //Action.
             dc.append("Action");
             break;
-         case IBOTypesBOC.TYPE_035_OBJECT_MANAGED:
+         case TYPE_035_OBJECT_MANAGED:
             dc.append("Struct");
             break;
-         case IBOTypesBOC.TYPE_036_BYTE_CONTROLLER:
+         case TYPE_036_BYTE_CONTROLLER:
             boc.getByteControllerFactory().toStringB1Line(dc, bo);
             break;
          default:
@@ -219,6 +235,10 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
       }
    }
 
+   private void toStringPrivate(Dctx dc) {
+
+   }
+
    public String toStringType(ByteObject bo) {
       return toStringType(bo.getType());
    }
@@ -235,47 +255,47 @@ public class BOByteObjectModule extends BOAbstractModule implements IDebugString
     */
    public String toStringType(int type) {
       switch (type) {
-         case IBOTypesBOC.TYPE_001_EXTENSION:
+         case TYPE_001_EXTENSION:
             return "Extension";
-         case IBOTypesBOC.TYPE_015_REFERENCE_32:
+         case TYPE_015_REFERENCE_32:
             return "Reference";
-         case IBOTypesBOC.TYPE_002_LIT_INT:
+         case TYPE_002_LIT_INT:
             return "Intger";
-         case IBOTypesBOC.TYPE_003_LIT_STRING:
+         case TYPE_003_LIT_STRING:
             return "String";
-         case IBOTypesBOC.TYPE_004_:
+         case TYPE_004_:
             return "_";
-         case IBOTypesBOC.TYPE_005_:
+         case TYPE_005_:
             return "_";
-         case IBOTypesBOC.TYPE_006_LIT_NAME:
+         case TYPE_006_LIT_NAME:
             return "Name";
-         case IBOTypesBOC.TYPE_007_LIT_ARRAY_INT:
+         case TYPE_007_LIT_ARRAY_INT:
             return "ArrayInt";
-         case IBOTypesBOC.TYPE_008_LIT_ARRAY_STRING:
+         case TYPE_008_LIT_ARRAY_STRING:
             return "ArrayString";
-         case IBOTypesBOC.TYPE_009_LIT_ARRAY_INT_DOUBLE:
+         case TYPE_009_LIT_ARRAY_INT_DOUBLE:
             return "ArrayIntDouble";
-         case IBOTypesBOC.TYPE_010_POINTER:
+         case TYPE_010_POINTER:
             return "Pointer";
-         case IBOTypesBOC.TYPE_011_MERGE_MASK:
+         case TYPE_011_MERGE_MASK:
             return "MergeMask";
-         case IBOTypesBOC.TYPE_012_MODULE_SETTINGS:
+         case TYPE_012_MODULE_SETTINGS:
             return "ModuleSetting";
-         case IBOTypesBOC.TYPE_013_TEMPLATE:
+         case TYPE_013_TEMPLATE:
             return "Template";
-         case IBOTypesBOC.TYPE_021_FUNCTION:
+         case TYPE_021_FUNCTION:
             return "Function";
-         case IBOTypesBOC.TYPE_022_ACCEPTOR:
+         case TYPE_022_ACCEPTOR:
             return "Acceptor";
-         case IBOTypesBOC.TYPE_036_BYTE_CONTROLLER:
+         case TYPE_036_BYTE_CONTROLLER:
             return "ByteController";
-         case IBOTypesBOC.TYPE_025_ACTION:
+         case TYPE_025_ACTION:
             return "Action";
-         case IBOTypesBOC.TYPE_026_INDEX:
+         case TYPE_026_INDEX:
             return "Index";
-         case IBOTypesBOC.TYPE_027_CONFIG:
+         case TYPE_027_CONFIG:
             return "Config";
-         case IBOTypesBOC.TYPE_033_TUPLE:
+         case TYPE_033_TUPLE:
             return "Array";
          default:
             return null;

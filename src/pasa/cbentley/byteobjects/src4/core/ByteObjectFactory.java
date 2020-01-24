@@ -116,6 +116,62 @@ public class ByteObjectFactory extends BOAbstractFactory implements ITechByteObj
       return createByteObjectFromWrapIto(bc, its);
    }
 
+   public ByteObject createByteObjectFromWrapIto(BADataIS bc, IntToObjects its) {
+      ByteObject bo = new ByteObject(boc, bc.getArray(), bc.getPosition());
+      int type = bo.getType();
+      if (type == IBOTypesBOC.TYPE_015_REFERENCE_32) {
+         int reference = bo.get4(ITechByteObject.A_OBJECT_OFFSET_2_REFERENCE4);
+         if (reference == -1) {
+            bc.skipBytes(5);
+            return null;
+         }
+         if (reference >= 0 && reference < its.objects.length) {
+            bo = (ByteObject) its.objects[reference];
+            if (bo == null) {
+               throw new NullPointerException("Null Reference " + reference + " when unwrapping");
+            } else {
+               //SystemLog
+            }
+         } else {
+            throw new IllegalArgumentException("Wrong Reference " + reference);
+         }
+         bc.skipBytes(5);
+         return bo;
+      } else {
+         //returns 
+         int length = bo.getLength();
+         //flag object as unwrapped- so next time it is toByteArray, just return the byte array
+         //verify data not corrupted
+         if (length == 0xFFFF) {
+            //we have a ByteObjectManaged.
+            bo = new ByteObjectManaged(boc, bc.getArray(), bc.getPosition());
+            length = bo.getLength();
+         }
+         if (length > bc.getArray().length) {
+            throw new ArrayIndexOutOfBoundsException("Length read in header " + bo.getLength() + " >= " + bc.getArray().length + " bigger than BytesCounter array's length");
+         }
+         its.add(bo, 0); //add the reference for the newly created ByteObject.
+         bc.skipBytes(bo.getLength()); //add the reading
+         int magicByte = bo.getSerializedMagicByte();
+         if (magicByte != -1) {
+            //we have sub parameters.
+            if (magicByte != ITechByteObject.MAGIC_BYTE_DEF) {
+               throw new IllegalArgumentException("ByteObject is malformed. Wrong MagicByte");
+            }
+            //last 2 bytes are used to code for the number of parameters.
+            int numSub = bo.getSerializedNumParam();
+            //adds the length of the ByteObject
+            if (numSub != 0) {
+               bo.param = new ByteObject[numSub];
+               for (int i = 0; i < numSub; i++) {
+                  bo.param[i] = createByteObjectFromWrapIto(bc, its);
+               }
+            }
+         }
+         return bo;
+      }
+   }
+
    public ByteObject createByteObjectFromWrapIto(BytesIterator bc, IntToObjects its) {
       ByteObject bo = new ByteObject(boc, bc.getArray(), bc.getPosition());
       int type = bo.getType();

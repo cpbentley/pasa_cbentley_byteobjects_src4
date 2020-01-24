@@ -4,6 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.tech.ITechAcceptor;
 import pasa.cbentley.byteobjects.src4.tech.ITechOperator;
+import pasa.cbentley.core.src4.structs.IntToStrings;
 import pasa.cbentley.core.src4.utils.DateUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 
@@ -90,6 +91,74 @@ public class AcceptorOperator extends BOAbstractOperator implements ITechOperato
       return false;
    }
 
+   private IntToStrings its;
+
+   public IntToStrings getOperators() {
+      if (its == null) {
+         its = new IntToStrings(boc.getUCtx(), 11);
+         int i = 0;
+         its.ints[i] = OP_ARI_1_PLUS;
+         its.strings[i++] = "+";
+         its.ints[i] = OP_ARI_2_MINUS;
+         its.strings[i++] = "-";
+         its.ints[i] = OP_ARI_3_MUL;
+         its.strings[i++] = "*";
+         its.ints[i] = OP_ARI_4_DIV;
+         its.strings[i++] = "/";
+         its.ints[i] = OP_DATE_DAY;
+         its.strings[i++] = "Day";
+         its.ints[i] = OP_DATE_LAST;
+         its.strings[i++] = "Last";
+         its.ints[i] = OP_DATE_MONTH;
+         its.strings[i++] = "Month";
+         its.ints[i] = OP_DATE_WEEK;
+         its.strings[i++] = "Week";
+         its.ints[i] = OP_DATE_YEAR;
+         its.strings[i++] = "Year";
+         its.ints[i] = OP_DOES_NOT_EXIST;
+         its.strings[i++] = "NOT";
+         its.ints[i] = OP_COMP_0_EQUAL;
+         its.strings[i++] = "=";
+         its.ints[i] = OP_COMP_2_BIGGER;
+         its.strings[i++] = ">";
+         its.ints[i] = OP_COMP_1_SMALLER;
+         its.strings[i++] = "<";
+         its.ints[i] = OP_COMP_3_DIFFERENT;
+         its.strings[i++] = "!=";
+      }
+      return its;
+   }
+
+   /**
+    * 
+    * @param c
+    * @return
+    */
+   public int getOp(char c) {
+      switch (c) {
+         case '=':
+            return OP_COMP_0_EQUAL;
+         case '>':
+            return OP_COMP_2_BIGGER;
+         case '<':
+            return OP_COMP_1_SMALLER;
+         case 'W':
+            return OP_DATE_WEEK;
+         case 'D':
+            return OP_DATE_DAY;
+         case 'M':
+            return OP_DATE_MONTH;
+         case 'Y':
+            return OP_DATE_YEAR;
+         case 'L':
+            return OP_DATE_LAST;
+         case 'C':
+            return OP_INT_ARRAY_CONTAINS;
+      }
+      System.out.println("BIP:546 Could not find Operator for character=" + c);
+      return OP_COMP_0_EQUAL;
+   }
+
    public boolean checkString(String str, int operator, String operand) {
       switch (operator) {
          case OP_DOES_NOT_EXIST:
@@ -104,7 +173,8 @@ public class AcceptorOperator extends BOAbstractOperator implements ITechOperato
             }
          }
          default:
-            //UiLink.bip(357, operator + " not a string operator");
+            //#debug
+            toDLog().pNull(operator + " not a string operator", this, AcceptorOperator.class, "checkString", LVL_05_FINE, true);
       }
       return false;
    }

@@ -1,6 +1,7 @@
 package pasa.cbentley.byteobjects.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteController;
+import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.ctx.IFlagsToString;
 
 public interface IFlagsToStringBO extends IFlagsToString {
@@ -13,6 +14,9 @@ public interface IFlagsToStringBO extends IFlagsToString {
     */
    public static final int TOSTRING_FLAG_1_SERIALIZE        = 1 << 0;
 
+   /**
+    * Set to true to not ToString {@link ByteObject} param field
+    */
    public static final int TOSTRING_FLAG_2_IGNORE_PARAMS    = 1 << 1;
 
    /**

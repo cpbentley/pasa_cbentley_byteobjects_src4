@@ -149,6 +149,12 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
       return p;
    }
 
+   public Function createFunction(int[] values, boolean asc) {
+      int op = asc ? ITechFunction.FUN_COUNTER_OP_0_ASC : ITechFunction.FUN_COUNTER_OP_1_DESC;
+      Function f = createFunValues(values, op);
+      return f;
+   }
+
    /**
     * y=Ax+C function. At each function call
     * <br>
@@ -292,7 +298,6 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
       return p;
    }
 
-
    //#mdebug
    public String toString() {
       return Dctx.toString(this);
@@ -309,7 +314,6 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, "FunctionC");
    }
-
 
    public String toStringCounterOp(int type) {
       switch (type) {

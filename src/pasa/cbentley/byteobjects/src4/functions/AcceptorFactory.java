@@ -61,7 +61,7 @@ public class AcceptorFactory extends BOAbstractFactory implements ITechFunction,
             String str = boc.getLitteralStringOperator().getLitteralString(strOperand);
             acceptor.setStrOperand(str);
             break;
-         case ACC_TYPE_5_EXPRESSION:
+         case ACC_TYPE_7_EXPRESSION:
             //
             ByteObject accLeft = acc.getSubOrder(IBOTypesBOC.TYPE_022_ACCEPTOR, 0);
             ByteObject accRight = acc.getSubOrder(IBOTypesBOC.TYPE_022_ACCEPTOR, 1);
@@ -150,7 +150,7 @@ public class AcceptorFactory extends BOAbstractFactory implements ITechFunction,
       ByteObject p = createAcceptorEmpty();
       p.setFlag(ACC_OFFSET_01_FLAG, ACC_FLAG_1_ACCEPT, isAcceptor);
       p.setValue(ACC_OFFSET_02_OPERATOR1, op, 1);
-      p.setValue(ACC_OFFSET_03_TYPE1, ACC_TYPE_5_EXPRESSION, 1);
+      p.setValue(ACC_OFFSET_03_TYPE1, ACC_TYPE_7_EXPRESSION, 1);
       p.addByteObject(new ByteObject[] { accLeft, accRight });
       return p;
    }

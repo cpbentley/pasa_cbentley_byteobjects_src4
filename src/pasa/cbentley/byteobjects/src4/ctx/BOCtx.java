@@ -1,7 +1,7 @@
 package pasa.cbentley.byteobjects.src4.ctx;
 
-import pasa.cbentley.byteobjects.src4.core.BOAbstractModule;
-import pasa.cbentley.byteobjects.src4.core.BOByteObjectModule;
+import pasa.cbentley.byteobjects.src4.core.BOModuleAbstract;
+import pasa.cbentley.byteobjects.src4.core.BOModuleCore;
 import pasa.cbentley.byteobjects.src4.core.BOModulesManager;
 import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteControllerFactory;
@@ -11,7 +11,7 @@ import pasa.cbentley.byteobjects.src4.core.ByteObjectManagedFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectRef;
 import pasa.cbentley.byteobjects.src4.core.LitteralManager;
 import pasa.cbentley.byteobjects.src4.core.LockManager;
-import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactory;
+import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactoryBO;
 import pasa.cbentley.byteobjects.src4.extra.PointerFactory;
 import pasa.cbentley.byteobjects.src4.extra.PointerOperator;
 import pasa.cbentley.byteobjects.src4.functions.AcceptorFactory;
@@ -30,10 +30,10 @@ import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.event.EventBusArray;
+import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
  * Implementation of objects which are array of bytes.
@@ -58,7 +58,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, IDebugIDsBOC {
+public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, IDebugIDsBOC, IEventsBO {
 
    //what about sub classing? isA relationship.. subclass must keep the same ID
    public static final int   BOCTX_ID = 2;
@@ -95,13 +95,13 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
    /**
     * Know specifics about {@link ByteObject}
     */
-   private BOAbstractModule  module;
+   private BOModuleAbstract  module;
 
    private BOModulesManager  moduleManager;
 
    private ByteObjectFactory byteObjectC;
 
-   private MergeMaskFactory  mergeMask;
+   private MergeMaskFactoryBO  mergeMask;
 
    private ActionOperator    action;
 
@@ -117,6 +117,7 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
 
    public BOCtx(UCtx uc) {
       super(uc);
+      moduleManager = new BOModulesManager(this);
       lockManager = new LockManager(this);
       boU = new ByteObjectUtilz(this);
       litteral = new LitteralManager(this);
@@ -124,15 +125,15 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       pointerFactory = new PointerFactory(this);
       functionC = new FunctionFactory(this);
       acceptorC = new AcceptorFactory(this);
-      moduleManager = new BOModulesManager(this);
-      module = new BOByteObjectModule(this);
-      moduleManager.addModule(module); //don't forget to link module
+
+      module = new BOModuleCore(this);
+      
       acceptorStatic = new AcceptorOperator(this);
       byteObjectC = new ByteObjectFactory(this);
-      mergeMask = new MergeMaskFactory(this);
+      mergeMask = new MergeMaskFactoryBO(this);
    }
 
-   public MergeMaskFactory getMergeMaskFactory() {
+   public MergeMaskFactoryBO getMergeMaskFactory() {
       return mergeMask;
    }
 
@@ -179,6 +180,21 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
 
    private ActionFactory          actionFactory;
 
+   private EventBusArray eventBus;
+
+   public IEventBus getEventBus() {
+      if (eventBus == null) {
+         eventBus = new EventBusArray(uc, this, getEventBaseTopology());
+      }
+      return eventBus;
+   }
+   
+   public int[] getEventBaseTopology() {
+      int[] events = new int[IEventsBO.BASE_EVENTS];
+      events[IEventsBO.PID_0_ANY] = PID_0_ANY_X_NUM;
+      events[IEventsBO.PID_1_CTX] = PID_1_CTX_X_NUM;
+      return events;
+   }
    /**
     * 
     * @param p
@@ -205,11 +221,11 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
    }
 
    /**
-    * The {@link BOAbstractModule} handling definitions of {@link ByteObject} with {@link BOCtx} 
+    * The {@link BOModuleAbstract} handling definitions of {@link ByteObject} with {@link BOCtx} 
     * as root context in the pasa.cbentley.byteobjects module
     * @return
     */
-   public BOAbstractModule getModule() {
+   public BOModuleAbstract getModule() {
       return module;
    }
 

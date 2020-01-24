@@ -132,7 +132,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * <br>
     * When null, the {@link ByteObject} has not been loaded from the raw array
     * How to load it?
-    * {@link ByteObject#unwrapByteObject(BOAbstractModule, byte[], int)}
+    * {@link ByteObject#unwrapByteObject(BOModuleAbstract, byte[], int)}
     * <br>
     * Nulls are permitted inside though.
     * <br>
@@ -189,9 +189,9 @@ public class ByteObject implements ITechByteObject, IStringable {
     * <br>
     * This constructor MUST NOT be used for serialized data. {@link ByteObject#createByteObjectFromWrap(byte[], int)} must be used instead.
     * <br>
-    * The {@link BOAbstractModule} is used for reflection on data fields.
+    * The {@link BOModuleAbstract} is used for reflection on data fields.
     * <br>
-    * @param boc the never null {@link BOAbstractModule} identifying the code base to which this {@link ByteObject} belongs.
+    * @param boc the never null {@link BOModuleAbstract} identifying the code base to which this {@link ByteObject} belongs.
     * @param data
     * @param index
     */
@@ -1982,7 +1982,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Serialize object to {@link OutputStream} using the reference store.
+    * Serialize object to {@link BADataOS} using the reference store.
     * If Object has already been written, it is not written anymore.
     * 
     * Write object, check

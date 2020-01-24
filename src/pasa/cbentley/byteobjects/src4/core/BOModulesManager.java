@@ -10,6 +10,7 @@ import pasa.cbentley.byteobjects.src4.sources.RootSource;
 import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.io.BADataIS;
+import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -17,7 +18,7 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ShortUtils;
 
 /**
- * Manages the registration of {@link BOAbstractModule}s.
+ * Manages the registration of {@link BOModuleAbstract}s.
  * <br>
  * The default manager is provided by the {@link BOCtx#getBOModuleManager()}
  * <br>
@@ -50,7 +51,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * But it also allows the merging of types. So moduling loading is EXTREMELY important.
     * 
     */
-   private BOAbstractModule[] modules = new BOAbstractModule[0];
+   private BOModuleAbstract[] modules = new BOModuleAbstract[0];
 
    protected RootSource       rootSource;
 
@@ -92,7 +93,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * @param idslots the number of integer ids requested
     * @throw {@link RuntimeException} if a module is already registerd
     */
-   public void addModule(BOAbstractModule module) {
+   public void addModule(BOModuleAbstract module) {
       if (hasModuleClass(module)) {
          throw new RuntimeException();
       }
@@ -135,8 +136,6 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return null;
    }
 
-
-
    /**
     * interface ID collision?
     */
@@ -167,7 +166,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    }
 
    /**
-    * Asks all {@link BOAbstractModule} to handle flag ordered ByteObject search.
+    * Asks all {@link BOModuleAbstract} to handle flag ordered ByteObject search.
     * @param bo
     * @param offset
     * @param flag
@@ -206,7 +205,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return fac;
    }
 
-   public BOAbstractModule getMod(Class cl) {
+   public BOModuleAbstract getMod(Class cl) {
       for (int i = 0; i < modules.length; i++) {
          if (modules[i].getClass() == cl) {
             return modules[i];
@@ -220,7 +219,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * @param cl
     * @return
     */
-   public BOAbstractModule getModule(Class cl) {
+   public BOModuleAbstract getModule(Class cl) {
       for (int i = 0; i < modules.length; i++) {
          if (modules[i].getClass() == cl) {
             return modules[i];
@@ -237,7 +236,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return rootSource;
    }
 
-   public boolean hasModuleClass(BOAbstractModule module) {
+   public boolean hasModuleClass(BOModuleAbstract module) {
       for (int i = 0; i < modules.length; i++) {
          if (modules[i].getClass() == module.getClass()) {
             return true;
@@ -255,9 +254,9 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * @param ad
     * @return
     */
-   public BOAbstractModule[] increaseCapacity(BOAbstractModule[] ps, int ad) {
-      BOAbstractModule[] old = ps;
-      ps = new BOAbstractModule[old.length + ad];
+   public BOModuleAbstract[] increaseCapacity(BOModuleAbstract[] ps, int ad) {
+      BOModuleAbstract[] old = ps;
+      ps = new BOModuleAbstract[old.length + ad];
       for (int i = 0; i < old.length; i++) {
          ps[i] = old[i];
       }
@@ -296,7 +295,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * Returns null, when flagHeader is zero.
     * <br>
     * <br>
-    * 
+    * Reads a {@link ByteObject} that was written with {@link ByteObject#serialize(BADataOS)}
     * @param dis
     * @return
     */
@@ -363,7 +362,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * Create sub byte objects if there are some flagged.
     * @param data
     */
-   public ByteObject toByteObject(BOAbstractModule mod, byte[] array) {
+   public ByteObject toByteObject(BOModuleAbstract mod, byte[] array) {
       //check consistency concerning type and length
       if (array[A_OBJECT_OFFSET_1_TYPE1] == IBOTypesBOC.TYPE_013_TEMPLATE) {
          int len = ShortUtils.readShortBEUnsigned(array, A_OBJECT_OFFSET_3_LENGTH2);
@@ -373,7 +372,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       }
       return null;
    }
-   
+
    //#mdebug
    public IDLog toDLog() {
       return boc.toDLog();
@@ -423,6 +422,16 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       dc.root1Line(this, "BOModule");
    }
 
+   public String getIDString(int did, int value) {
+      for (int i = 0; i < modules.length; i++) {
+         String idString = modules[i].getIDString(did, value);
+         if (idString != null) {
+            return idString;
+         }
+      }
+      return null;
+   }
+
    public void toString1Line(Dctx dc, ByteObject bo) {
       for (int i = 0; i < modules.length; i++) {
          boolean isDone = modules[i].toString1Line(dc, bo);
@@ -432,7 +441,10 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       }
       //throw an exception if modules are not loaded
       int type = bo.getType();
-      throw new RuntimeException("Module " + type + " not found or implemented for toString1Line");
+
+      //#debug
+      toDLog().pNull("", this, BOModulesManager.class, "toString1Line", LVL_10_SEVERE, false);
+      throw new RuntimeException("toString1Line ByteObject type " + type + " -> Module not found or implemented");
    }
 
    /**

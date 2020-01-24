@@ -1,6 +1,6 @@
 package pasa.cbentley.byteobjects.src4.utils;
 
-import pasa.cbentley.byteobjects.src4.core.BOAbstractModule;
+import pasa.cbentley.byteobjects.src4.core.BOModuleAbstract;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
@@ -114,9 +114,9 @@ public class ByteObjectUtilz implements ITechByteObject {
     * @param ad
     * @return
     */
-   public BOAbstractModule[] increaseCapacity(BOAbstractModule[] ps, int ad) {
-      BOAbstractModule[] old = ps;
-      ps = new BOAbstractModule[old.length + ad];
+   public BOModuleAbstract[] increaseCapacity(BOModuleAbstract[] ps, int ad) {
+      BOModuleAbstract[] old = ps;
+      ps = new BOModuleAbstract[old.length + ad];
       for (int i = 0; i < old.length; i++) {
          ps[i] = old[i];
       }

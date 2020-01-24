@@ -3,6 +3,7 @@ package pasa.cbentley.byteobjects.src4.core;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -31,6 +32,11 @@ public class BOAbstractOperator implements IStringable {
       toStringPrivate(dc);
    }
 
+   
+   public IDLog toDLog() {
+      return boc.toDLog();
+   }
+   
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }

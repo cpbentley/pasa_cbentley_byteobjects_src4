@@ -12,6 +12,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
  * ByteObject class definition that defines which values of a ByteObject should be merged
+ * 
  * in merge operation with using {@link BOModulesManager#mergeByteObject(ByteObject, ByteObject)}
  * <br>
  * This allows to define a {@link ByteObject} with a merge mask. It is used as a style template.
@@ -21,10 +22,10 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class MergeMaskFactory extends BOAbstractFactory implements ITechMergeMask {
+public class MergeMaskFactoryBO extends BOAbstractFactory implements ITechMergeMask {
 
 
-   public MergeMaskFactory(BOCtx boc) {
+   public MergeMaskFactoryBO(BOCtx boc) {
       super(boc);
    }
 

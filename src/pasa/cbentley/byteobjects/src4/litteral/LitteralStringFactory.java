@@ -10,11 +10,10 @@ import pasa.cbentley.core.src4.utils.StringUtils;
 
 public class LitteralStringFactory extends BOAbstractFactory implements ITechLitteral {
 
-
    public LitteralStringFactory(BOCtx boc) {
-     super(boc);
+      super(boc);
    }
-   
+
    /**
     * 
     * @param str
@@ -22,6 +21,23 @@ public class LitteralStringFactory extends BOAbstractFactory implements ITechLit
     */
    public ByteObject getLitteralString(String str) {
       return getLitteralString(str.toCharArray(), 0, str.length());
+   }
+
+   /**
+    * Create a ByteObject representing an array of Strings.
+    * @param mod
+    * @param ar
+    * @return
+    */
+   public ByteObject getLitteralArrayString(String[] ar) {
+      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_008_LIT_ARRAY_STRING, LITTERAL_ARRAY_BASIC_SIZE);
+      ByteObject[] strings = new ByteObject[ar.length];
+      for (int i = 0; i < ar.length; i++) {
+         strings[i] = getLitteralString(ar[i]);
+      }
+      p.setByteObjects(strings);
+      //TODO fix
+      return p;
    }
 
    public ByteObject getLitteralString(char[] c, int offset, int len) {

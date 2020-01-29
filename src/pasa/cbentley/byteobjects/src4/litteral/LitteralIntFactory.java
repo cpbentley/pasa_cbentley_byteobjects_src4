@@ -26,6 +26,10 @@ public class LitteralIntFactory extends BOAbstractFactory implements ITechLitter
       return p;
    }
 
+   public ByteObject getLitteralInt(int value) {
+      return getIntBO(value);
+   }
+   
    public ByteObject getLitteralArray(int[] ar, int offset, int len) {
       int max = BitUtils.getMaxByteSize(ar);
       int size = ITechLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * len);
@@ -99,6 +103,8 @@ public class LitteralIntFactory extends BOAbstractFactory implements ITechLitter
       dc.append("LitteralArray");
       boc.getUCtx().getIU().toStringIntArray(dc, ar);      
    }
+
+ 
 
    //#enddebug
    

@@ -6,6 +6,7 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.tech.ITechPointer;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
@@ -186,7 +187,7 @@ public class PointerOperator extends BOAbstractOperator implements ITechPointer 
       return boc.getUCtx();
    }
 
-   public void toStringPointer(ByteObject pointer, StringBuilder sb, String nl) {
+   public void toStringPointer(ByteObject pointer, StringBBuilder sb, String nl) {
       sb.append("#Pointer ");
       sb.append(" Offset = " + pointer.get1(POINTER_OFFSET_02_OFFSET2));
       if (pointer.hasFlag(POINTER_OFFSET_01_FLAG, POINTER_FLAG_1_FLAG)) {

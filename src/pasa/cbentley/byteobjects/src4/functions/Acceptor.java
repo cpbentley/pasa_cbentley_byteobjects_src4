@@ -1,15 +1,11 @@
 package pasa.cbentley.byteobjects.src4.functions;
 
-import javax.swing.text.StyleConstants.ColorConstants;
-
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.tech.ITechAcceptor;
 import pasa.cbentley.byteobjects.src4.tech.ITechPointer;
 import pasa.cbentley.core.src4.ctx.UCtx;
-
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.utils.DateUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 
 /**

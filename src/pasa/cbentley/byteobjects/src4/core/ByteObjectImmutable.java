@@ -10,6 +10,7 @@ import pasa.cbentley.byteobjects.src4.utils.ByteObjectUtilz;
 import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
 import pasa.cbentley.core.src4.ctx.IFlagsToString;
 import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -769,7 +770,7 @@ public class ByteObjectImmutable extends ByteObject implements ITechByteObject, 
     * VAL1 VAL2-PARAM.LENGTH-VAL3
     */
    public String getMyHashCode() {
-      StringBuilder sb = new StringBuilder(10);
+      StringBBuilder sb = new StringBBuilder(boc.getUCtx(), 10);
       sb.append("[#code=");
       int val1 = 0;
       for (int i = 0; i < A_OBJECT_BASIC_SIZE; i++) {

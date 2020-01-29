@@ -731,10 +731,6 @@ public class Function implements ITechFunction, IStringable {
       }
    }
 
-   public void toString(StringBuilder sb, String nnl) {
-      sb.append(this.toString());
-   }
-
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }

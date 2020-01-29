@@ -3,7 +3,6 @@ package pasa.cbentley.byteobjects.src4.functions;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**

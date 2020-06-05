@@ -3,9 +3,9 @@ package pasa.cbentley.byteobjects.src4.litteral;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.tech.ITechLitteral;
+import pasa.cbentley.byteobjects.src4.tech.ITechByteLitteral;
 
-public class LitteralIntOperator extends BOAbstractOperator implements ITechLitteral {
+public class LitteralIntOperator extends BOAbstractOperator implements ITechByteLitteral {
 
 
    public LitteralIntOperator(BOCtx boc) {

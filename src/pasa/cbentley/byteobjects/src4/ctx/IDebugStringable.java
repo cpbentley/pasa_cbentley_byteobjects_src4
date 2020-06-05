@@ -32,6 +32,8 @@ public interface IDebugStringable {
     * @return
     */
    public String getIDString(int did, int value);
+   
+   public void setDynamicDIDData(int did, String[] strings);
 
    //#enddebug
 

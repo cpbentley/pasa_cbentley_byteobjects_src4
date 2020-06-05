@@ -3,7 +3,7 @@ package pasa.cbentley.byteobjects.src4.litteral;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.tech.ITechLitteral;
+import pasa.cbentley.byteobjects.src4.tech.ITechByteLitteral;
 
 /**
  * No plain object since we have String
@@ -11,7 +11,7 @@ import pasa.cbentley.byteobjects.src4.tech.ITechLitteral;
  * @author Charles Bentley
  *
  */
-public class LitteralStringOperator extends BOAbstractOperator implements ITechLitteral {
+public class LitteralStringOperator extends BOAbstractOperator implements ITechByteLitteral {
 
    public LitteralStringOperator(BOCtx boc) {
       super(boc);
@@ -35,7 +35,7 @@ public class LitteralStringOperator extends BOAbstractOperator implements ITechL
    }
 
    public int[] getLitteralArray(ByteObject bo) {
-      return bo.getValues(ITechLitteral.LITTERAL_OFFSET_ARRAY);
+      return bo.getValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY);
    }
 
 }

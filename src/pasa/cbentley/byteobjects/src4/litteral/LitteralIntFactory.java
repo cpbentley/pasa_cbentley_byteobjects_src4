@@ -4,7 +4,7 @@ import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.tech.ITechLitteral;
+import pasa.cbentley.byteobjects.src4.tech.ITechByteLitteral;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -14,15 +14,15 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class LitteralIntFactory extends BOAbstractFactory implements ITechLitteral {
+public class LitteralIntFactory extends BOAbstractFactory implements ITechByteLitteral {
 
    public LitteralIntFactory(BOCtx boc) {
       super(boc);
    }
 
    public ByteObject getIntBO(int value) {
-      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_002_LIT_INT, ITechLitteral.LITTERAL_INT_SIZE);
-      p.setValue(ITechLitteral.LITTERAL_HEADER_SIZE, value, 4);
+      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_002_LIT_INT, ITechByteLitteral.LITTERAL_INT_SIZE);
+      p.setValue(ITechByteLitteral.LITTERAL_HEADER_SIZE, value, 4);
       return p;
    }
 
@@ -32,9 +32,9 @@ public class LitteralIntFactory extends BOAbstractFactory implements ITechLitter
    
    public ByteObject getLitteralArray(int[] ar, int offset, int len) {
       int max = BitUtils.getMaxByteSize(ar);
-      int size = ITechLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * len);
+      int size = ITechByteLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * len);
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_007_LIT_ARRAY_INT, size);
-      p.setDynOverWriteValues(ITechLitteral.LITTERAL_OFFSET_ARRAY, ar, offset, len, max);
+      p.setDynOverWriteValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY, ar, offset, len, max);
       return p;
    }
 
@@ -62,9 +62,9 @@ public class LitteralIntFactory extends BOAbstractFactory implements ITechLitter
     */
    public ByteObject getIntArrayBO(int[] ar) {
       int max = BitUtils.getMaxByteSize(ar);
-      int size = ITechLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * ar.length);
+      int size = ITechByteLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * ar.length);
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_007_LIT_ARRAY_INT, size);
-      p.setDynOverWriteValues(ITechLitteral.LITTERAL_OFFSET_ARRAY, ar, max);
+      p.setDynOverWriteValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY, ar, max);
       return p;
    }
    

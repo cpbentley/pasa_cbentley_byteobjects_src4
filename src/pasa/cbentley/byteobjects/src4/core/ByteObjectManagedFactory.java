@@ -101,7 +101,7 @@ public class ByteObjectManagedFactory extends BOAbstractFactory implements ITech
       byte[] data = new byte[headerSize];
       ByteObjectManaged bo = new ByteObjectManaged(boc, data);
       bo.set1(A_OBJECT_OFFSET_1_TYPE1, IBOTypesBOC.TYPE_035_OBJECT_MANAGED);
-      bo.setValueNoVersion(A_OBJECT_OFFSET_3_LENGTH2, 0xFFFF, 2);
+      bo.setValueNoVersion(A_OBJECT_OFFSET_3_LENGTH2, A_OBJECT_LENGTH_OVERRIDE, 2);
       bo.set2(AGENT_OFFSET_05_CLASS_ID2, classid);
       bo.set2(AGENT_OFFSET_04_INTERFACE_ID2, intid);
       //this tech is always the same
@@ -116,7 +116,7 @@ public class ByteObjectManagedFactory extends BOAbstractFactory implements ITech
       byte[] data = new byte[headerSize];
       ByteObjectManaged bo = new ByteObjectManaged(boc, data);
       bo.set1(A_OBJECT_OFFSET_1_TYPE1, IBOTypesBOC.TYPE_035_OBJECT_MANAGED);
-      bo.setValueNoVersion(A_OBJECT_OFFSET_3_LENGTH2, 0xFFFF, 2);
+      bo.setValueNoVersion(A_OBJECT_OFFSET_3_LENGTH2, A_OBJECT_LENGTH_OVERRIDE, 2);
       bo.set2(AGENT_OFFSET_05_CLASS_ID2, classid);
       bo.setDynBOParamValues(AGENT_OFFSET_04_INTERFACE_ID2, intids);
       //this tech is always the same
@@ -144,7 +144,7 @@ public class ByteObjectManagedFactory extends BOAbstractFactory implements ITech
    public void toStringHeader(Dctx dc, ByteObjectManaged tech) {
       toStringHeaderAlone(dc, tech);
       dc.nl();
-      tech.toStringBackUp(dc.nLevel());
+      tech.toStringBackUp(dc.newLevel());
    }
 
    public void toStringHeaderAlone(Dctx sb, ByteObjectManaged tech) {

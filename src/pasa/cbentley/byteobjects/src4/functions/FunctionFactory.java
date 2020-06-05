@@ -36,6 +36,17 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
    }
 
    /**
+    * Wraps the {@link Function} in a {@link ByteObject}.
+    * {@link Function} is stored in Factory data structure
+    * @param f
+    * @return
+    */
+   public ByteObject getFunction(Function f) {
+      int id = addFunction(f);
+      return getFunction(id);
+   }
+
+   /**
     * 
     * @param my
     * @return

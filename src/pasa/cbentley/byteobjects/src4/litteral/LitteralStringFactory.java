@@ -4,11 +4,11 @@ import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.tech.ITechLitteral;
+import pasa.cbentley.byteobjects.src4.tech.ITechByteLitteral;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.StringUtils;
 
-public class LitteralStringFactory extends BOAbstractFactory implements ITechLitteral {
+public class LitteralStringFactory extends BOAbstractFactory implements ITechByteLitteral {
 
    public LitteralStringFactory(BOCtx boc) {
       super(boc);

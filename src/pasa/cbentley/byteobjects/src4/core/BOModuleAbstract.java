@@ -3,7 +3,7 @@ package pasa.cbentley.byteobjects.src4.core;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.IDebugStringable;
-import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactoryBO;
+import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactory;
 import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
 import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.core.src4.ctx.ICtx;
@@ -30,6 +30,9 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * </p>
  * <br>
  * <br>
+ * Template for all modules wanting to plug into the debug architecture of {@link ByteObject}s.
+ * <br>
+ * <br>
  * 
  * All users Implements the module {@link IStaticObjCtrl}
  * Provides "instance" method for generic {@link ByteObject}.
@@ -41,6 +44,7 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * <li>
  * @author Charles Bentley
  *
+ * BOEngine, BOInterpreter, 
  */
 public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringable, IStringable {
 
@@ -52,11 +56,11 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
 
    /**
     * 
-    * @param dd
+    * @param boc
     * @param root is null.. then this BOModule is its own root
     */
-   public BOModuleAbstract(BOCtx dd) {
-      this.boc = dd;
+   public BOModuleAbstract(BOCtx boc) {
+      this.boc = boc;
       boc.getBOModuleManager().addModule(this);
    }
 
@@ -66,11 +70,21 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
 
    public abstract ByteObject getFlagOrdered(ByteObject bo, int offset, int flag);
 
+   public void setDynamicDIDData(int did, String[] strings) {
+      boc.getBOModuleManager().setDynamicDIDData(did, strings);
+   }
+
+   ByteObject mergeNoCheck(ByteObject root, ByteObject merge) {
+      return merge(root, merge);
+   }
+
    /**
     * Takes root {@link ByteObject} and merge object. Similar to 2 image layers
     * <br>
-    * Usually <code>merge</code> will be incomplete (transparent), {@link ITechByteObject#A_OBJECT_FLAG_1_INCOMPLETE}
-    * which means a {@link MergeMaskFactoryBO} is present.
+    * Usually <code>merge</code> will be incomplete (transparent).
+    * 
+    * That will depends on implementation.
+    * It might means a {@link MergeMaskFactory} is present. or a specific flag is set 
     * <br>
     * When <code>merge</code> is opaque, a carbon copy is returned or
     * 
@@ -78,12 +92,12 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
     * <br>
     * <br>
     * 
-    * This method with {@link MergeMaskFactoryBO} allow {@link ByteObject} to represent CSS styles
+    * This method with {@link MergeMaskFactory} allow {@link ByteObject} to represent CSS styles
     * that are applied in cascade
     * 
-    * @param root
-    * @param merge
-    * @return
+    * @param root not null and of same type
+    * @param merge not null and of same type
+    * @return null if the type is unknown for this {@link BOModuleAbstract}
     */
    public abstract ByteObject merge(ByteObject root, ByteObject merge);
 
@@ -140,21 +154,6 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
    }
 
    /**
-    * Displays a name of the offset field. Reflection on the field.
-    * <br>
-    * @param offset
-    * @return
-    */
-   public abstract String subToStringOffset(ByteObject o, int offset);
-
-   /**
-    * Class outside the framework implement this method
-    * @param type
-    * @return null if not found
-    */
-   public abstract String subToStringType(int type);
-
-   /**
     * Tries to read a ByteObject from byte array
     * <br>
     * Create sub byte objects if there are some flagged.
@@ -182,7 +181,7 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
    public void toString(Dctx dc) {
       dc.root(this, "BOModuleAbstract");
       toStringPrivate(dc);
-      dc.nlLvlNoTitle("IJavaObjectFactory", defFac);
+      dc.nlLvlNullTitle("IJavaObjectFactory", defFac);
    }
 
    private void toStringPrivate(Dctx dc) {
@@ -240,10 +239,10 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
    /**
     * Return a String representation of the data that resides at the position.
     * <br>
-    * 
-    * @param o
+    * Reflection on the field of the byteobject.
+    * <br>
     * @param offset
-    * @return
+    * @return null if none
     */
    public abstract String toStringOffset(ByteObject o, int offset);
 
@@ -253,6 +252,10 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
     * @return null if not known
     */
    public abstract String toStringType(int type);
+
+   public boolean toStringSubType(Dctx dc, ByteObject bo, int subType) {
+      return false;
+   }
 
    //#enddebug
 

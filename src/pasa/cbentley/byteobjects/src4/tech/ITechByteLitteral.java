@@ -1,6 +1,11 @@
 package pasa.cbentley.byteobjects.src4.tech;
 
-public interface ITechLitteral extends ITechByteObject {
+/**
+ * 
+ * @author Charles Bentley
+ *
+ */
+public interface ITechByteLitteral extends ITechByteObject {
 
    /**
     * 4 bytes for header
@@ -23,7 +28,7 @@ public interface ITechLitteral extends ITechByteObject {
    public static final int LITTERAL_HEADER_SIZE      = ITechByteObject.A_OBJECT_BASIC_SIZE;
 
    /**
-    * 4 byte for litteral
+    * 4 byte for litteral.
     */
    public static final int LITTERAL_INT_SIZE         = ITechByteObject.A_OBJECT_BASIC_SIZE + 4;
 

@@ -3,7 +3,7 @@ package pasa.cbentley.byteobjects.src4.core;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
-import pasa.cbentley.byteobjects.src4.tech.ITechLitteral;
+import pasa.cbentley.byteobjects.src4.tech.ITechByteLitteral;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.BitUtils;
@@ -35,12 +35,12 @@ public class LitteralManager implements ITechByteObject {
 
 
    public int getLitteralInt(ByteObject p) {
-      return p.get4(ITechLitteral.LITTERAL_HEADER_SIZE);
+      return p.get4(ITechByteLitteral.LITTERAL_HEADER_SIZE);
    }
 
    public ByteObject getLitteralInt(int value) {
-      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_002_LIT_INT, ITechLitteral.LITTERAL_INT_SIZE);
-      p.setValue(ITechLitteral.LITTERAL_HEADER_SIZE, value, 4);
+      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_002_LIT_INT, ITechByteLitteral.LITTERAL_INT_SIZE);
+      p.setValue(ITechByteLitteral.LITTERAL_HEADER_SIZE, value, 4);
       return p;
    }
 
@@ -59,15 +59,15 @@ public class LitteralManager implements ITechByteObject {
       if (fullZero) {
          maxByteSize = 1;
       }
-      byte[] data = new byte[ITechLitteral.LITTERAL_HEADER_SIZE + 3 + (len * maxByteSize)];
+      byte[] data = new byte[ITechByteLitteral.LITTERAL_HEADER_SIZE + 3 + (len * maxByteSize)];
       ByteObject p = new ByteObject(boc, data);
       p.setValue(A_OBJECT_OFFSET_1_TYPE1, IBOTypesBOC.TYPE_003_LIT_STRING, 1);
-      p.setDynOverWriteChars(ITechLitteral.LITTERAL_HEADER_SIZE, c, offset, len, maxByteSize);
+      p.setDynOverWriteChars(ITechByteLitteral.LITTERAL_HEADER_SIZE, c, offset, len, maxByteSize);
       return p;
    }
 
    public char[] getLitteralChars(ByteObject p) {
-      return p.getNumSizePrefixedChars(ITechLitteral.LITTERAL_HEADER_SIZE);
+      return p.getNumSizePrefixedChars(ITechByteLitteral.LITTERAL_HEADER_SIZE);
    }
 
    public String getLitteralString(ByteObject p) {
@@ -75,9 +75,9 @@ public class LitteralManager implements ITechByteObject {
    }
 
    public ByteObject getLitteralArray(int[][] ar) {
-      int size = ITechLitteral.LITTERAL_HEADER_SIZE + 4;
+      int size = ITechByteLitteral.LITTERAL_HEADER_SIZE + 4;
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_009_LIT_ARRAY_INT_DOUBLE, size);
-      p.setValue(ITechLitteral.LITTERAL_OFFSET, ar.length, 4);
+      p.setValue(ITechByteLitteral.LITTERAL_OFFSET, ar.length, 4);
       ByteObject[] ars = new ByteObject[ar.length];
       for (int i = 0; i < ar.length; i++) {
          ars[i] = getLitteralArray(ar[i]);
@@ -95,17 +95,17 @@ public class LitteralManager implements ITechByteObject {
     */
    public ByteObject getLitteralArray(int[] ar) {
       int max = BitUtils.getMaxByteSize(ar);
-      int size = ITechLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * ar.length);
+      int size = ITechByteLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * ar.length);
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_007_LIT_ARRAY_INT, size);
-      p.setDynOverWriteValues(ITechLitteral.LITTERAL_OFFSET_ARRAY, ar, max);
+      p.setDynOverWriteValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY, ar, max);
       return p;
    }
 
    public ByteObject getLitteralArray(int[] ar, int offset, int len) {
       int max = BitUtils.getMaxByteSize(ar);
-      int size = ITechLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * len);
+      int size = ITechByteLitteral.LITTERAL_ARRAY_BASIC_SIZE + (max * len);
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_007_LIT_ARRAY_INT, size);
-      p.setDynOverWriteValues(ITechLitteral.LITTERAL_OFFSET_ARRAY, ar, offset, len, max);
+      p.setDynOverWriteValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY, ar, offset, len, max);
       return p;
    }
 
@@ -117,13 +117,13 @@ public class LitteralManager implements ITechByteObject {
     */
    public ByteObject getLitteralArrayString(String[] ar) {
       int numChars = 0;
-      int size = ITechLitteral.LITTERAL_ARRAY_BASIC_SIZE + (numChars * ar.length);
+      int size = ITechByteLitteral.LITTERAL_ARRAY_BASIC_SIZE + (numChars * ar.length);
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_007_LIT_ARRAY_INT, size);
       return p;
    }
 
    public int getLitteralArrayLength(ByteObject array) {
-      return array.getDynNumValues(ITechLitteral.LITTERAL_OFFSET_ARRAY);
+      return array.getDynNumValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY);
    }
    
    /**
@@ -133,7 +133,7 @@ public class LitteralManager implements ITechByteObject {
     * @return
     */
    public int getLitteralArrayValueAt(ByteObject array, int index) {
-      return array.getDynNumValueNoCheck(ITechLitteral.LITTERAL_OFFSET_ARRAY, index);
+      return array.getDynNumValueNoCheck(ITechByteLitteral.LITTERAL_OFFSET_ARRAY, index);
    }
    /**
     * 
@@ -146,7 +146,7 @@ public class LitteralManager implements ITechByteObject {
    }
 
    public int[] getLitteralArray(ByteObject bo) {
-      return bo.getValues(ITechLitteral.LITTERAL_OFFSET_ARRAY);
+      return bo.getValues(ITechByteLitteral.LITTERAL_OFFSET_ARRAY);
    }
 
    public String getName(ByteObject name) {

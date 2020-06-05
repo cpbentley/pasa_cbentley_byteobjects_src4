@@ -7,13 +7,15 @@ import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteControllerFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectFactory;
+import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManagedFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectRef;
 import pasa.cbentley.byteobjects.src4.core.LitteralManager;
 import pasa.cbentley.byteobjects.src4.core.LockManager;
-import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactoryBO;
+import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactory;
 import pasa.cbentley.byteobjects.src4.extra.PointerFactory;
 import pasa.cbentley.byteobjects.src4.extra.PointerOperator;
+import pasa.cbentley.byteobjects.src4.factory.FactoryByteObject;
 import pasa.cbentley.byteobjects.src4.functions.AcceptorFactory;
 import pasa.cbentley.byteobjects.src4.functions.AcceptorOperator;
 import pasa.cbentley.byteobjects.src4.functions.ActionFactory;
@@ -28,6 +30,8 @@ import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.byteobjects.src4.utils.ByteObjectUtilz;
 import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
 import pasa.cbentley.core.src4.ctx.ACtx;
+import pasa.cbentley.core.src4.ctx.CtxManager;
+import pasa.cbentley.core.src4.ctx.IConfig;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.EventBusArray;
@@ -37,21 +41,38 @@ import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
  * Implementation of objects which are array of bytes.
+ * <br>
+ * <br>
  * 
  * This is a src4 module. It only depends on {@link UCtx}.
+ * <br>
+ * <br>
  * 
- * Why was it created? This module was originally created in response to a claim that Java could not support
- * Pointers and Memory managed objects. Inded you are free to create such a framework inside the Java framework.
+ * <b>Why was it created?</b> This module was originally created in response to a claim that Java could not support
+ * Pointers and Memory managed objects. Indeed you are free to create such a framework inside the Java framework.
+ * <br>
+ * <br>
  * 
- * <li> To provide faster objects easily mapped in memory
- * <li> To give developer control over memory. If you don't want that. use regular Java objects.
+ * <p>
+ * <b>Pros:</b>
+ * <li> It provides faster objects that are easily mapped in memory
+ * <li> It gives the developer control over memory. If you don't want that. use regular Java objects.
  * <li> Provide pointer access to {@link ByteObject} fields.
+ * <li> Straight forward serialization 
+ * </p>
+ * <p>
+ * <b>Cons:</b>
+ * <li>You lose Java typing.
+ * </p>
  * <br>
- * Module uses experimental conventions.
+ * 
+ * For a discusion on the code context pattern see {@link UCtx}.
  * <br>
- * Most important classes
- * <li> {@link ByteObject} is the main one
- * <li> {@link ByteController}
+ * <br>
+ * 
+ * The most important classes in the {@link BOCtx} code context are
+ * <li> {@link ByteObject}
+ * <li> {@link ByteController} managing {@link ByteObjectManaged}
  * <br>
  * <br>
  * 
@@ -61,7 +82,48 @@ import pasa.cbentley.core.src4.logging.IStringable;
 public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, IDebugIDsBOC, IEventsBO {
 
    //what about sub classing? isA relationship.. subclass must keep the same ID
-   public static final int   BOCTX_ID = 2;
+   public static final int    CTX_ID = 6;
+
+   private AcceptorFactory    acceptorC;
+
+   private AcceptorOperator   acceptorStatic;
+
+   private ActionOperator     actionOp;
+
+   private ActionFactory          actionFactory;
+
+   private ByteObjectUtilz    boU;
+
+   private ByteControllerFactory byteControllerFactory;
+
+   private ByteObjectFactory  byteObjectC;
+
+   private ByteObjectManagedFactory byteObjectManagedFactory;
+
+   private EventBusArray          eventBus;
+
+   private FunctionFactory    functionC;
+
+   private LitteralManager    litteral;
+
+   private LitteralIntFactory     litteralIntFactory;
+
+   private LitteralIntOperator    litteralIntStatic;
+
+   private LitteralStringFactory  litteralStringFactory;
+
+   private LitteralStringOperator litteralStringOperator;
+
+   private LockManager        lockManager;
+
+   private MergeMaskFactory mergeMask;
+
+   /**
+    * Know specifics about {@link ByteObject}
+    */
+   private BOModuleAbstract   module;
+
+   private BOModulesManager   moduleManager;
 
    /**
     * Each module will define its own {@link ByteObject}s in the scope of their {@link BOCtx}. 
@@ -78,42 +140,15 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
     * But it also allows the merging of types. So moduling loading is EXTREMELY important.
     * 
     */
-   public BOCtx[]            modules  = new BOCtx[0];
+   public BOCtx[]             modules  = new BOCtx[0];
 
-   private LockManager       lockManager;
+   private PointerFactory         pointerFactory;
 
-   private ByteObjectUtilz   boU;
+   private PointerOperator    pointerOperator;
 
-   private LitteralManager   litteral;
+   private ByteObjectRef            rootRefs;
 
-   private PointerOperator   pointerOperator;
-
-   private FunctionFactory   functionC;
-
-   private AcceptorFactory   acceptorC;
-
-   /**
-    * Know specifics about {@link ByteObject}
-    */
-   private BOModuleAbstract  module;
-
-   private BOModulesManager  moduleManager;
-
-   private ByteObjectFactory byteObjectC;
-
-   private MergeMaskFactoryBO  mergeMask;
-
-   private ActionOperator    action;
-
-   private AcceptorOperator  acceptorStatic;
-
-   public AcceptorOperator getAcceptorStatic() {
-      return acceptorStatic;
-   }
-
-   public int getCtxID() {
-      return BOCTX_ID;
-   }
+   private ValuesInArrayReader    valueReadCache;
 
    public BOCtx(UCtx uc) {
       super(uc);
@@ -127,74 +162,38 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       acceptorC = new AcceptorFactory(this);
 
       module = new BOModuleCore(this);
-      
+
       acceptorStatic = new AcceptorOperator(this);
       byteObjectC = new ByteObjectFactory(this);
-      mergeMask = new MergeMaskFactoryBO(this);
+      mergeMask = new MergeMaskFactory(this);
    }
 
-   public MergeMaskFactoryBO getMergeMaskFactory() {
-      return mergeMask;
+   public BOCtx(UCtx uc, CtxManager m) {
+      super(uc, m);
    }
 
-   private ByteObjectRef            rootRefs;
+   public AcceptorFactory getAcceptorFactory() {
+      return acceptorC;
+   }
 
-   private ByteObjectManagedFactory byteObjectManagedFactory;
+   public AcceptorOperator getAcceptorStatic() {
+      return acceptorStatic;
+   }
 
-   public ByteObjectManagedFactory getByteObjectManagedFactory() {
-      if (byteObjectManagedFactory == null) {
-         byteObjectManagedFactory = new ByteObjectManagedFactory(this);
+   public ActionOperator getActionOp() {
+      if(actionOp == null) {
+         actionOp = new ActionOperator(this);
       }
-      return byteObjectManagedFactory;
+      return actionOp;
    }
 
-   private ByteControllerFactory byteControllerFactory;
-
-   public ByteControllerFactory getByteControllerFactory() {
-      if (byteControllerFactory == null) {
-         byteControllerFactory = new ByteControllerFactory(this);
+   public ActionFactory getActionFactory() {
+      if (actionFactory == null) {
+         actionFactory = new ActionFactory(this);
       }
-      return byteControllerFactory;
+      return actionFactory;
    }
 
-   /**
-    * Object array of {@link ByteObject}O
-    * @return
-    */
-   public ByteObjectRef getReferences() {
-      return rootRefs;
-   }
-
-   private ValuesInArrayReader    valueReadCache;
-
- 
-   private PointerFactory         pointerFactory;
-
-   private LitteralIntFactory     litteralIntFactory;
-
-   private LitteralStringFactory  litteralStringFactory;
-
-   private LitteralStringOperator litteralStringOperator;
-
-   private LitteralIntOperator    litteralIntStatic;
-
-   private ActionFactory          actionFactory;
-
-   private EventBusArray eventBus;
-
-   public IEventBus getEventBus() {
-      if (eventBus == null) {
-         eventBus = new EventBusArray(uc, this, getEventBaseTopology());
-      }
-      return eventBus;
-   }
-   
-   public int[] getEventBaseTopology() {
-      int[] events = new int[IEventsBO.BASE_EVENTS];
-      events[IEventsBO.PID_0_ANY] = PID_0_ANY_X_NUM;
-      events[IEventsBO.PID_1_CTX] = PID_1_CTX_X_NUM;
-      return events;
-   }
    /**
     * 
     * @param p
@@ -210,65 +209,63 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       return moduleManager;
    }
 
+   public ByteObjectUtilz getBOU() {
+      return boU;
+   }
+
+   private FactoryByteObject factoryByteObject;
+
+   public FactoryByteObject getFactoryByteObject() {
+      if (factoryByteObject == null) {
+         factoryByteObject = new FactoryByteObject();
+      }
+      return factoryByteObject;
+   }
+
+   public ByteControllerFactory getByteControllerFactory() {
+      if (byteControllerFactory == null) {
+         byteControllerFactory = new ByteControllerFactory(this);
+      }
+      return byteControllerFactory;
+   }
+
    public ByteObjectFactory getByteObjectFactory() {
       return byteObjectC;
    }
 
-   public void setByteObjectC(ByteObjectFactory boc) {
-      //#debug
-      uc.toStrDebugNullCheck(boc, this);
-      this.byteObjectC = boc;
-   }
-
-   /**
-    * The {@link BOModuleAbstract} handling definitions of {@link ByteObject} with {@link BOCtx} 
-    * as root context in the pasa.cbentley.byteobjects module
-    * @return
-    */
-   public BOModuleAbstract getModule() {
-      return module;
-   }
-
-   public AcceptorFactory getAcceptorFactory() {
-      return acceptorC;
-   }
-
-   public ActionOperator getAction() {
-      return action;
-   }
-
-   public ActionFactory getActionFactory() {
-      if (actionFactory == null) {
-         actionFactory = new ActionFactory(this);
+   public ByteObjectManagedFactory getByteObjectManagedFactory() {
+      if (byteObjectManagedFactory == null) {
+         byteObjectManagedFactory = new ByteObjectManagedFactory(this);
       }
-      return actionFactory;
+      return byteObjectManagedFactory;
+   }
+
+   public IConfig getConfig() {
+      return null;
+   }
+
+   public int getCtxID() {
+      return CTX_ID;
+   }
+
+   public int[] getEventBaseTopology() {
+      int[] events = new int[IEventsBO.BASE_EVENTS];
+      events[IEventsBO.PID_0_ANY] = PID_0_ANY_X_NUM;
+      events[IEventsBO.PID_1_CTX] = PID_1_CTX_X_NUM;
+      return events;
+   }
+
+   public IEventBus getEventBus() {
+      if (eventBus == null) {
+         eventBus = new EventBusArray(uc, this, getEventBaseTopology());
+      }
+      return eventBus;
    }
 
    public FunctionFactory getFunctionFactory() {
       return functionC;
    }
 
-   public ByteObjectUtilz getBOU() {
-      return boU;
-   }
-
-   /**
-    * Returns the PointerFactory that knows how to deal with Pointer {@link ByteObject} definition.
-    * <br>
-    * Static mutation? It returns the global version of interpreting the Pointer bytes.
-    * A sub class of Pointer. Why not creating an interface IPointer with those methods
-    * and any class can provide that functionnality
-    * @return
-    */
-   public PointerOperator getPointerOperator() {
-      return pointerOperator;
-   }
-
-   public PointerFactory getPointerFactory() {
-      return pointerFactory;
-   }
-
-   
    //#mdebug
    public String getIDString(int did, int value) {
       switch (did) {
@@ -284,28 +281,11 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
    }
    //#enddebug
 
-
-
-   public LockManager getLock() {
-      return lockManager;
-   }
-
-   //   public LitteralManager getLitteral() {
-   //      return litteral;
-   //   }
-
    public LitteralIntFactory getLitteralIntFactory() {
       if (litteralIntFactory == null) {
          litteralIntFactory = new LitteralIntFactory(this);
       }
       return litteralIntFactory;
-   }
-
-   public LitteralStringFactory getLitteralStringFactory() {
-      if (litteralStringFactory == null) {
-         litteralStringFactory = new LitteralStringFactory(this);
-      }
-      return litteralStringFactory;
    }
 
    public LitteralIntOperator getLitteralIntOperator() {
@@ -315,6 +295,13 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       return litteralIntStatic;
    }
 
+   public LitteralStringFactory getLitteralStringFactory() {
+      if (litteralStringFactory == null) {
+         litteralStringFactory = new LitteralStringFactory(this);
+      }
+      return litteralStringFactory;
+   }
+
    public LitteralStringOperator getLitteralStringOperator() {
       if (litteralStringOperator == null) {
          litteralStringOperator = new LitteralStringOperator(this);
@@ -322,8 +309,59 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       return litteralStringOperator;
    }
 
+   public LockManager getLock() {
+      return lockManager;
+   }
+
+   public MergeMaskFactory getMergeMaskFactory() {
+      return mergeMask;
+   }
+
+   //   public LitteralManager getLitteral() {
+   //      return litteral;
+   //   }
+
+   /**
+    * The {@link BOModuleAbstract} handling definitions of {@link ByteObject} with {@link BOCtx} 
+    * as root context in the pasa.cbentley.byteobjects module
+    * @return
+    */
+   public BOModuleAbstract getModule() {
+      return module;
+   }
+
+   public PointerFactory getPointerFactory() {
+      return pointerFactory;
+   }
+
+   /**
+    * Returns the PointerFactory that knows how to deal with Pointer {@link ByteObject} definition.
+    * <br>
+    * Static mutation? It returns the global version of interpreting the Pointer bytes.
+    * A sub class of Pointer. Why not creating an interface IPointer with those methods
+    * and any class can provide that functionnality
+    * @return
+    */
+   public PointerOperator getPointerOperator() {
+      return pointerOperator;
+   }
+
+   /**
+    * Object array of {@link ByteObject}O
+    * @return
+    */
+   public ByteObjectRef getReferences() {
+      return rootRefs;
+   }
+
    public RootSource getRootSource() {
       return getBOModuleManager().getRootSource();
+   }
+
+   public void setByteObjectC(ByteObjectFactory boc) {
+      //#debug
+      uc.toStrDebugNullCheck(boc, this);
+      this.byteObjectC = boc;
    }
 
    /**
@@ -344,10 +382,12 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       dc.root(this, "BOCtx");
       toStringPrivate(dc);
       super.toString(dc.sup());
-   }
-
-   private void toStringPrivate(Dctx dc) {
-
+      
+      dc.nlLvl(eventBus, "eventBus");
+      dc.nlLvl(moduleManager, "moduleManager");
+      dc.nlLvl(lockManager, "lockManager");
+      dc.nlLvl(rootRefs, "rootRefs");
+      dc.nlLvl(valueReadCache, "valueReadCache");
    }
 
    public void toString1Line(Dctx dc) {
@@ -356,5 +396,9 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       super.toString1Line(dc.sup1Line());
    }
    //#enddebug
+
+   private void toStringPrivate(Dctx dc) {
+
+   }
 
 }

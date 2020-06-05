@@ -11,6 +11,7 @@ import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.core.src4.utils.ShortUtils;
 
@@ -55,19 +56,14 @@ public class ByteObjectUtilz implements ITechByteObject {
 
    /**
     * Trim from front as soon as one reference is null
+    * 
     * @param ar
     * @return
+    * 
+    * @see ArrayUtils#getTrim(Object[])
     */
    public ByteObject[] getTrim(ByteObject[] ar) {
-      int count = boc.getUCtx().getAU().getLastNotNullIndex(ar);
-      if (count == -1) { //only nulls
-         count = 0;
-      }
-      ByteObject[] pa = new ByteObject[count];
-      for (int i = 0; i < pa.length; i++) {
-         pa[i] = ar[i];
-      }
-      return pa;
+      return (ByteObject[]) boc.getUCtx().getAU().getTrim(ar, boc.getFactoryByteObject()) ;
    }
 
    /**

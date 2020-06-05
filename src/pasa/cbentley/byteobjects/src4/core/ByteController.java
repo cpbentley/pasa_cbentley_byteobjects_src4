@@ -13,6 +13,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.memory.IMemFreeable;
 import pasa.cbentley.core.src4.memory.IMemory;
+import pasa.cbentley.core.src4.stator.IStatorable;
 import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.structs.synch.MutexSignal;
 import pasa.cbentley.core.src4.thread.IBProgessable;
@@ -22,6 +23,8 @@ import pasa.cbentley.core.src4.utils.IntUtils;
 /**
  * Controls the loading, expansion and saving of {@link ByteObjectManaged}'s memory spaces inside a datastructure.
  * <br>
+ * Much more fine grained control unlike the {@link IStatorable} base specification.
+ * A class will create a {@link ByteController} if the {@link IStatorable} does not load any
  * <br>
  * In the context of an Application, IMemo
  * <br>
@@ -309,7 +312,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
          //this.arraysByte[i] = dataSources[i].preload();
          this.dataSources[i] = dataSources[i];
          //for each data source, get the header
-         byte[] data = dataSources[i].loadHeader(ITechByteControler.MEMC_BASIC_SIZE);
+         byte[] data = dataSources[i].loadHeader(MEMC_BASIC_SIZE);
       }
       mod.getUCtx().getMem().addMemFreeable(this);
    }
@@ -966,7 +969,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
       if (bc.getType() == IBOTypesBOC.TYPE_036_BYTE_CONTROLLER) {
          int num = bc.get3(MEMC_OFFSET_05_NUM_AGENTS3);
          agents = new ByteObjectManaged[num];
-         int offset = ITechByteControler.MEMC_BASIC_SIZE;
+         int offset = MEMC_BASIC_SIZE;
          int acount = 0;
          for (int j = 0; j < num; j++) {
             ByteObjectManaged ag = new ByteObjectManaged(boc, array, offset);
@@ -997,7 +1000,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
       if (bc.getType() == IBOTypesBOC.TYPE_036_BYTE_CONTROLLER) {
          int num = bc.get3(MEMC_OFFSET_05_NUM_AGENTS3);
          agents = new ByteObjectManaged[num];
-         int offset = ITechByteControler.MEMC_BASIC_SIZE;
+         int offset = MEMC_BASIC_SIZE;
          int acount = 0;
          for (int j = 0; j < num; j++) {
             //create tech with ByteController, which will be used to initialize inside the factory
@@ -1145,6 +1148,11 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
       return get1(MEMC_OFFSET_02_MODE1);
    }
 
+   /**
+    * Retusn {@link IJavaObjectFactory} set with {@link ByteController#setFactory(IJavaObjectFactory)}
+    * or the default one
+    * @return
+    */
    public IJavaObjectFactory getFactory() {
       if (factory == null) {
          //returns default one
@@ -1238,7 +1246,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
       int[] ids = new int[] { 0 };
       if (bcse[gid] == null) {
 
-         if (ms.hasMSFlag(MemorySource.MS_FLAG_1_IDS)) {
+         if (ms.hasMSFlag(MS_FLAG_1_IDS)) {
             //initialize
             int[] mids = ms.getValidIDs();
             if (mids != null && mids.length != 0) {
@@ -1279,6 +1287,13 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
       //at this stage, the method instantiateFrom has been called and
       // fin is docked to the ByteController
       //reset the flag so the serializeReverse can call methods
+      if (fin == null) {
+
+         //#debug
+         toDLog().pNull("Factory -> " + getFactory().toString1Line() + " could not create object for " + tech.toString1Line(), this, ByteController.class, "instancetiate", LVL_05_FINE, false);
+
+         throw new IllegalArgumentException("Could not create object for " + tech.toString1Line());
+      }
       fin.initMe();
       fin.setFlag(AGENT_OFFSET_03_FLAGZ_1, AGENT_FLAGZ_CTRL_7_SAVED, true);
 
@@ -1430,7 +1445,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
 
             //when its not, create that enveloppe and tries to read the agents
             int numAgents = 1;
-            bc = boc.getByteControllerFactory().getEnveloppe(ITechByteControler.MEMC_BASIC_SIZE, numAgents);
+            bc = boc.getByteControllerFactory().getEnveloppe(MEMC_BASIC_SIZE, numAgents);
             bc.copyAppendData(rootData, 0, rootData.length);
 
          }
@@ -1569,18 +1584,18 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     */
    public void loadAllAgents() {
       //we don't have progress defined at this level
-//            if (progress != null) {
-//               //how to internationize strings at this level? Put translatable strings in a module API.
-//               progress.set(isp.getIString("loadingAgents", "Loading Agents"), null, null, dataSources.length, IMProgessable.LVL_0_USER);
-//            }
-//            for (int i = 0; i < dataSources.length; i++) {
-//               if (progress != null) {
-//                  IString sourceStr = isp.getIString("sourceSpace", "Source ", "" + (i + 1));
-//                  progress.setLabel(sourceStr);
-//                  progress.setValue(i);
-//                  dataSources[i].setProgress(progress.getChild());
-//               }
-//            }
+      //            if (progress != null) {
+      //               //how to internationize strings at this level? Put translatable strings in a module API.
+      //               progress.set(isp.getIString("loadingAgents", "Loading Agents"), null, null, dataSources.length, IMProgessable.LVL_0_USER);
+      //            }
+      //            for (int i = 0; i < dataSources.length; i++) {
+      //               if (progress != null) {
+      //                  IString sourceStr = isp.getIString("sourceSpace", "Source ", "" + (i + 1));
+      //                  progress.setLabel(sourceStr);
+      //                  progress.setValue(i);
+      //                  dataSources[i].setProgress(progress.getChild());
+      //               }
+      //            }
       loadDefaultDataSources();
    }
 
@@ -1762,19 +1777,19 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     */
    public void saveAgent(int[] stats, ByteObjectManaged bom) {
       if (isSerializationNeeded(bom)) {
-         int gid = bom.memoryMemSrcIndex;
-         int iid = bom.memoryMemSrcID;
+         int idSource = bom.memoryMemSrcIndex;
+         int idInstance = bom.memoryMemSrcID;
          //
-         ByteObjectManaged[] a0 = getSourceAgents(gid, iid);
+         ByteObjectManaged[] a0 = getSourceAgents(idSource, idInstance);
          ByteObjectManaged ctrl = getByteController(a0);
          byte[] datac = ctrl.getByteObjectData();
          stats[1] += datac.length;
          //#mdebug
-         if (gid >= dataSources.length) {
-            toDLog().pMemory("gid is not index to a datasource :" + gid, this, ByteController.class, "saveAgent");
+         if (idSource >= dataSources.length) {
+            toDLog().pMemory("gid is not index to a datasource :" + idSource, this, ByteController.class, "saveAgent");
          }
          //#enddebug
-         dataSources[gid].save(datac, 0, datac.length, iid);
+         dataSources[idSource].save(datac, 0, datac.length, idInstance);
          for (int j = 0; j < a0.length; j++) {
             ByteObjectManaged agent = a0[j];
             agent.setSaveFlag(true);//flag agent as saved
@@ -1789,44 +1804,45 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * Can be run in its own thread. Thread safe.
     * All agents on the controller's list will have the modified data saved
     * The modified flag is automatically managed by the {@link ByteController} when agent's memory array is expanded
+    * 
     * Save agents with the {@link IObjectManaged#}.
     * <br>
-    * When saving an Agent from a {@link MemorySource}, code writes all agents from that belong to that
+    * When saving an {@link ByteObjectManaged} to a {@link MemorySource}, code writes all {@link ByteObjectManaged}s from that belong to that
     * {@link MemorySource}.
     * <br>
     * <br>
-    * A {@link MemorySource} will not be saved when none of its agents were modified.
+    * A {@link MemorySource} will not be saved when none of its {@link ByteObjectManaged} were modified.
     * <br>
-    * @return first value is the number of agents saved and then the number of bytes written.
     * <br>
     * When a source id and instance id agent has been modified, all agents from that source
     * are written.
     * <br>
     * When a source point is loaded, all the agents are loaded in memory, therefore all agents must be written
-    * back even if only one agent from that source point was modified
-    * @return
+    * back even if only one agent from that source point was modified.
+    * 
+    * @return array with 2 values. first value is the number of agents saved and then the number of bytes written.
     */
    public int[] saveAgents() {
       //how do we make sure cached agents are what they are in other threads?
-      //lock the agents
+      //lock the agents, each thread increase a shared counter?
       //some statistics
       int[] stats = new int[] { 0, 0 };
       IntBuffer waitingOn = new IntBuffer(getUCtx());
       if (dataSources.length != 0) {
          for (int i = 0; i < agentsRefArray.length; i++) {
-            ByteObjectManaged ag = agentsRefArray[i];
-            if (ag != null) {
+            ByteObjectManaged bom = agentsRefArray[i];
+            if (bom != null) {
                //agent is currently being written to or read by another thread
-               if (ag.isSyncroFlag(SYNCRO_FLAG_2_LOCKED)) {
+               if (bom.isSyncroFlag(SYNCRO_FLAG_2_LOCKED)) {
                   waitingOn.addInt(i);
-                  saveThread(ag, stats);
+                  saveThread(bom, stats);
                   //go to next agent
                   continue;
                } else {
-                  ag.dataLock();
+                  bom.dataLock();
                }
-               saveAgent(stats, ag);
-               ag.dataUnLock();
+               saveAgent(stats, bom);
+               bom.dataUnLock();
             }
          }
          //now wait for all saveThreads to complete
@@ -2050,11 +2066,12 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    public void toString(Dctx dc) {
       dc.root(this, "ByteController");
       toStringHeaderHeader(dc);
-      super.toString(dc.nLevel());
-      toStringMemoryStats(dc.nLevel());
-      toStringLiveAgents(dc.nLevel());
-      toStringBCHeaders(dc.nLevel());
-      toStringDataSources(dc.nLevel());
+      super.toString(dc.newLevel());
+      dc.nlLvl(factory, "Factory");
+      toStringMemoryStats(dc.newLevel());
+      toStringLiveAgents(dc.newLevel());
+      toStringBCHeaders(dc.newLevel());
+      toStringDataSources(dc.newLevel());
    }
 
    public String toString1Line() {
@@ -2080,7 +2097,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
                } else {
                   //toString only the ByteController header
                   if (boc.toStringHasToStringFlag(IFlagsToStringBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
-                     sb.nlLvlOneLine(bcse[k][i]);
+                     sb.nlLvl1Line(bcse[k][i]);
                   } else {
                      sb.nlLvl(bcse[k][i]);
                   }
@@ -2090,37 +2107,36 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
       }
    }
 
-   public void toStringBusiness(Dctx sb) {
-      toStringHeaderHeader(sb);
-      sb.nl();
-      sb.append("Internal Headers #" + bcse.length);
+   public void toStringBusiness(Dctx dc) {
+      toStringHeaderHeader(dc);
+      dc.nl();
+      dc.append("Internal Headers #" + bcse.length);
       for (int k = 0; k < bcse.length; k++) {
-         sb.nl();
-         sb.append(k + " : ");
+         dc.nl();
+         dc.append(k + " : ");
          if (bcse[k] == null) {
-            sb.append("null");
+            dc.append("null");
          } else {
-            sb.append("#" + bcse[k].length);
+            dc.append("#" + bcse[k].length);
             for (int i = 0; i < bcse[k].length; i++) {
                if (bcse[k][i] == null) {
-                  sb.append("null");
+                  dc.append("null");
                } else {
-                  sb.nlLvlOneLine(bcse[k][i]);
+                  dc.nlLvl1Line(bcse[k][i]);
                   //
                   for (int j = 0; j < agentsRefArray.length; j++) {
                      if (agentsRefArray[j].memoryMemSrcIndex == k) {
-                        sb.nnnl();
-                        agentsRefArray[j].toString1Line(sb);
+                        dc.nlLvl1Line(agentsRefArray[j]);
                      }
                   }
                }
             }
          }
       }
-      sb.nl();
-      toStringDataSources(sb.nLevel());
-      sb.nl();
-      toStringMemoryStats(sb.nLevel());
+      dc.nl();
+      toStringDataSources(dc.newLevel());
+      dc.nl();
+      toStringMemoryStats(dc.newLevel());
    }
 
    private void toStringDataSources(Dctx sb) {
@@ -2133,7 +2149,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
          boc.getUCtx().getIU().toStringIntArray1Line(sb, "IDs", ids, ",");
          //we have a branch
          if (boc.toStringHasToStringFlag(IFlagsToStringBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
-            sb.nlLvlOneLine(dataSources[k]);
+            dataSources[k].toString1Line(sb);
          } else {
             sb.nlLvl(dataSources[k]);
          }
@@ -2170,7 +2186,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
             if (boc.toStringHasToStringFlag(IFlagsToStringBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
                agentsRefArray[i].toString1Line(sb);
             } else {
-               agentsRefArray[i].toString(sb.nLevel());
+               agentsRefArray[i].toString(sb.newLevel());
             }
          }
       }

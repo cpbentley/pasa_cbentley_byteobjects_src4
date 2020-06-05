@@ -5,6 +5,7 @@ import java.io.IOException;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.interfaces.IMemorySource;
+import pasa.cbentley.byteobjects.src4.sources.ITechMemorySource;
 import pasa.cbentley.byteobjects.src4.sources.MemorySource;
 import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
@@ -87,9 +88,10 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * <li>{@link ITechObjectManaged#AGENT_OFFSET_16_LEN4}
  * <li>{@link ITechObjectManaged#AGENT_OFFSET_17_MAGIC2}
  * @author Charles Bentley
- *
+ * 
+ * TODO BOAgent or BOManaged?
  */
-public class ByteObjectManaged extends ByteObject implements ITechObjectManaged {
+public class ByteObjectManaged extends ByteObject implements ITechObjectManaged, ITechMemorySource {
 
    public static final int INTERFACE_OFFSET_MASK10BITS = 0x3FF;
 
@@ -295,7 +297,8 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
     * 
     * @param tech the {@link ByteObjectManaged} describes the technical parameters of the structure.
     * Uses the {@link ByteController} of the tech if any.
-    * It is designed just
+    * 
+    * When the Tech does not have a {@link ByteController}
     */
    public ByteObjectManaged(BOCtx mod, ByteObjectManaged tech) {
       this(mod, tech.getByteObjectData(), tech.getByteObjectOffset());
@@ -303,7 +306,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
          throw new IllegalArgumentException();
       }
       this.param = tech.getSubs();
-      this.byteCon = tech.byteCon;
+      this.byteCon = tech.getByteController();
       if (byteCon != null) {
          byteCon.instantiateFrom(this, tech);
       }
@@ -482,7 +485,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
     */
    public void dataLock() {
       //only checks for lock if multi threads
-      if (hasFlag(AGENT_OFFSET_02_FLAGX_1, AGENT_FLAGX_2_MUTLI_THREAD)) {
+      if (isMultiThread()) {
          if (isSyncroFlag(SYNCRO_FLAG_2_LOCKED)) {
             //what kind of lock?
             //lock thread
@@ -541,7 +544,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
             }
          }
       }
-      if (hasFlag(AGENT_OFFSET_02_FLAGX_1, AGENT_FLAGX_2_MUTLI_THREAD)) {
+      if (isMultiThread()) {
          //volatile.
          setSyncroFlag(SYNCRO_FLAG_2_LOCKED, false);
          setFlag(AGENT_OFFSET_03_FLAGZ_1, AGENT_FLAGZ_CTRL_5_LOCKED, false);
@@ -552,6 +555,10 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
             boc.getLock().notify(this);
          }
       }
+   }
+
+   public boolean isMultiThread() {
+      return hasFlag(AGENT_OFFSET_02_FLAGX_1, AGENT_FLAGX_2_MUTLI_THREAD);
    }
 
    /**
@@ -648,7 +655,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
     * <br>
     * Otherwise ask increase through {@link ByteController} if any.
     *
-    * <br>
+    * This method does not increment the version count
     * @param incr
     * @param position
     */
@@ -725,7 +732,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
    public ByteController getByteController() {
       return byteCon;
    }
-   
+
    /**
     * Creates a {@link ByteController} 
     * <br>
@@ -1047,11 +1054,14 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
    }
 
    /**
-    * Initialize critical fields
+    * Initialize critical fields.
+    * 
+    * The Length field of the {@link ByteObject} is set to 0xFFFF ( {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}
     */
    protected void initBOManaged() {
       if (get4(AGENT_OFFSET_16_LEN4) == 0) {
-         setValueNoVersion(AGENT_OFFSET_16_LEN4, super.getLength(), 4);
+         int superLen = super.getLength();
+         setValueNoVersion(AGENT_OFFSET_16_LEN4, superLen, 4);
       }
       setValueNoVersion(A_OBJECT_OFFSET_1_TYPE1, AGENT_BASE_TYPE, 1);
       setValueNoVersion(A_OBJECT_OFFSET_3_LENGTH2, 0xFFFF, 2);
@@ -1090,6 +1100,14 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
          return byteCon.isRunningLeanMemory();
       }
       return false;
+   }
+
+   public void setFlagMultiThread(boolean v) {
+      setFlag(AGENT_OFFSET_02_FLAGX_1, AGENT_FLAGX_2_MUTLI_THREAD, v);
+   }
+
+   public void setFlagReadOnly(boolean v) {
+      setFlag(AGENT_OFFSET_01_FLAG_1, AGENT_FLAG_CTRL_6_READ_ONLY, v);
    }
 
    /**
@@ -1388,7 +1406,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
    }
 
    public void setSaveFlag(boolean b) {
-      setFlag(AGENT_OFFSET_03_FLAGZ_1, AGENT_FLAGZ_CTRL_7_SAVED, b);
+      setFlagNoVersion(AGENT_OFFSET_03_FLAGZ_1, AGENT_FLAGZ_CTRL_7_SAVED, b);
    }
 
    /**
@@ -1424,17 +1442,17 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged 
 
    public void toString(Dctx dc) {
       dc.root(this, "ByteObjectManaged");
-      dc.nl();
-      dc.append("type=" + getType());
-      dc.append(" classid=" + getIDClass());
-      //module.toString(dc, this);
-
-      dc.nlLvl("", byteCon);
+      dc.appendVarWithSpace("len", getLength());
+      dc.appendVarWithSpace("type", getType());
+      dc.appendVarWithSpace(" classid", getIDClass());
+      dc.nlLvl("ByteController", byteCon);
+      super.toString(dc.sup());
    }
 
    public void toString1Line(Dctx sb) {
-      sb.root(this, "ByteObjectManaged ");
-      sb.append(toStringType());
+      sb.root1Line(this, "ByteObjectManaged");
+      sb.space();
+      super.toStringTypeDebugMsg(sb);
       sb.appendPretty(" SrcIndex=", memoryMemSrcIndex, 10);
       sb.appendPretty(" MemSrcID=", memoryMemSrcID, 10);
       sb.appendPretty(" ref=", get2(AGENT_OFFSET_08_REF_ID2), 10);

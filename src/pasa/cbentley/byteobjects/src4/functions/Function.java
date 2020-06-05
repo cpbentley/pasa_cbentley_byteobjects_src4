@@ -126,7 +126,7 @@ public class Function implements ITechFunction, IStringable {
    /**
     * Lazy init or set externaly by 
     */
-   protected Random        random;
+   private Random          random;
 
    /**
     * <li> {@link ITechFunction#FUN_TYPE_00_AXC}
@@ -149,8 +149,14 @@ public class Function implements ITechFunction, IStringable {
       this.boc = boc;
    }
 
+   /**
+    * 
+    * @param boc
+    * @param def
+    */
    public Function(BOCtx boc, ByteObject def) {
       this.boc = boc;
+      def.checkType(IBOTypesBOC.TYPE_021_FUNCTION);
       reset(def);
    }
 

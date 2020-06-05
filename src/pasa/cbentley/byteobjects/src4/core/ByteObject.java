@@ -25,6 +25,9 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * The mighty ByteObject encapsulate a byte array and one offset. All {@link ByteObject} are defined
  * by an interface definition that extends {@link ITechByteObject}
  * <br>
+ * For a discussion on why this ByteObject concept was created, see {@link BOCtx}.
+ * <br>
+ * <br>
  * Sub objects may be appended. Data length is fixed
  * <br>
  * <br>
@@ -95,6 +98,12 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * 
  * TODO: can you optimize often used flags by putting them in a integer field?
  * 
+ * Object size in Java is somewhat hard to determine. We do not have a sizeof operator. 
+ * It also varies by system. 
+ * For example, in a 64-bit JVM with compressed OOPS, we use 4 bytes for a reference and 12 bytes for the object header. 
+ * If our JVM is configured with a maximum heap of 32 GB or more, then a reference is 8 bytes and the object header is 16 bytes.
+ * 
+ * Objects are aligned on 8 byte boundaries. This means that the actual memory usage of an object is always be a multiple of 8.
  * <br>
  * @author Charles Bentley
  *
@@ -303,6 +312,36 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
+    * Replace existing {@link ByteObject} that has the same type
+    * @param bo
+    * @return
+    */
+   public int addByteObjectUniqueType(ByteObject bo) {
+      immutableCheck();
+      if (bo == null) {
+         return -1;
+      }
+      if (param == null) {
+         param = new ByteObject[] { bo };
+         setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, true);
+         return 0;
+      } else {
+         //check if
+         int type = bo.getType();
+         for (int i = 0; i < param.length; i++) {
+            if (param[i] != null && param[i].getType() == type) {
+               param[i] = bo;
+               return i;
+            }
+         }
+         //the flag is already set
+         param = boc.getBOU().increaseCapacity(param, 1);
+         param[param.length - 1] = bo;
+         return param.length - 1;
+      }
+   }
+
+   /**
     * Adds non null {@link ByteObject}s.
     * <br>
     * <br>
@@ -422,6 +461,24 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
+    * Create a tail if none.
+    * @param flag
+    * @param b
+    */
+   public void setTailFlag(int flag, boolean b) {
+      if (!hasFlagObject(A_OBJECT_FLAG_8_TAILER)) {
+
+      }
+      int index = getTailFlagIndex();
+      setFlag(index, flag, b);
+   }
+
+   public int getTailFlagIndex() {
+      int len = getLength();
+      return index + len - A_OBJECT_TAIL_OFFSET_2_SIZE1;
+   }
+
+   /**
     * Clone the {@link ByteObject} bytes but uses the parameter references
     * <br>
     * <br>
@@ -501,14 +558,14 @@ public class ByteObject implements ITechByteObject, IStringable {
       if (param != null) {
          //System.out.println("#ByteObject#toByteArray " + i + " NumParams=" + bo.param.length);
          numParams = param.length;
-         if (hasFlagObject(A_OBJECT_FLAG_8_SERIALIZED)) {
+         if (hasFlagObject(A_OBJECT_FLAG_4_SERIALIZED)) {
             //we have the header. just copy
             bo = new ByteObject(boc, bytes, offset);
          } else {
             int len = this.getLength();
             int serializeTrailerSize = TRAILER_LENGTH; //we need to add 3 bytes for the serialize trailer
             bo = new ByteObject(boc, bytes, offset, len + serializeTrailerSize);
-            bo.setFlagObject(A_OBJECT_FLAG_8_SERIALIZED, true);
+            bo.setFlagObject(A_OBJECT_FLAG_4_SERIALIZED, true);
             //now write 
          }
          int serialOffset = bo.getSerialziedOffset();
@@ -641,9 +698,9 @@ public class ByteObject implements ITechByteObject, IStringable {
       if (p1.getType() != p2.getType()) {
          return false;
       }
-      if (p1.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED) && p2.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED)) {
+      if (p1.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED) && p2.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED)) {
          return p1.equals(p2);
-      } else if (!p1.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED) && !p2.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED)) {
+      } else if (!p1.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED) && !p2.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED)) {
          return p1.equals(p2);
       } else {
          //only check data between inside header
@@ -1067,9 +1124,16 @@ public class ByteObject implements ITechByteObject, IStringable {
       return IntUtils.readInt24BE(data, this.index + index);
    }
 
+   /**
+    * 0 if none was previously set
+    * @return
+    */
    public int getIntraReference() {
-      int intraIndex = getSuffixIntraOffset();
-      return get1(intraIndex);
+      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE)) {
+         int intraIndex = getSuffixIntraOffset();
+         return get1(intraIndex);
+      }
+      return 0;
    }
 
    /**
@@ -1209,9 +1273,6 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @return
     */
    public int getRefID() {
-      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_MEMORY_PINNED)) {
-
-      }
       return -1;
    }
 
@@ -1230,7 +1291,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @return -1 if the MagicByte is not present
     */
    public int getSerializedMagicByte() {
-      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED)) {
+      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED)) {
          int len = getLength();
          return get1(len - ITechByteObject.TRAILER_LENGTH);
       }
@@ -1281,6 +1342,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    public ByteObject getSubAtIndex(int index) {
+      //TODO reads if we have subs in pointer table
       return param[index];
    }
 
@@ -1450,6 +1512,17 @@ public class ByteObject implements ITechByteObject, IStringable {
       return null;
    }
 
+   public boolean hasSubType(int type) {
+      if (param == null)
+         return false;
+      for (int i = 0; i < param.length; i++) {
+         if (param[i] != null && param[i].getType() == type) {
+            return true;
+         }
+      }
+      return false;
+   }
+
    /**
     * what happens with bigger types?
     * @param type
@@ -1562,7 +1635,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     */
    public int getSuffixVersioningOffset() {
       int len = getLength() - VERSION_BYTE_SIZE;
-      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_6_INTRA_REFERENCE)) {
+      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE)) {
          len = len - INTRA_REF_BYTE_SIZE;
       }
       return len;
@@ -1649,7 +1722,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * <br>
     * This is decided by several flags
     * <li> {@link ITechByteObject#A_OBJECT_FLAG_3_VERSIONING}
-    * <li> {@link ITechByteObject#A_OBJECT_FLAG_6_INTRA_REFERENCE}
+    * <li> {@link ITechByteObject#A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE}
     * 
     * @return
     */
@@ -1658,10 +1731,10 @@ public class ByteObject implements ITechByteObject, IStringable {
       if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_3_VERSIONING)) {
          size += 2;
       }
-      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_6_INTRA_REFERENCE)) {
+      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE)) {
          size += INTRA_REF_BYTE_SIZE;
       }
-      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED)) {
+      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED)) {
          size += 3;
       }
       return size;
@@ -1710,19 +1783,16 @@ public class ByteObject implements ITechByteObject, IStringable {
     * Reads 2 byte for value count, then 1 byte for value 1, then reads the values.
     * <br>
     * This is used to store variable size array of values inside the {@link ByteObject}.
+    * 
+    * Method used by litterals to read
+    * 
     * @param index
     * @return
     */
    public int[] getValues(int index) {
       int count = getValue(index, 2);
       int valueSize = getValue(index + 2, 1);
-      index += 3;
-      int[] v = new int[count];
-      for (int i = 0; i < count; i++) {
-         v[i] = getValue(index, valueSize);
-         index += valueSize;
-      }
-      return v;
+      return getValues(index + 3, valueSize, count);
    }
 
    /**
@@ -1805,7 +1875,8 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Returns array of characters stored at position
+    * Returns array of characters stored at position index.
+    * 
     * @param index start reading index
     * @param num number of characters
     * @return
@@ -1950,7 +2021,8 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @return
     */
    public ByteObject mergeByteObject(ByteObject merge) {
-      return boc.getBOModuleManager().mergeByteObject(this, merge);
+      BOModulesManager boModuleManager = boc.getBOModuleManager();
+      return boModuleManager.mergeByteObject(this, merge);
    }
 
    /**
@@ -2000,6 +2072,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param value
     */
    public void set1(int index, int value) {
+      immutableCheck();
       data[this.index + index] = (byte) value;
    }
 
@@ -2009,6 +2082,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param value
     */
    public void set1Signed(int index, int value) {
+      immutableCheck();
       data[this.index + index] = (byte) value;
    }
 
@@ -2063,6 +2137,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param value
     */
    public void set2Unsigned(int index, int value) {
+      immutableCheck();
       ShortUtils.writeShortBEUnsigned(data, this.index + index, value);
    }
 
@@ -2084,6 +2159,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param value
     */
    public void set3Signed(int index, int value) {
+      immutableCheck();
       if (value < 0) {
          value = -value;
          value |= (MINUS_SIGN_24BITS_FLAG);
@@ -2118,6 +2194,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    private void setByteInt(int index, int value) {
+      immutableCheck();
       data[this.index + index] = (byte) value;
    }
 
@@ -2126,6 +2203,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param bos
     */
    public void setByteObjects(ByteObject[] bos) {
+      immutableCheck();
       this.param = bos;
    }
 
@@ -2133,7 +2211,15 @@ public class ByteObject implements ITechByteObject, IStringable {
       setDynBOParamValues(index, values, 0, values.length);
    }
 
+   /**
+    * Store the values as an {@link IBOTypesBOC#TYPE_007_LIT_ARRAY_INT}
+    * @param index
+    * @param values
+    * @param offset
+    * @param len
+    */
    public void setDynBOParamValues(int index, int[] values, int offset, int len) {
+      //immutableCheck(); done by the setters below
       if (len == 1) {
          set2(index, values[offset]);
       } else {
@@ -2259,6 +2345,8 @@ public class ByteObject implements ITechByteObject, IStringable {
     * 
     */
    public void setDynOverWriteValues(int index, int[] dest, int destSize) {
+      if (dest == null)
+         return;
       setDynOverWriteValues(index, dest, 0, dest.length, destSize);
    }
 
@@ -2307,6 +2395,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @param v
     */
    public void setFlagNoVersion(int index, int flag, boolean v) {
+      immutableCheck();
       data[this.index + index] = (byte) BitUtils.setFlag(data[this.index + index] & 0xFF, flag, v);
    }
 
@@ -2325,16 +2414,14 @@ public class ByteObject implements ITechByteObject, IStringable {
    /**
     * Makes the object immutable.
     * Of course the byte array is not protected against tinkering.
+    * 
+    * The following methods will be protected
+    * <li> {@link ByteObject#set1(int, int)}
+    * 
+    * TODO compute a checksum and store it?
     */
    public void setImmutable() {
       setFlagNoVersion(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_7_IMMUTABLE, true);
-   }
-
-   /**
-    */
-   public void setIncomplete() {
-      immutableCheck();
-      setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_1_INCOMPLETE, true);
    }
 
    private void setInt(int index, int value) {
@@ -2349,9 +2436,9 @@ public class ByteObject implements ITechByteObject, IStringable {
     */
    public void setIntraReference(int id) {
       immutableCheck();
-      if (!hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_6_INTRA_REFERENCE)) {
+      if (!hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE)) {
          //increase to create suffix sapce
-         setFlagNoVersion(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_6_INTRA_REFERENCE, true);
+         setFlagNoVersion(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE, true);
          int len = getLength();
          //modifies the array data is tricky. only works easily when byte array is free
          data = getMem().increaseCapacity(data, 1, index + len);
@@ -2421,6 +2508,15 @@ public class ByteObject implements ITechByteObject, IStringable {
       param[index] = bo;
    }
 
+   /**
+    * Reads index for array position. If zero, create a new position.
+    * 
+    * Appends the {@link ByteObject} in the array. Store its position in the array
+    * at the [index] writing [value] bytes.
+    * @param bo
+    * @param index
+    * @param value
+    */
    public void setSubIndexed(ByteObject bo, int index, int value) {
       immutableCheck();
       int addy = getValue(index, value);
@@ -2430,14 +2526,33 @@ public class ByteObject implements ITechByteObject, IStringable {
          setValue(index, addy, value);
       } else {
          //TODO if this bombs.. the byte object is corrupted
+         //or we can upgrade the array
          param[addy] = bo;
       }
    }
 
+   /**
+    * Reads index for array position, set {@link ByteObject} at position in sub array
+    * 
+    * @param bo
+    * @param index
+    * 
+    * @see ByteObject#setSubIndexed(ByteObject, int, int) 
+    */
    public void setSubIndexed1(ByteObject bo, int index) {
       setSubIndexed(bo, index, 1);
    }
 
+   /**
+    * Reads index for array position (2 bytes for up to 16k objects). If zero, create a new position.
+    * 
+    * Appends the {@link ByteObject} in the array. Store its position in the array
+    * at the [index] writing [value] bytes.
+    * @param bo
+    * @param index read 2 bytes at index
+    * 
+    * @see ByteObject#setSubIndexed(ByteObject, int, int)
+    */
    public void setSubIndexed2(ByteObject bo, int index) {
       setSubIndexed(bo, index, 2);
    }
@@ -2508,7 +2623,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * No check on mutability and and versioning. Used for setting header values.
+    * No check on immutability and and versioning. Used for setting header values.
     * @param index
     * @param value
     * @param size
@@ -2549,6 +2664,12 @@ public class ByteObject implements ITechByteObject, IStringable {
       }
    }
 
+   /**
+    * No immutability check
+    * @param offset
+    * @param len
+    * @param shiftSize
+    */
    public void shiftBytesDown(int offset, int len, int shiftSize) {
       boc.getUCtx().getBU().shiftBytesDown(data, shiftSize, index + offset, index + offset + len - 1);
    }
@@ -2589,7 +2710,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * When a byte array is floating around, a flag serialization is set?
     * <br>
     * <br>
-    * When flag {@link ITechByteObject#A_OBJECT_FLAG_8_SERIALIZED}, the array is returned? No a copy is created. Because
+    * When flag {@link ITechByteObject#A_OBJECT_FLAG_4_SERIALIZED}, the array is returned? No a copy is created. Because
     * you never know if the {@link ByteObject} is already part of a bigger array.
     * <br>
     * Since this method is used to write this and only one {@link ByteObject}'s data, the method cannot
@@ -2647,7 +2768,8 @@ public class ByteObject implements ITechByteObject, IStringable {
          //magic byte
          if (bo != null) {
             sizeTotal += bo.getLength();
-            if (bo.param != null && !bo.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED)) {
+            boolean isNotSerialized = !bo.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED);
+            if (bo.param != null && isNotSerialized) {
                //2 byte for number of sub params +1 for magic byte
                sizeTotal += TRAILER_LENGTH;
             }
@@ -2716,7 +2838,7 @@ public class ByteObject implements ITechByteObject, IStringable {
             int len = bo.getLength();
             int flagoffset = offset + A_OBJECT_OFFSET_2_FLAG; //save position
             System.arraycopy(bo.data, bo.index, bytes, offset, len);
-            BitUtils.setFlag(bytes, flagoffset, A_OBJECT_FLAG_8_SERIALIZED, true);
+            BitUtils.setFlag(bytes, flagoffset, A_OBJECT_FLAG_4_SERIALIZED, true);
             offset += len;
             //deep first
             if (bo.param != null) {
@@ -2759,24 +2881,39 @@ public class ByteObject implements ITechByteObject, IStringable {
     * To String of a byte Object
     */
    public void toString(Dctx dc) {
-      dc.root(this, "ByteObject");
-      dc.appendVarWithSpace("Type", get1(A_OBJECT_OFFSET_1_TYPE1));
-      dc.append(" ");
-      dc.append(toStringType());
+      dc.root(this, ByteObject.class);
+
+      dc.appendVarWithSpace("Type", toStringType());
+      dc.append("[");
+      dc.append(get1(A_OBJECT_OFFSET_1_TYPE1));
+      dc.append("]");
       dc.appendVarWithSpace("getLength", getLength());
       dc.appendVarWithSpace("lenByteField", get2(A_OBJECT_OFFSET_3_LENGTH2));
-      if (!dc.hasFlagData(boc.getUCtx(), IFlagsToString.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (dc.hasFlagData(boc.getUCtx(), IFlagsToString.FLAG_DATA_05_NO_ABSOLUTES)) {
+         dc.append(" [Absolutes Ignored]");
+      } else {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
       }
-      dc.nl();
-      boc.getBOModuleManager().toString(dc, this); //stringing the actual content of the byte object
-      if (!dc.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_2_IGNORE_PARAMS)) {
-         if (param != null) {
-            dc.nlLvlArray("Params", param);
-         } else {
-            // (param == null)
-            dc.append(" Param is null");
-         }
+      if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_3_VERSIONING)) {
+         int index = this.index + getSuffixVersioningOffset();
+         int v = ShortUtils.readShortBEUnsigned(data, index);
+         dc.appendVarWithSpace("version", v);
+      }
+
+      dc.appendWithSpaceArrayNullOnly(param, "Params");
+
+      //check if flag wants to hide actual content of byte object
+      if (dc.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_3_IGNORE_CONTENT)) {
+         dc.append("[BOModuleManager.String Ignored]");
+      } else {
+         dc.nl();
+         boc.getBOModuleManager().toString(dc, this); //stringing the actual content of the byte object
+      }
+
+      if (dc.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_2_IGNORE_PARAMS)) {
+         dc.nlArrayRaw(param, "Params Ignored");
+      } else {
+         dc.nlLvlArrayNullIgnore(param, "Params");
       }
    }
 
@@ -2817,8 +2954,8 @@ public class ByteObject implements ITechByteObject, IStringable {
       } else {
          sb.nl();
          sb.append("Flags=");
-         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_1_INCOMPLETE)) {
-            sb.append(" Incomplete");
+         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_1_)) {
+            sb.append(" NOTUSED");
          }
          if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_2_VARIABLE_SIZE)) {
             sb.append(" VariableSize");
@@ -2827,22 +2964,56 @@ public class ByteObject implements ITechByteObject, IStringable {
             sb.append(" Versioning=");
             sb.append(this.getVersion());
          }
-         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_MEMORY_PINNED)) {
-            sb.append(" MemoryPinned");
+         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_TAILER)) {
+            sb.append(" Tail");
          }
          if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS)) {
             sb.append(" HasSubs");
          }
-         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_6_INTRA_REFERENCE)) {
-            sb.append(" A_OBJECT_FLAG_6INTRA_REFERENCE ");
+         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_6_)) {
+            sb.append(" NOTUSED ");
          }
          if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_7_IMMUTABLE)) {
             sb.append(" Immutable");
          }
-         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_SERIALIZED)) {
+         if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED)) {
             sb.append(" Serialized");
          }
          sb.append("");
+      }
+   }
+
+   public boolean hasFlagTailer(int flag) {
+      if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_TAILER)) {
+         int len = getLength();
+         int tailFlagsIndex = this.index + len - A_OBJECT_TAIL_OFFSET_1_FLAG;
+         int tailFlags = this.get1(tailFlagsIndex);
+         return BitUtils.hasFlag(tailFlags, flag);
+      } else {
+         return false;
+      }
+   }
+
+   public void toStringFlagsTail(Dctx sb) {
+      if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_TAILER)) {
+         int len = getLength();
+         int tailFlagsIndex = this.index + len - A_OBJECT_TAIL_OFFSET_1_FLAG;
+         int tailFlags = this.get1(tailFlagsIndex);
+         if (tailFlags == 0) {
+            sb.append("[No TailFlags True]");
+         } else {
+            sb.nl();
+            sb.append("Flags=");
+            if (BitUtils.hasFlag(tailFlags, A_OBJECT_TAIL_FLAG_4_MEMORY_PINNED)) {
+               sb.append(" MemoryPinned");
+            }
+            if (BitUtils.hasFlag(tailFlags, A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE)) {
+               sb.append(" IntraReference");
+            }
+            sb.append("");
+         }
+      } else {
+         sb.append("[No Tailer]");
       }
    }
 
@@ -2853,16 +3024,16 @@ public class ByteObject implements ITechByteObject, IStringable {
    public void toStringHeader(Dctx sb) {
       sb.root(this, "#ByteObjectHeader");
       ByteObjectUtilz bou = boc.getBOU();
-      bou.toStringAppend(sb, this, "Incomplete", A_OBJECT_FLAG_1_INCOMPLETE);
+      bou.toStringAppend(sb, this, "Incomplete", A_OBJECT_FLAG_1_);
       bou.toStringAppend(sb, this, "VariableSize", A_OBJECT_FLAG_2_VARIABLE_SIZE);
       bou.toStringAppend(sb, this, "Versioning", A_OBJECT_FLAG_3_VERSIONING);
-      bou.toStringAppend(sb, this, "MemoryPinned", A_OBJECT_FLAG_4_MEMORY_PINNED);
+      bou.toStringAppend(sb, this, "MemoryPinned", A_OBJECT_FLAG_8_TAILER);
       bou.toStringAppend(sb, this, "HasSubs", A_OBJECT_FLAG_5_HAS_SUBS);
-      bou.toStringAppend(sb, this, "IntraRef", A_OBJECT_FLAG_6_INTRA_REFERENCE);
+      bou.toStringAppend(sb, this, "IntraRef", A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE);
       bou.toStringAppend(sb, this, "Immutable", A_OBJECT_FLAG_7_IMMUTABLE);
       //
       if (sb.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_1_SERIALIZE)) {
-         bou.toStringAppend(sb, this, "Serialized", A_OBJECT_FLAG_8_SERIALIZED);
+         bou.toStringAppend(sb, this, "Serialized", A_OBJECT_FLAG_4_SERIALIZED);
       }
    }
 
@@ -2874,8 +3045,25 @@ public class ByteObject implements ITechByteObject, IStringable {
       return "#ByteObject:" + toStringType();
    }
 
+   /**
+    * 
+    * @return null if unknown
+    */
    public String toStringType() {
       return boc.getBOModuleManager().toStringType(this.getType());
+   }
+
+   public void toStringTypeDebugMsg(Dctx dc) {
+      int type = this.getType();
+      String str = boc.getBOModuleManager().toStringType(type);
+      if (str == null) {
+         dc.append("Unknown Type");
+      } else {
+         dc.append(str);
+      }
+      dc.append("[");
+      dc.append(type);
+      dc.append("]");
    }
    //#enddebug
 

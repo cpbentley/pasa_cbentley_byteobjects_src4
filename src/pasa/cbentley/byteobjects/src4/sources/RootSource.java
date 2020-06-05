@@ -43,16 +43,14 @@ public class RootSource implements IStringable {
     * @param ms
     */
    public synchronized MemorySource registerMemorySource(MemorySource ms) {
-      for (int i = 0; i < srcs.nextempty; i++) {
-         MemorySource objectAtIndex = (MemorySource) srcs.getObjectAtIndex(i);
-         if (objectAtIndex.getClass() == ms.getClass()) {
-            if (objectAtIndex.getSrcID().equals(ms.getSrcID())) {
-               return objectAtIndex;
-            }
-         }
+      //find if already here
+      MemorySource msFound = findSource(ms.getSrcID());
+      if(msFound == null) {
+         srcs.add(ms);
+         return ms;
+      } else {
+         return msFound;
       }
-      srcs.add(ms);
-      return ms;
    }
 
    

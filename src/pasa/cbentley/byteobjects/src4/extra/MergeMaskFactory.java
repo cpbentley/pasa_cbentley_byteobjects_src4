@@ -1,14 +1,13 @@
 package pasa.cbentley.byteobjects.src4.extra;
 
 import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
-import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.core.BOModulesManager;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.byteobjects.src4.tech.ITechMergeMask;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.utils.BitUtils;
 
 /**
  * ByteObject class definition that defines which values of a ByteObject should be merged
@@ -22,10 +21,9 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class MergeMaskFactoryBO extends BOAbstractFactory implements ITechMergeMask {
+public class MergeMaskFactory extends BOAbstractFactory implements ITechMergeMask {
 
-
-   public MergeMaskFactoryBO(BOCtx boc) {
+   public MergeMaskFactory(BOCtx boc) {
       super(boc);
    }
 
@@ -46,6 +44,18 @@ public class MergeMaskFactoryBO extends BOAbstractFactory implements ITechMergeM
          o.addByteObject(mm);
       }
       mm.setFlag(mmoffset, mmflag, true);
+   }
+
+   public int mergeFlag(ByteObject root, ByteObject merge, ByteObject mm, int pointer, int mergePointer) {
+      int flag = root.get1(pointer);
+      int flagM = merge.get1(pointer);
+      int flagMM = mm.get1(mergePointer);
+      for (int i = 1; i <= 8; i++) {
+         if (BitUtils.isBitSet(flagMM, i)) {
+            flag = BitUtils.setBit(flag, i, BitUtils.getBit(i, flagM));
+         }
+      }
+      return flag;
    }
 
    /**
@@ -70,6 +80,28 @@ public class MergeMaskFactoryBO extends BOAbstractFactory implements ITechMergeM
       p.setFlag(pointer, flag, true);
       return p;
    }
+   /**
+    * Create a mask over a single flag.
+    * <br>
+    * <br>
+    * root OVER merge => flagged in MM replace root
+    * root IV merge => flagged in MM root replaced merge
+    * <br>
+    * <br>
+    * {@link IBOTypesDrw#TYPE_MERGE_MASK}.
+    * <br>
+    * <br>
+    * @param pointer
+    * @param flag
+    * @return
+    * <br>
+    * @see ByteObject
+    */
+   public ByteObject getMergeMask(int pointer, int flag) {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_MASK_BASIC_SIZE);
+      p.setFlag(pointer, flag, true);
+      return p;
+   }
 
    /**
     * Gives a merge mask to {@link ByteObject} on flag pointer
@@ -81,8 +113,7 @@ public class MergeMaskFactoryBO extends BOAbstractFactory implements ITechMergeM
     */
    public void setMergeMask(ByteObject obj, int pointer, int flag) {
       ByteObject mm = createMergeMask(pointer, flag);
-      obj.addByteObject(mm);
-      obj.setFlag(ITechByteObject.A_OBJECT_OFFSET_2_FLAG, ITechByteObject.A_OBJECT_FLAG_1_INCOMPLETE, true);
+      obj.addByteObjectUniqueType(mm);
    }
 
    /**
@@ -91,21 +122,21 @@ public class MergeMaskFactoryBO extends BOAbstractFactory implements ITechMergeM
     * @param o
     */
    public void setMergeMask(ByteObject mm, ByteObject o) {
-      o.setFlag(ITechByteObject.A_OBJECT_OFFSET_2_FLAG, ITechByteObject.A_OBJECT_FLAG_1_INCOMPLETE, true);
-      o.addByteObject(mm);
+      //only accept one mm
+      o.addByteObjectUniqueType(mm);
    }
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "MergeMask");
+      dc.root(this, MergeMaskFactory.class, 113);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "MergeMask");
+      dc.root1Line(this, MergeMaskFactory.class);
    }
 
    public void toStringMergeMask(Dctx sb, ByteObject bo) {
-      sb.append("MergeMask");
+      sb.rootN(bo, "MergeMask");
       toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_1FLAG1, "Flag1");
       toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_2FLAG1, "Flag2");
       toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_3FLAG1, "Flag3");

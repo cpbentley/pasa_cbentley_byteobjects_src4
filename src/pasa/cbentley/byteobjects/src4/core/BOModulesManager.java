@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
+import pasa.cbentley.byteobjects.src4.ctx.IDebugIDsBOC;
 import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
 import pasa.cbentley.byteobjects.src4.sources.RootSource;
 import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
@@ -26,9 +27,14 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * @author Charles Bentley
  *
  */
-public class BOModulesManager implements IStringable, ITechByteObject, IJavaObjectFactory {
+public class BOModulesManager implements IStringable, ITechByteObject, IJavaObjectFactory, IDebugIDsBOC {
 
    private BOCtx              boc;
+
+   /**
+    * Hosts the dynamics DID
+    */
+   private String[][]         dynamicDID = new String[10][];
 
    /**
     * Hash table of {@link IJavaObjectFactory}.
@@ -51,7 +57,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * But it also allows the merging of types. So moduling loading is EXTREMELY important.
     * 
     */
-   private BOModuleAbstract[] modules = new BOModuleAbstract[0];
+   private BOModuleAbstract[] modules    = new BOModuleAbstract[0];
 
    protected RootSource       rootSource;
 
@@ -165,6 +171,8 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return null;
    }
 
+   //#enddebug
+
    /**
     * Asks all {@link BOModuleAbstract} to handle flag ordered ByteObject search.
     * @param bo
@@ -181,8 +189,6 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       }
       return null;
    }
-
-   //#enddebug
 
    public IJavaObjectFactory getDefaultFactory() {
       return this;
@@ -203,6 +209,24 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
          throw new NullPointerException(" " + facID);
       }
       return fac;
+   }
+
+   public String getIDString(int did, int value) {
+      if (did <= DYN_9) {
+         if (dynamicDID[did] != null) {
+            if (value < 0 || value >= dynamicDID[did].length) {
+               return "BOModule#getIDString DID < DYNAMIC " + value;
+            }
+            return dynamicDID[did][value];
+         }
+      }
+      for (int i = 0; i < modules.length; i++) {
+         String idString = modules[i].getIDString(did, value);
+         if (idString != null) {
+            return idString;
+         }
+      }
+      return null;
    }
 
    public BOModuleAbstract getMod(Class cl) {
@@ -276,19 +300,42 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * Method to be sub-classed by the Module.
     * <br>
     * <br>
+    * Merging with nulls returns the non null object.
+    * <br>
+    * Otherwise the {@link BOModulesManager} queries its {@link BOModuleAbstract} for the type merges.
     * 
+    * Both first types must match, except for .
+    * <br>
+    * When merge is a {@link IBOTypesBOC#TYPE_025_ACTION}, the merge method applies the action on the root object.
+    * 
+    * If root object is also an action, then a action merge is executed.
+    * There is on
     * @param root
     * @param merge
     * @return
     */
    public ByteObject mergeByteObject(ByteObject root, ByteObject merge) {
+      if (merge == null) {
+         return root;
+      }
+      if (root == null) {
+         return merge;
+      }
+      int typeRoot = root.getType();
+      int typeMerge = merge.getType();
+      if (typeMerge == IBOTypesBOC.TYPE_025_ACTION && typeRoot != IBOTypesBOC.TYPE_025_ACTION) {
+         return boc.getActionOp().doActionFunctorClone(merge, root);
+      } else if (typeRoot != typeMerge) {
+         throw new IllegalArgumentException("Cannot merge different first types");
+      }
       for (int i = 0; i < modules.length; i++) {
-         ByteObject merged = modules[i].merge(root, merge);
+         ByteObject merged = modules[i].mergeNoCheck(root, merge);
          if (merged != null) {
             return merged;
          }
       }
-      return null;
+      //could not find a module for the merge
+      throw new RuntimeException("Could not find a module for merging " + root.toStringType());
    }
 
    /**
@@ -309,6 +356,10 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       }
       return o;
 
+   }
+
+   public void setDynamicDIDData(int did, String[] strings) {
+      dynamicDID[did] = strings;
    }
 
    /**
@@ -383,21 +434,19 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "BOModule");
-      dc.append(" modIndex=" + modIndex);
+      dc.root(this, BOModulesManager.class);
+      dc.appendVarWithSpace("modIndex", modIndex);
       dc.nl();
       if (factoriesStr == null) {
          dc.append("Factories = Null");
       } else {
          int fsize = factoriesStr.size();
-         dc.append(" Number of Factories = " + fsize + " ");
+         dc.appendVar("Number of Factories", fsize);
          Enumeration keys = factoriesStr.keys();
          while (keys.hasMoreElements()) {
             String key = (String) keys.nextElement();
-            dc.nnl();
             IJavaObjectFactory fac = (IJavaObjectFactory) factoriesStr.get(key);
-            dc.append(key + " - ");
-            fac.toString(dc.nnLvl());
+            dc.nlLvl(fac, key);
          }
       }
       //
@@ -419,17 +468,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BOModule");
-   }
-
-   public String getIDString(int did, int value) {
-      for (int i = 0; i < modules.length; i++) {
-         String idString = modules[i].getIDString(did, value);
-         if (idString != null) {
-            return idString;
-         }
-      }
-      return null;
+      dc.root1Line(this, "BOModulesManager");
    }
 
    public void toString1Line(Dctx dc, ByteObject bo) {
@@ -500,17 +539,34 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
             return str;
          }
       }
-      return null;
+      return "Type [" + bo.getType() + "] offset " + offset + " not found";
    }
 
+   /**
+    * Handles the fetching of the string.
+    * @param type
+    * @return
+    */
    public String toStringType(int type) {
+      //asks the registered modules for the string of the type
       for (int i = 0; i < modules.length; i++) {
          String debugType = modules[i].toStringType(type);
          if (debugType != null) {
             return debugType;
          }
       }
-      return null;
+      return "Type [" + type + "] not found";
+   }
+
+   public void toStringSubType(Dctx dc, ByteObject bo, int subType) {
+      for (int i = 0; i < modules.length; i++) {
+         boolean isDone = modules[i].toStringSubType(dc, bo, subType);
+         if (isDone) {
+            return;
+         }
+      }
+      throw new RuntimeException("toStringSubType ByteObject subtype " + subType + " -> Module not found or implemented");
+
    }
 
    //#enddebug

@@ -45,22 +45,14 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @see ByteArraySource
  * @see JarSource
  */
-public abstract class MemorySource implements IMemorySource, IStringable {
+public abstract class MemorySource implements IMemorySource, ITechMemorySource, IStringable {
 
-   public static final int MS_FLAG_1_IDS      = 1;
-
-   public static final int MS_FLAG_2_WRITABLE = 1 << 1;
-
-   /**
-    * Flagged when the source has been registered at {@link RootSource}
-    */
-   public static final int MS_FLAG_3_ROOTED   = 1 << 2;
 
    protected int           flags              = 0;
 
    protected IBProgessable progress;
 
-   private BOCtx           boc;
+   protected final BOCtx           boc;
 
    public MemorySource(BOCtx boc) {
       this.boc = boc;
@@ -95,8 +87,7 @@ public abstract class MemorySource implements IMemorySource, IStringable {
     * <br>
     * Order is from the smallest to the biggest
     * <br>
-    * null if no IDs. i.e. return always the same as 
-    * {@link MemorySource#load()}
+    * null if no IDs. i.e. return always the same data for any id {@link MemorySource#load()}
     * @return
     */
    public abstract int[] getValidIDs();
@@ -254,7 +245,7 @@ public abstract class MemorySource implements IMemorySource, IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root(this, "MemorySource");
+      dc.root1Line(this, "MemorySource");
    }
    //#enddebug
 }

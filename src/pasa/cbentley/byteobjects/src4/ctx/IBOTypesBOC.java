@@ -38,14 +38,14 @@ import pasa.cbentley.byteobjects.src4.tech.ITechPointer;
  */
 public interface IBOTypesBOC {
 
+   public static final int SID_BASETYPE_A                = 0;
+
+   public static final int SID_BASETYPE_Z                = 40;
+
    /**
     * The static ID of the BaseType
     */
    public static final int SID_BOTYPE_3                  = 1;
-
-   public static final int SID_BASETYPE_A                = 0;
-
-   public static final int SID_BASETYPE_Z                = 40;
 
    public static final int SID_DIDTYPE_2                 = 2;
 
@@ -53,8 +53,6 @@ public interface IBOTypesBOC {
     * Reserved for NULL Type.
     */
    public static final int TYPE_000_UNKNOWN              = 0;
-
-   public static final int TYPE_255_RESERVED             = 255;
 
    /**
     * Extension point for module not part of the base framework.
@@ -70,23 +68,6 @@ public interface IBOTypesBOC {
     * The base framework will not be able to differentiate their types
     */
    public static final int TYPE_001_EXTENSION            = 1;
-
-   /**
-    * Special type saying that the given byte object is not really a {@link ByteObject} but a reference
-    * whose value is the following 4 bytes.
-    */
-   public static final int TYPE_015_REFERENCE_32         = 15;
-
-   /**
-    * Special type saying that the given byte object is not really a {@link ByteObject} but a reference
-    * whose value is the following 8 bytes.
-    */
-   public static final int TYPE_016_REFERENCE_64         = 16;
-
-   /**
-    * 
-    */
-   public static final int TYPE_017_REFERENCE_OBJECT     = 17;
 
    /**
     * Object storing 4 bytes
@@ -165,7 +146,7 @@ public interface IBOTypesBOC {
    /**
     * {@link ITechCtxSettings}
     */
-   public static final int TYPE_012_MODULE_SETTINGS      = 12;
+   public static final int TYPE_012_CTX_SETTINGS      = 12;
 
    /**
     * Type for envelopping header returned by {@link ByteObject#toByteArray()}
@@ -174,13 +155,58 @@ public interface IBOTypesBOC {
    public static final int TYPE_013_TEMPLATE             = 13;
 
    /**
-    * Object used to serialize class state.
-    * Implementation provides its serialization/deserialization
-    * Similar than Object managed with a bytecontroller that loads
-    * big data structure.
-    * A Factory object is needed to map IDs to class for the module
+    * Special type saying that the given byte object is not really a {@link ByteObject} but a reference
+    * whose value is the following 4 bytes.
     */
-   public static final int TYPE_037_CLASS_STATE          = 14;
+   public static final int TYPE_015_REFERENCE_32         = 15;
+
+   /**
+    * Special type saying that the given byte object is not really a {@link ByteObject} but a reference
+    * whose value is the following 8 bytes.
+    */
+   public static final int TYPE_016_REFERENCE_64         = 16;
+
+   /**
+    * 
+    */
+   public static final int TYPE_017_REFERENCE_OBJECT     = 17;
+
+   public static final int TYPE_019_RELATIONSHIP         = 19;
+
+   public static final int TYPE_020_PARAMATERS           = 20;
+
+   /**
+    * Codes a function.
+    * <br>
+    * <br>
+    * Use an {@link Operator}
+    */
+   public static final int TYPE_021_FUNCTION             = 21;
+
+   /**
+    * When a function is called with a value, tests it against a boolean comparator.
+    * <br>
+    * an acceptor rejects/accepts it. It also decides if rejections counter to the value counter.
+    * <br>
+    * 
+    */
+   public static final int TYPE_022_ACCEPTOR             = 22;
+
+   /**
+    * Action on Pointers. 
+    * <br>
+    * <li> Toggles a flag of a {@link ByteObject}
+    * <li> Swap values from 2 {@link ByteObject} with a {@link ITechPointer}.
+    * <li> Applies a {@link ITechFunction} to a {@link ByteObject}.
+    */
+   public static final int TYPE_025_ACTION               = 25;
+
+   /**
+    * bad. should be made a sub type of model module
+    */
+   public static final int TYPE_026_INDEX                = 26;
+
+   public static final int TYPE_027_CONFIG               = 27;
 
    /**
     * A small (max 65k bytes) array of same type/flag/length {@link ByteObject}s.
@@ -211,48 +237,6 @@ public interface IBOTypesBOC {
     */
    public static final int TYPE_029_ARRAY_MAP            = 14;
 
-   public static final int TYPE_019_RELATIONSHIP         = 19;
-
-   public static final int TYPE_020_PARAMATERS           = 20;
-
-   /**
-    * Codes a function.
-    * <br>
-    * <br>
-    * Use an {@link Operator}
-    */
-   public static final int TYPE_021_FUNCTION             = 21;
-
-   /**
-    * When a function is called with a value, tests it against a boolean comparator.
-    * <br>
-    * an acceptor rejects/accepts it. It also decides if rejections counter to the value counter.
-    * <br>
-    * 
-    */
-   public static final int TYPE_022_ACCEPTOR             = 22;
-
-   /**
-    * 
-    */
-   public static final int TYPE_036_BYTE_CONTROLLER      = 36;
-
-   /**
-    * Action on Pointers. 
-    * <br>
-    * <li> Toggles a flag of a {@link ByteObject}
-    * <li> Swap values from 2 {@link ByteObject} with a {@link ITechPointer}.
-    * <li> Applies a {@link ITechFunction} to a {@link ByteObject}.
-    */
-   public static final int TYPE_025_ACTION               = 25;
-
-   /**
-    * bad. should be made a sub type of model module
-    */
-   public static final int TYPE_026_INDEX                = 26;
-
-   public static final int TYPE_027_CONFIG               = 27;
-
    /**
     * Max 65k
     * A number of {@link ByteObject}s grouped together sequentially.
@@ -270,5 +254,21 @@ public interface IBOTypesBOC {
     * Those that extends the {@link ByteObjectManaged}
     */
    public static final int TYPE_035_OBJECT_MANAGED       = 35;
+
+   /**
+    * 
+    */
+   public static final int TYPE_036_BYTE_CONTROLLER      = 36;
+
+   /**
+    * Object used to serialize class state.
+    * Implementation provides its serialization/deserialization
+    * Similar than Object managed with a bytecontroller that loads
+    * big data structure.
+    * A Factory object is needed to map IDs to class for the module
+    */
+   public static final int TYPE_037_CLASS_STATE          = 14;
+
+   public static final int TYPE_255_RESERVED             = 255;
 
 }

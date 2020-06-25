@@ -6,6 +6,12 @@ package pasa.cbentley.byteobjects.src4.tech;
 
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 
+/**
+ * TODO rename with IBOArray
+ * 
+ * @author Charles Bentley
+ *
+ */
 public interface ITechByteObjectArray extends ITechByteObject {
 
    public final static int BOA_BASE_TYPE               = IBOTypesBOC.TYPE_034_ARRAY_BIG;

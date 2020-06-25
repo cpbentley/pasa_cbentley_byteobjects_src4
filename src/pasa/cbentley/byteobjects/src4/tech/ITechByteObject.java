@@ -22,6 +22,7 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * 
  * Object has a 4 bytes suffix trailer field with a checksum.
  * 
+ * TODO rename with IBO, {@link ITechByteObjectArray}
  * 
  * @author Charles Bentley
  *

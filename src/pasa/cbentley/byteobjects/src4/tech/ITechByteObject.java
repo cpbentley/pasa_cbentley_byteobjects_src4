@@ -4,7 +4,6 @@
  */
 package pasa.cbentley.byteobjects.src4.tech;
 
-import pasa.cbentley.byteobjects.src4.core.BOModuleAbstract;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectRef;
@@ -38,7 +37,7 @@ public interface ITechByteObject extends IStringable {
 
    /**
     */
-   public static final int  A_OBJECT_FLAG_1_           = 1 << 0;
+   public static final int  A_OBJECT_FLAG_1_                     = 1 << 0;
 
    /**
     * This {@link ByteObject} has variable size due to {@link ByteObject#setDynOverWriteValues(int, int[], int)} kind of method.
@@ -107,23 +106,6 @@ public interface ITechByteObject extends IStringable {
    public static final int  A_OBJECT_FLAG_5_HAS_SUBS             = 1 << 4;
 
    /**
-    * ID to distinguish between two sub {@link ByteObject} with identical types when using
-    * {@link ByteObject#getSubTypedIntra(int, int)}.
-    * <br>
-    * Replaces the numerical order "referencing"
-    * <br>
-    * Up to 255 difference may coded.
-    * <br>
-    * <br>
-    * 
-    * Found using Length Last Byte litteral.
-    * <br>
-    * <br>
-    * @see ByteObject#getIntraReference()
-    */
-   public static final int  A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE = 1 << 5;
-
-   /**
     */
    public static final int  A_OBJECT_FLAG_6_                     = 1 << 5;
 
@@ -141,7 +123,12 @@ public interface ITechByteObject extends IStringable {
     * The tail header will always be located at the end of the {@link ByteObject}, even when extended
     * by a {@link ByteObjectManaged} with variable size.
     */
-   public static final int  A_OBJECT_FLAG_8_TAILER                 = 1 << 7;
+   public static final int  A_OBJECT_FLAG_8_TAILER               = 1 << 7;
+
+   /**
+    * 
+    */
+   public static final int  A_OBJECT_LENGTH_OVERRIDE             = 0xFFFF;
 
    public static final int  A_OBJECT_LITTERAL                    = 1;
 
@@ -221,11 +208,6 @@ public interface ITechByteObject extends IStringable {
    public static final int  A_OBJECT_OFFSET_3_LENGTH2            = 2;
 
    /**
-    * 
-    */
-   public static final int  A_OBJECT_LENGTH_OVERRIDE             = 0xFFFF;
-
-   /**
     * 1 byte for number of elements
     * 2 bytes for bytes consumed by all.
     */
@@ -241,6 +223,23 @@ public interface ITechByteObject extends IStringable {
     * In the serialized byte array version, this flag and data is removed.
     */
    public static final int  A_OBJECT_TAIL_FLAG_4_MEMORY_PINNED   = 8;
+
+   /**
+    * ID to distinguish between two sub {@link ByteObject} with identical types when using
+    * {@link ByteObject#getSubTypedIntra(int, int)}.
+    * <br>
+    * Replaces the numerical order "referencing"
+    * <br>
+    * Up to 255 difference may coded.
+    * <br>
+    * <br>
+    * 
+    * Found using Length Last Byte litteral.
+    * <br>
+    * <br>
+    * @see ByteObject#getIntraReference()
+    */
+   public static final int  A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE = 1 << 5;
 
    /**
     * Flags for the trailer header, if there is one.

@@ -215,24 +215,6 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return fac;
    }
 
-   public String getIDString(int did, int value) {
-      if (did <= DYN_9) {
-         if (dynamicDID[did] != null) {
-            if (value < 0 || value >= dynamicDID[did].length) {
-               return "BOModule#getIDString DID < DYNAMIC " + value;
-            }
-            return dynamicDID[did][value];
-         }
-      }
-      for (int i = 0; i < modules.length; i++) {
-         String idString = modules[i].getIDString(did, value);
-         if (idString != null) {
-            return idString;
-         }
-      }
-      return null;
-   }
-
    public BOModuleAbstract getMod(Class cl) {
       for (int i = 0; i < modules.length; i++) {
          if (modules[i].getClass() == cl) {
@@ -339,7 +321,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
          }
       }
       //could not find a module for the merge
-      throw new RuntimeException("Could not find a module for merging " + root.toStringType());
+      throw new RuntimeException("Could not find a module for merging " + root.toString());
    }
 
    /**
@@ -507,6 +489,24 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return null;
    }
 
+   public String toStringGetIDString(int did, int value) {
+      if (did <= DYN_9) {
+         if (dynamicDID[did] != null) {
+            if (value < 0 || value >= dynamicDID[did].length) {
+               return "BOModule#getIDString DID < DYNAMIC " + value;
+            }
+            return dynamicDID[did][value];
+         }
+      }
+      for (int i = 0; i < modules.length; i++) {
+         String idString = modules[i].getIDString(did, value);
+         if (idString != null) {
+            return idString;
+         }
+      }
+      return null;
+   }
+
    public UCtx toStringGetUCtx() {
       return boc.getUCtx();
    }
@@ -546,6 +546,17 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return "Type [" + bo.getType() + "] offset " + offset + " not found";
    }
 
+   public void toStringSubType(Dctx dc, ByteObject bo, int subType) {
+      for (int i = 0; i < modules.length; i++) {
+         boolean isDone = modules[i].toStringSubType(dc, bo, subType);
+         if (isDone) {
+            return;
+         }
+      }
+      throw new RuntimeException("toStringSubType ByteObject subtype " + subType + " -> Module not found or implemented");
+
+   }
+
    /**
     * Handles the fetching of the string.
     * @param type
@@ -560,17 +571,6 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
          }
       }
       return "Type [" + type + "] not found";
-   }
-
-   public void toStringSubType(Dctx dc, ByteObject bo, int subType) {
-      for (int i = 0; i < modules.length; i++) {
-         boolean isDone = modules[i].toStringSubType(dc, bo, subType);
-         if (isDone) {
-            return;
-         }
-      }
-      throw new RuntimeException("toStringSubType ByteObject subtype " + subType + " -> Module not found or implemented");
-
    }
 
    //#enddebug

@@ -1296,7 +1296,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
          //#debug
          toDLog().pNull("Factory -> " + getFactory().toString1Line() + " could not create object for " + tech.toString1Line(), this, ByteController.class, "instancetiate", LVL_05_FINE, false);
 
-         throw new IllegalArgumentException("Could not create object for " + tech.toString1Line());
+         throw new IllegalArgumentException("Could not create object for " + tech.toString());
       }
       fin.initMe();
       fin.setFlag(AGENT_OFFSET_03_FLAGZ_1, AGENT_FLAGZ_CTRL_7_SAVED, true);

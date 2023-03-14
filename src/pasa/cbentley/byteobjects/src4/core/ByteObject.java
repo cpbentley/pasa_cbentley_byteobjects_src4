@@ -1989,6 +1989,25 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
+    * Decrement the index value, not below zero
+    * @param index
+    * @param size
+    * @param incr
+    */
+   public void decrementZero(int index, int size, int incr) {
+      decrementMin(index, size, incr, 0);
+   }
+
+   public void decrementMin(int index, int size, int incr, int min) {
+      int val = getValue(index, size);
+      val -= incr;
+      if (val < min) {
+         val = min;
+      }
+      setValue(index, val, size);
+   }
+
+   /**
     * Increment the field {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}
     * <br>
     * 

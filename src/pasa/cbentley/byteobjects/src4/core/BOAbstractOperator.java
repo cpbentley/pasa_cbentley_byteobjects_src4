@@ -11,7 +11,7 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
- * Super class of all classes that implement a ByteObject in a static instance way.
+ * Super class of all classes that implement a {@link ByteObject} in a static instance way.
  * <br>
  * <br>
  * @author Charles Bentley
@@ -26,21 +26,21 @@ public class BOAbstractOperator implements IStringable {
 
    }
 
+
    //#mdebug
+   public IDLog toDLog() {
+      return toStringGetUCtx().toDLog();
+   }
+
    public String toString() {
       return Dctx.toString(this);
    }
 
    public void toString(Dctx dc) {
-      dc.root(this, "FactoryInstance");
+      dc.root(this, BOAbstractOperator.class, "@line5");
       toStringPrivate(dc);
    }
 
-   
-   public IDLog toDLog() {
-      return boc.toDLog();
-   }
-   
    public String toString1Line() {
       return Dctx.toString1Line(this);
    }
@@ -50,13 +50,16 @@ public class BOAbstractOperator implements IStringable {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "FactoryInstance");
+      dc.root1Line(this, BOAbstractOperator.class);
       toStringPrivate(dc);
    }
 
    public UCtx toStringGetUCtx() {
       return boc.getUCtx();
    }
+
    //#enddebug
+   
+
 
 }

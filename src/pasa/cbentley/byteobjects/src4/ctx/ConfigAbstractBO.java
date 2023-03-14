@@ -6,9 +6,16 @@ package pasa.cbentley.byteobjects.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.ctx.ConfigAbstract;
+import pasa.cbentley.core.src4.ctx.IConfig;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 
+/**
+ * Base implementation of the {@link IConfig} interface at the level of ByteObject module.
+ * 
+ * @author Charles Bentley
+ *
+ */
 public abstract class ConfigAbstractBO extends ConfigAbstract {
 
    public ConfigAbstractBO(UCtx uc) {
@@ -18,7 +25,7 @@ public abstract class ConfigAbstractBO extends ConfigAbstract {
    public void postProcessing(ByteObject settings, ABOCtx ctx) {
       //we don't want to do anything here in the default
    }
-   
+
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, ConfigAbstractBO.class, "@line5");
@@ -27,7 +34,7 @@ public abstract class ConfigAbstractBO extends ConfigAbstract {
    }
 
    private void toStringPrivate(Dctx dc) {
-      
+
    }
 
    public void toString1Line(Dctx dc) {
@@ -37,6 +44,5 @@ public abstract class ConfigAbstractBO extends ConfigAbstract {
    }
 
    //#enddebug
-   
 
 }

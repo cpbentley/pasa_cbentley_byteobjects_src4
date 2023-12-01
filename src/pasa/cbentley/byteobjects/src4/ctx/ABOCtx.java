@@ -16,7 +16,13 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * 
  * When first created without the knowledge of previous state, a default {@link ITechCtxSettings} is
  * created
+ * <p>
+ * Q: What is the difference between ByteObject settings and IConfigBO ?
+ * A: A {@link IConfig} is a Java class aggregating all the relevant settings of all the various
+ * ByteObjects used by the module of the config. A ByteObject setting is local to definition
  * 
+ *  
+ * </p>
  * @author Charles Bentley
  *
  */
@@ -29,12 +35,15 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
    private ByteObject        previousSettings;
 
    /**
+    * Tech Settings
     * Won't be null after the {@link ABOCtx#a_Init()}
     */
    private ByteObject        settingsBO;
 
    /**
     * Takes the def
+    * 
+    * Call to {@link ABOCtx#a_Init()} must be made by bottom class definition.
     * @param boc
     */
    public ABOCtx(IConfigBO config, BOCtx boc) {
@@ -44,10 +53,19 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
       //take the default size
    }
 
+   public ABOCtx(IConfigBO config, BOCtx boc, ByteObject settings) {
+      super(boc.getUCtx()); //registers the module and get the saved byte data
+      this.boc = boc;
+      this.configBO = config;
+      this.settingsBO = settings;
+   }
+
    /**
     * Calls {@link ABOCtx#applySettings(ByteObject, ByteObject)} last.
     * 
     * Caller must be able to deal with it.
+    * 
+    * This is a trick because there are no post creation method call. So this a_Init pattern is used
     */
    public void a_Init() {
       ByteObject settings = null;
@@ -76,8 +94,8 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
     * 
     * Old settings are given to know if they changed
     * 
-    * @param settingsNew
-    * @param settingsOld
+    * @param settingsNew cannot be null
+    * @param settingsOld null if first new settings
     */
    protected abstract void applySettings(ByteObject settingsNew, ByteObject settingsOld);
 
@@ -95,7 +113,12 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
       return configBO;
    }
 
+   /**
+    * Creates a {@link IBOTypesBOC#TYPE_012_CTX_SETTINGS} {@link ByteObject}
+    * @return
+    */
    public ByteObject getSettingsBOEmpty() {
+      //#mdebug
       int size = getBOCtxSettingSize();
       if (size < 4 || size > 1024) {
          throw new IllegalStateException(size + " is probably an invalid size. Make sure implementation returns the value");
@@ -180,7 +203,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
       int typesub = bo.get1(ITechCtxSettings.CTX_OFFSET_02_TYPE_SUB1);
       dc.appendVarWithSpace("typesub", typesub);
       dc.appendVarWithSpace("isUSed", bo.hasFlag(ITechCtxSettings.CTX_OFFSET_01_FLAG, ITechCtxSettings.CTX_FLAG_01_USED));
-      if(typesub != 0) {
+      if (typesub != 0) {
          dc.nl();
          boc.getBOModuleManager().toStringSubType(dc, bo, typesub);
       }

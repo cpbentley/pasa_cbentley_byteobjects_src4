@@ -9,6 +9,14 @@ import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.core.src4.ctx.IFlagsToString;
 
+/**
+ * Defines the flags to help debugging ByteObject modules.
+ * 
+ * @see IFlagsToString for master definition
+ * 
+ * @author Charles Bentley
+ *
+ */
 public interface IFlagsToStringBO extends IFlagsToString {
 
    /**
@@ -30,7 +38,7 @@ public interface IFlagsToStringBO extends IFlagsToString {
     * method for details.
     * The toString will only print the {@link ByteObject} class raw data.
     */
-   public static final int TOSTRING_FLAG_3_IGNORE_CONTENT    = 1 << 2;
+   public static final int TOSTRING_FLAG_3_IGNORE_CONTENT   = 1 << 2;
 
    /**
     * When set, toString of {@link ByteController} with lots of 
@@ -39,6 +47,6 @@ public interface IFlagsToStringBO extends IFlagsToString {
     */
    public static final int TOSTRING_FLAG_4_BYTEOBJECT_1LINE = 1 << 3;
 
-   public static final int D_FLAG_29_NULLS = 0;
+   public static final int D_FLAG_29_NULLS                  = 0;
 
 }

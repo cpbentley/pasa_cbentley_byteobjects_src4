@@ -1568,8 +1568,27 @@ public class ByteObject implements ITechByteObject, IStringable {
     * @return
     */
    public ByteObject[] getSubs(int type) {
+      int num = getSubNum(type);
+      ByteObject[] p = new ByteObject[num];
+      int count = 0;
+      for (int i = 0; i < p.length; i++) {
+         //will not enter loop when param is null since num is zero
+         if (param[i] != null && param[i].getType() == type) {
+            p[count] = param[i];
+            count++;
+         }
+      }
+      return p;
+   }
+
+   /**
+    * The Number of subs with given type
+    * @param type
+    * @return
+    */
+   public int getSubNum(int type) {
       if (param == null) {
-         return new ByteObject[0];
+         return 0;
       }
       int count = 0;
       for (int i = 0; i < param.length; i++) {
@@ -1577,15 +1596,29 @@ public class ByteObject implements ITechByteObject, IStringable {
             count++;
          }
       }
-      ByteObject[] p = new ByteObject[count];
-      count = 0;
+      return count;
+   }
+
+   /**
+    * Append at offset
+    * @param type
+    * @param ar
+    * @param offset
+    * @return
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough
+    */
+   public int getSubsAppend(int type, ByteObject[] ar, int offset) {
+      if (param == null) {
+         return 0;
+      }
+      int count = offset;
       for (int i = 0; i < param.length; i++) {
          if (param[i] != null && param[i].getType() == type) {
-            p[count] = param[i];
+            ar[count] = param[i];
             count++;
          }
       }
-      return p;
+      return count - offset;
    }
 
    /**

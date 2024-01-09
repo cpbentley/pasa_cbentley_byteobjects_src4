@@ -66,14 +66,28 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
     * Caller must be able to deal with it.
     * 
     * This is a trick because there are no post creation method call. So this a_Init pattern is used
+    * 
+    * When ignore saved settings are avoided, burn the ctx configuration file into the settings object.
+    * 3 cases
+    * <li>No Saved Settings on Disk. Use Config
+    * <li>Save Settings on Disk. Ignore Config
+    * <li>Ignore Saved Setting flags . Use Config
+    * 
+    * <p>
+    * <li> {@link ABOCtx#matchConfig(IConfigBO, ByteObject)}
+    * <li> {@link ABOCtx#applySettings(ByteObject, ByteObject)}
+    * </p>
     */
    public void a_Init() {
       ByteObject settings = null;
+      
       if (configBO.isIgnoreSettings() || uc.getConfigU().isIgnoreSettingsAll()) {
          //#debug
          toDLog().pInit("Ignoring Ctx Settings for " + this.getClass().getName(), this, ABOCtx.class, "a_Init", LVL_05_FINE, true);
-
+         
+         //flags tell us to ignored user saved config settings.. 
          settings = getSettingsBOEmpty();
+         //so create empty shell and burn hardcoded config
          matchConfig(configBO, settings);
 
       } else {
@@ -90,9 +104,19 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
    }
 
    /**
-    * Called when Settings have been changed. Implementation updates its behavior based on the new settings
+    * Go over every values/flags in settingsNew and configure context and package classes to reflect those values.
     * 
+    * <p>
+    * Called when 
+    * <li>Settings have been changed 
+    * <li>Automatically by constructor when the context is created. 
+    * </p>
+    * 
+    * <p>
+    * Implementation updates its behavior based on the new settings
     * Old settings are given to know if they changed
+    * </p>
+    * 
     * 
     * @param settingsNew cannot be null
     * @param settingsOld null if first new settings
@@ -111,24 +135,6 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
 
    public IConfig getConfig() {
       return configBO;
-   }
-
-   /**
-    * Creates a {@link IBOTypesBOC#TYPE_012_CTX_SETTINGS} {@link ByteObject}
-    * @return
-    */
-   public ByteObject getSettingsBOEmpty() {
-      //#mdebug
-      int size = getBOCtxSettingSize();
-      if (size < 4 || size > 1024) {
-         throw new IllegalStateException(size + " is probably an invalid size. Make sure implementation returns the value");
-      }
-      //#enddebug
-      int type = IBOTypesBOC.TYPE_012_CTX_SETTINGS;
-      ByteObject settings = new ByteObject(boc, type, size);
-      int ctxID = getCtxID();
-      settings.set3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3, ctxID);
-      return settings;
    }
 
    /**
@@ -166,6 +172,24 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
          throw new IllegalStateException("SettingsBO are initialized in a_Init(). Make sure the call was made for " + this.getClass().getName());
       }
       return settingsBO;
+   }
+
+   /**
+    * Creates a {@link IBOTypesBOC#TYPE_012_CTX_SETTINGS} {@link ByteObject}
+    * @return
+    */
+   public ByteObject getSettingsBOEmpty() {
+      //#mdebug
+      int size = getBOCtxSettingSize();
+      if (size < 4 || size > 1024) {
+         throw new IllegalStateException(size + " is probably an invalid size. Make sure implementation returns the value");
+      }
+      //#enddebug
+      int type = IBOTypesBOC.TYPE_012_CTX_SETTINGS;
+      ByteObject settings = new ByteObject(boc, type, size);
+      int ctxID = getCtxID();
+      settings.set3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3, ctxID);
+      return settings;
    }
 
    public ByteObject getSettingsBOForModification() {

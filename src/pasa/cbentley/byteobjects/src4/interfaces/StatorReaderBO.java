@@ -17,6 +17,13 @@ import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.StatorReader;
 
+/**
+ * {@link StatorReader} for {@link ByteObject} and {@link BOCtx}.
+ * 
+ * It can have a parent {@link StatorReaderBO}
+ * @author Charles Bentley
+ *
+ */
 public class StatorReaderBO extends StatorReader implements ITechStateBO {
 
    protected final BOCtx    boc;
@@ -33,17 +40,22 @@ public class StatorReaderBO extends StatorReader implements ITechStateBO {
       return false;
    }
 
+   /**
+    * Returns the {@link StatorReaderBO} associated with the type of data
+    * @param type
+    * @return
+    */
    public StatorReaderBO getStateReader(int type) {
       return this;
    }
-   
+
    public IPrefsReader getKeyValuePairs() {
       if (prefs == null && parent != null) {
          return parent.getKeyValuePairs();
       }
       return prefs;
    }
-   
+
    public ByteObject readByteObject() {
       byte[] data = getDataReader().readByteArray();
       ByteObject bo = new ByteObject(boc, data);

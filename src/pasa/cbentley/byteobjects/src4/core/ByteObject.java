@@ -316,9 +316,12 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Replace existing {@link ByteObject} that has the same type
+    * Replace existing {@link ByteObject} that has the same type.
+    * <p>
+    * When {@link ByteObject} is null, nothing happens and return -1;
+    * </p>
     * @param bo
-    * @return
+    * @return the index at which the {@link ByteObject} was set in the parameter array.
     */
    public int addByteObjectUniqueType(ByteObject bo) {
       immutableCheck();
@@ -512,7 +515,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Clone the {@link ByteObject} bytes but uses the parameter references
+    * Clone the {@link ByteObject} bytes but uses the parameter references in a new {@link ByteObject}[]
     * <br>
     * <br>
     * @return
@@ -1396,6 +1399,11 @@ public class ByteObject implements ITechByteObject, IStringable {
       return p;
    }
 
+   public int getSubFirstIndex(int type) {
+      int p = getSubOrderIndex(type, 0);
+      return p;
+   }
+
    public ByteObject getSubFirst(int type, int index, int size, int value) {
       return getSub(type, index, size, value, 0);
    }
@@ -1514,6 +1522,35 @@ public class ByteObject implements ITechByteObject, IStringable {
          }
       }
       return null;
+   }
+
+   /**
+    * Look up the <code>num</code> th {@link ByteObject} of {@link ITechByteObject#A_OBJECT_OFFSET_1_TYPE1}
+    * <code>type</code>.
+    * <br>
+    * Zero based index
+    * <br>
+    * <br>
+    * -1 when not found.
+    * <br>
+    * <br>
+    * 
+    * @param type int value such as {@link IBOTypesBOC#TYPE_010_POINTER}
+    * @param num first is zero
+    * @return
+    */
+   public int getSubOrderIndex(int type, int num) {
+      if (param == null)
+         return -1;
+      int count = 0;
+      for (int i = 0; i < param.length; i++) {
+         if (param[i] != null && param[i].getType() == type) {
+            if (count == num)
+               return i;
+            count++;
+         }
+      }
+      return -1;
    }
 
    public boolean hasSubType(int type) {

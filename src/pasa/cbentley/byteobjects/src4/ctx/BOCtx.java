@@ -170,6 +170,9 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       acceptorStatic = new AcceptorOperator(this);
       byteObjectC = new ByteObjectFactory(this);
       mergeMask = new MergeMaskFactory(this);
+      
+      //#debug
+      toDLog().pInit("Created", this, BOCtx.class, "BOCtx", LVL_05_FINE, true);
    }
 
    public BOCtx(UCtx uc, CtxManager m) {

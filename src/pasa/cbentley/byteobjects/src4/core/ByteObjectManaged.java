@@ -6,13 +6,13 @@ package pasa.cbentley.byteobjects.src4.core;
 
 import java.io.IOException;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IMemorySource;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.interfaces.IMemorySource;
 import pasa.cbentley.byteobjects.src4.sources.ITechMemorySource;
 import pasa.cbentley.byteobjects.src4.sources.MemorySource;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
-import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.BytesIterator;
 import pasa.cbentley.core.src4.io.BADataIS;
@@ -32,8 +32,8 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * {@link ByteObjectManaged} can be unmanaged i.e. null {@link ByteController} and thus behave like a regular {@link ByteObject}.
  * <br>
  * <br>
- * Following the {@link ByteObject} header defined in {@link ITechByteObject} of size {@link ITechByteObject#A_OBJECT_BASIC_SIZE}, all {@link ByteObjectManaged}
- * have a {@link ITechObjectManaged} header of size {@link ITechObjectManaged#AGENT_BASIC_SIZE}. Unlike simple {@link ByteObject}s philosophy of <b>small and many</b>, {@link ByteObjectManaged}
+ * Following the {@link ByteObject} header defined in {@link IByteObject} of size {@link IByteObject#A_OBJECT_BASIC_SIZE}, all {@link ByteObjectManaged}
+ * have a {@link IBOAgentManaged} header of size {@link IBOAgentManaged#AGENT_BASIC_SIZE}. Unlike simple {@link ByteObject}s philosophy of <b>small and many</b>, {@link ByteObjectManaged}
  * have big header, so they fit the use case of <b>few and big</b>.
  * <br>
  * This header's field helps the {@link ByteController} loading data structures from various {@link IMemorySource}.
@@ -47,10 +47,10 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * <li> {@link ByteObjectManaged#getDataOffsetStartLoaded()} : 
  * <li> {@link ByteObjectManaged#getLastUsedByte()} : Lastusedbyte is relative to offset and must be equal or smaller than the length attribute.
  * <br>
- * Immediately following we have the Memory Managing header {@link ITechObjectManaged#AGENT_OFFSET_17_MAGIC2}
+ * Immediately following we have the Memory Managing header {@link IBOAgentManaged#AGENT_OFFSET_17_MAGIC2}
  * <br>
  * <br>
- * The length is controlled by {@link ITechObjectManaged#AGENT_OFFSET_16_LEN4}. This field only records data in the actual byte array.
+ * The length is controlled by {@link IBOAgentManaged#AGENT_OFFSET_16_LEN4}. This field only records data in the actual byte array.
  * If the sub class of {@link ByteObjectManaged} uses un-serialized integer arrays to store some data, the length field
  * does not record it.
  * <br>
@@ -74,28 +74,28 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * <br>
  * <br>
  * <br>
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_01_FLAG_1}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_03_FLAGZ_1}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_02_FLAGX_1}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_04_INTERFACE_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_05_CLASS_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_07_INSTANCE_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_08_REF_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_09_CTRL_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_10_PAKAGE_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_11_APP_ID2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_12_LEN_HEADER_DYN2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_13_LEN_HEADER2}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_14_LEN_DATA_4}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_15_LEN_BUFFER_3}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_16_LEN4}
- * <li>{@link ITechObjectManaged#AGENT_OFFSET_17_MAGIC2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_01_FLAG_1}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_03_FLAGZ_1}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_02_FLAGX_1}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_04_INTERFACE_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_05_CLASS_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_07_INSTANCE_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_08_REF_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_09_CTRL_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_10_PAKAGE_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_11_APP_ID2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_12_LEN_HEADER_DYN2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_13_LEN_HEADER2}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_14_LEN_DATA_4}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_15_LEN_BUFFER_3}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_16_LEN4}
+ * <li>{@link IBOAgentManaged#AGENT_OFFSET_17_MAGIC2}
  * @author Charles Bentley
  * 
  * TODO BOAgent or BOManaged?
  */
-public class ByteObjectManaged extends ByteObject implements ITechObjectManaged, ITechMemorySource {
+public class ByteObjectManaged extends ByteObject implements IBOAgentManaged, ITechMemorySource {
 
    public static final int INTERFACE_OFFSET_MASK10BITS = 0x3FF;
 
@@ -271,7 +271,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * True when {@link ITechObjectManaged#AGENT_FLAGZ_CTRL_5_LOCKED}
+    * True when {@link IBOAgentManaged#AGENT_FLAGZ_CTRL_5_LOCKED}
     * @return
     */
    public boolean isLocked() {
@@ -279,7 +279,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * True when {@link ITechObjectManaged#AGENT_FLAGZ_CTRL_6_WAITING}
+    * True when {@link IBOAgentManaged#AGENT_FLAGZ_CTRL_6_WAITING}
     * @return
     */
    public boolean isWaiting() {
@@ -292,10 +292,10 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
     * <br>
     * The {@link ByteObject} may have sub object which are transferred to the
     * newly created {@link ByteObjectManaged} which only copies the header and data of
-    * size given by {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2} and {@link ITechObjectManaged#AGENT_OFFSET_16_LEN4}
+    * size given by {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2} and {@link IBOAgentManaged#AGENT_OFFSET_16_LEN4}
     * <br>
     * <br> 
-    * Sets the {@link ITechObjectManaged#AGENT_OFFSET_16_LEN4} with the length of the array.
+    * Sets the {@link IBOAgentManaged#AGENT_OFFSET_16_LEN4} with the length of the array.
     * <br>
     * <br>
     * 
@@ -515,7 +515,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * Asks the {@link ByteController} to reload the agent data.
     * <br>
-    * The data must have been unloaded. i.e. {@link ITechObjectManaged#AGENT_FLAG_CTRL_7_DATA_UNLOADED} set to true by the ByteCon.
+    * The data must have been unloaded. i.e. {@link IBOAgentManaged#AGENT_FLAG_CTRL_7_DATA_UNLOADED} set to true by the ByteCon.
     * Why was the data unloaded? To free memory.
     * <br>
     * When reloading the data, what happens to dependencies ? If those havent been unloaded or they have and then reloaded
@@ -597,7 +597,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * Expand array increasing the data region. Use the buffer area if any.
     * <br>
-    * {@link ITechObjectManaged#AGENT_OFFSET_15_LEN_BUFFER_3}. Will try to eat into the buffer zone
+    * {@link IBOAgentManaged#AGENT_OFFSET_15_LEN_BUFFER_3}. Will try to eat into the buffer zone
     * See {@link ByteObjectManaged#expandArrayInternal(int, int)}
     * <br>
     * <br>
@@ -632,7 +632,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * Expanding buffer.
     * <br>
-    * See {@link ITechObjectManaged#AGENT_OFFSET_15_LEN_BUFFER_3}
+    * See {@link IBOAgentManaged#AGENT_OFFSET_15_LEN_BUFFER_3}
     * @param incr when increment is negative, reduce buffer.
     * 
     * See {@link ByteObjectManaged#bufferTrim()} to remove buffer
@@ -677,7 +677,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
 
    /**
     * Cut a new array
-    * Sets the number of bytes available for the data part {@link ITechObjectManaged#AGENT_OFFSET_14_LEN_DATA_4}. Those bytes are set to 0.
+    * Sets the number of bytes available for the data part {@link IBOAgentManaged#AGENT_OFFSET_14_LEN_DATA_4}. Those bytes are set to 0.
     * <br>
     * <br>
     * Does not reset header values. Header size is returned by {@link ByteObjectManaged#}.
@@ -754,7 +754,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Utility method to creates an object to start reading at {@link ITechObjectManaged#AGENT_OFFSET_14_LEN_DATA_4}
+    * Utility method to creates an object to start reading at {@link IBOAgentManaged#AGENT_OFFSET_14_LEN_DATA_4}
     * 
     * Creates a {@link DataBAInputStream} to read the {@link ByteObjectManaged} data.
     * @return
@@ -794,7 +794,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Returns {@link ITechObjectManaged#AGENT_OFFSET_05_CLASS_ID2} from the {@link ByteObjectManaged} byte array header.
+    * Returns {@link IBOAgentManaged#AGENT_OFFSET_05_CLASS_ID2} from the {@link ByteObjectManaged} byte array header.
     * <br>
     * <br>
     * 
@@ -805,7 +805,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * {@link ITechObjectManaged#AGENT_OFFSET_09_CTRL_ID2}
+    * {@link IBOAgentManaged#AGENT_OFFSET_09_CTRL_ID2}
     * @return
     */
    public int getIDCtrl() {
@@ -815,7 +815,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * Return the GSource id written in the Agent's header
     * 0 if no data
-    * {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2}
+    * {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2}
     */
    public int getIDGSource() {
       return get2(AGENT_OFFSET_06_GSOURCE_ID2);
@@ -824,7 +824,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * Return the instance id written in the Agent's header
     * 0 if no data
-    * {@link ITechObjectManaged#AGENT_OFFSET_07_INSTANCE_ID2}
+    * {@link IBOAgentManaged#AGENT_OFFSET_07_INSTANCE_ID2}
     */
    public int getIDInstance() {
       return get2(AGENT_OFFSET_07_INSTANCE_ID2);
@@ -860,7 +860,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * {@link ITechObjectManaged#AGENT_OFFSET_08_REF_ID2}
+    * {@link IBOAgentManaged#AGENT_OFFSET_08_REF_ID2}
     * @return
     */
    public int getIDRef() {
@@ -870,11 +870,11 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * We override because the length is decided by 4 bytes
     * <br>
-    * All {@link ByteObjectManaged} have a maxed out {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2} field.
+    * All {@link ByteObjectManaged} have a maxed out {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2} field.
     * <br>
     * <br>
-    * @see ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2
-    * @see ITechObjectManaged#AGENT_OFFSET_16_LEN4
+    * @see IByteObject#A_OBJECT_OFFSET_3_LENGTH2
+    * @see IBOAgentManaged#AGENT_OFFSET_16_LEN4
     */
    public int getLength() {
       return get4(AGENT_OFFSET_16_LEN4);
@@ -893,7 +893,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Gets the {@link ITechObjectManaged#AGENT_OFFSET_16_LEN4} field value.
+    * Gets the {@link IBOAgentManaged#AGENT_OFFSET_16_LEN4} field value.
     * <br>
     * <br>
     * 
@@ -903,7 +903,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Gets the {@link ITechObjectManaged#AGENT_OFFSET_13_LEN_HEADER2} field value.
+    * Gets the {@link IBOAgentManaged#AGENT_OFFSET_13_LEN_HEADER2} field value.
     * <br>
     * <br>
     * This value is set during creation and is the fixed header length.
@@ -982,7 +982,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Check whether {@link ITechObjectManaged#AGENT_OFFSET_14_LEN_DATA_4} is 0
+    * Check whether {@link IBOAgentManaged#AGENT_OFFSET_14_LEN_DATA_4} is 0
     * 
     * @return return true if != 0
     */
@@ -1011,7 +1011,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Increment the {@link ITechObjectManaged#AGENT_OFFSET_16_LEN4} field.
+    * Increment the {@link IBOAgentManaged#AGENT_OFFSET_16_LEN4} field.
     * <br>
     * <br>
     * Used when increasing/decreasing suffix trailers.
@@ -1060,7 +1060,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    /**
     * Initialize critical fields.
     * 
-    * The Length field of the {@link ByteObject} is set to 0xFFFF ( {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}
+    * The Length field of the {@link ByteObject} is set to 0xFFFF ( {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}
     */
    protected void initBOManaged() {
       if (get4(AGENT_OFFSET_16_LEN4) == 0) {
@@ -1119,8 +1119,8 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
     * <br>
     * a {@link ByteObjectManaged} in a {@link ByteController} only belongs to ONE {@link MemorySource}.
     * <br>
-    * <li>Is the flag {@link ITechObjectManaged#AGENT_FLAG_CTRL_6_READ_ONLY}
-    * <li> {@link ITechByteObject#A_OBJECT_FLAG_7_IMMUTABLE}
+    * <li>Is the flag {@link IBOAgentManaged#AGENT_FLAG_CTRL_6_READ_ONLY}
+    * <li> {@link IByteObject#A_OBJECT_FLAG_7_IMMUTABLE}
     * <li>
     * Flag it when it is obvious
     * <li>Take a CRC check for critical
@@ -1163,11 +1163,11 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
    }
 
    /**
-    * Sub class makes its best effort to remove its data from memory. It always keep its {@link ITechObjectManaged} header.
+    * Sub class makes its best effort to remove its data from memory. It always keep its {@link IBOAgentManaged} header.
     * <br>
-    * The flag is set {@link ITechObjectManaged#AGENT_FLAG_CTRL_7_DATA_UNLOADED}
+    * The flag is set {@link IBOAgentManaged#AGENT_FLAG_CTRL_7_DATA_UNLOADED}
     * <br>
-    * {@link ITechObjectManaged#AGENT_FLAG_CTRL_8_DATA_ON_DEMAND}
+    * {@link IBOAgentManaged#AGENT_FLAG_CTRL_8_DATA_ON_DEMAND}
     * When a method is called, it must reload itself on the {@link ByteController}
     */
    protected void memoryClearSub() {
@@ -1285,7 +1285,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
     * <br>
     * This method breaks the one to one
     * 
-    * {@link ITechObjectManaged#AGENT_FLAG_CTRL_5_ROOT} is set to true
+    * {@link IBOAgentManaged#AGENT_FLAG_CTRL_5_ROOT} is set to true
     */
    public byte[] serializePack() {
       ByteController bc = new ByteController(boc);
@@ -1354,7 +1354,7 @@ public class ByteObjectManaged extends ByteObject implements ITechObjectManaged,
     * <br>
     * The snapshot content is modified as followed:
     * <li> Flag {@link IObjectManaged#}
-    * <li> Field {@link ITechObjectManaged#AGENT_OFFSET_08_REF_ID2} is set according
+    * <li> Field {@link IBOAgentManaged#AGENT_OFFSET_08_REF_ID2} is set according
     * to entry
     * <br>
     * What if {@link ByteController} has special MemorySource rule? GID are mapped equally

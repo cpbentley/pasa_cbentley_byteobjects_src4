@@ -4,15 +4,15 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IJavaObjectFactory;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOByteControler;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IFlagsToStringBO;
-import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
+import pasa.cbentley.byteobjects.src4.ctx.IToStringFlagsBO;
 import pasa.cbentley.byteobjects.src4.sources.ByteArraySource;
 import pasa.cbentley.byteobjects.src4.sources.JarSource;
 import pasa.cbentley.byteobjects.src4.sources.MemorySource;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteControler;
-import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.ITechLvl;
 import pasa.cbentley.core.src4.memory.IMemFreeable;
@@ -63,12 +63,12 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * 1)Create a Trie. Serialize using {@link ByteObjectManaged#serializePack()}. Save the byte array as a single block. 
  * <br>
  * 2)Create a Trie. Fill it. Create a {@link ByteController} with several memory sources. Each {@link ByteObjectManaged} is assigned several IDs.
- * {@link ByteController} links each Trie component to its memory source using {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2} for the memory source
- * and {@link ITechObjectManaged#AGENT_OFFSET_07_INSTANCE_ID2} for the instance in that memory source.
+ * {@link ByteController} links each Trie component to its memory source using {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2} for the memory source
+ * and {@link IBOAgentManaged#AGENT_OFFSET_07_INSTANCE_ID2} for the instance in that memory source.
  * Call {@link ByteObjectManaged#serializeTo(ByteController)} and then {@link ByteController#saveAgents()}
  * <br>
  * <br>
- * Every chunk of memory from {@link MemorySource} is wrapped in a byte header defined by {@link ITechByteControler}.
+ * Every chunk of memory from {@link MemorySource} is wrapped in a byte header defined by {@link IBOByteControler}.
  *  
  * <br>
  * <b>Loading</b>
@@ -148,7 +148,7 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * @author Charles Bentley
  *
  */
-public class ByteController extends ByteObjectManaged implements ITechByteControler, IMemFreeable {
+public class ByteController extends ByteObjectManaged implements IBOByteControler, IMemFreeable {
 
    /**
     * Index of the first free slot in agent array.
@@ -183,10 +183,10 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * 
     * Headers of root ByteController from ith {@link MemorySource}. 
     * <br>
-    * {@link ITechByteControler} headers that match the {@link ByteController}.
+    * {@link IBOByteControler} headers that match the {@link ByteController}.
     * <br>
     * When the flag is set, the header is alone and none of the data is not loaded
-    * {@link ITechByteControler#MEMC_FLAG_4_HEADER_ALONE}.
+    * {@link IBOByteControler#MEMC_FLAG_4_HEADER_ALONE}.
     * <br>
     * Initialized during constructor with size of MemorySource array.
     * <br>
@@ -219,7 +219,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    MemorySource[]                dataSources;
 
    /**
-    * Factory for creating instance of {@link ByteObjectManaged} based on {@link ITechObjectManaged#AGENT_OFFSET_05_CLASS_ID2}
+    * Factory for creating instance of {@link ByteObjectManaged} based on {@link IBOAgentManaged#AGENT_OFFSET_05_CLASS_ID2}
     * <br>
     * <br>
     * If none is set, uses the 
@@ -366,7 +366,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * Adds the Agent to the list. Agent takes next index.
     * Since the memory area is known
     * <br>
-    * The agent is linked to the data source {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2}.
+    * The agent is linked to the data source {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2}.
     * 
     * <br>
     * @param agent {@link ByteObjectManaged}
@@ -569,10 +569,10 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * <br>
     * <br>
     * Expansion of memory follows different directives
-    * <li> {@link ITechByteControler#MEMC_EX_POLICY_0_DEFAULT}
-    * <li> {@link ITechByteControler#MEMC_EX_POLICY_3_SINGLE}
-    * <li> {@link ITechByteControler#MEMC_EX_POLICY_1_MULTIPLE}
-    * <li> {@link ITechByteControler#MEMC_EX_POLICY_2_EXPULSE}
+    * <li> {@link IBOByteControler#MEMC_EX_POLICY_0_DEFAULT}
+    * <li> {@link IBOByteControler#MEMC_EX_POLICY_3_SINGLE}
+    * <li> {@link IBOByteControler#MEMC_EX_POLICY_1_MULTIPLE}
+    * <li> {@link IBOByteControler#MEMC_EX_POLICY_2_EXPULSE}
     * <br>
     * <br>
     * The goal is to reach
@@ -818,7 +818,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    //   }
 
    /**
-    * Look up the {@link ByteObjectManaged} with {@link ITechObjectManaged#AGENT_OFFSET_08_REF_ID2}.
+    * Look up the {@link ByteObjectManaged} with {@link IBOAgentManaged#AGENT_OFFSET_08_REF_ID2}.
     * <br>
     * <br>
     * @see ByteController#getBOMLive(int, int, int)
@@ -847,7 +847,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * {@link ByteController#getAgentRoot()} is the starting point.
     * <br>
     * <br>
-    * If the tech is not null, {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2} gives a hint
+    * If the tech is not null, {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2} gives a hint
     * on which memory source the object resides.
     * If it is not found, the {@link ByteController} will scan all {@link MemorySource} for the reference.
     * <br>
@@ -855,7 +855,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * <br>
     * The agent is added to the list
     * <br>
-    * @param refID {@link ITechObjectManaged#AGENT_OFFSET_08_REF_ID2} to look for. When 0, method uses the factory
+    * @param refID {@link IBOAgentManaged#AGENT_OFFSET_08_REF_ID2} to look for. When 0, method uses the factory
     * to create a new instance object based on the {@link ByteObjectManaged} tech parameters and safety Interface.
     * @param tech
     * @return
@@ -1123,7 +1123,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    /**
     * Computes the total number of bytes consumed by the main byte arrays.
     * <br>
-    * Agents {@link ITechObjectManaged#AGENT_FLAG_CTRL_4_UNPACKED} are requested to compute unpacked data cost
+    * Agents {@link IBOAgentManaged#AGENT_FLAG_CTRL_4_UNPACKED} are requested to compute unpacked data cost
     * @return
     */
    public int getBytesConsumed() {
@@ -1359,7 +1359,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    }
 
    /**
-    * {@link ITechByteControler#MEMC_FLAG_3_LEAN_MEMORY}
+    * {@link IBOByteControler#MEMC_FLAG_3_LEAN_MEMORY}
     * Decided by Master Memory Controller based on Memory Conditions
     * @return
     */
@@ -1372,7 +1372,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
     * <br>
     * Null if no agents need to be saved at the {@link MemorySource}.
     * @param gid
-    * @return an array of {@link ByteObjectManaged} whose {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2} is "gid"
+    * @return an array of {@link ByteObjectManaged} whose {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2} is "gid"
     */
    public ByteObjectManaged[] isSaveNeed(int gid) {
       ByteObjectManaged[] a0 = findAgentsGroup(gid);
@@ -1694,8 +1694,8 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
 
    /**
     * Merge {@link ByteController}
-    * <li> Shift {@link ITechObjectManaged#AGENT_OFFSET_08_REF_ID2}
-    * <li> Shift {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2}
+    * <li> Shift {@link IBOAgentManaged#AGENT_OFFSET_08_REF_ID2}
+    * <li> Shift {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2}
     * <li> Update {@link ByteObjectManaged} references
     * <li> 
     * 
@@ -1708,7 +1708,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    /**
     * Read the datasource of the Agent, if it has been nulled
     * <br>
-    * The {@link MemorySource} is identified by {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2} and {@link ITechObjectManaged#AGENT_OFFSET_07_INSTANCE_ID2}
+    * The {@link MemorySource} is identified by {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2} and {@link IBOAgentManaged#AGENT_OFFSET_07_INSTANCE_ID2}
     * <br>
     * <br>
     * The agent data is not saved. it is serialized in reverse.
@@ -1928,7 +1928,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
    }
 
    /**
-    * Packs all the data into a single byte array inside a {@link ITechByteControler} enveloppe.
+    * Packs all the data into a single byte array inside a {@link IBOByteControler} enveloppe.
     * <br>
     * 
     * @return
@@ -2100,7 +2100,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
                   sb.append("null");
                } else {
                   //toString only the ByteController header
-                  if (boc.toStringHasToStringFlag(IFlagsToStringBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
+                  if (boc.toStringHasToStringFlag(IToStringFlagsBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
                      sb.nlLvl1Line(bcse[k][i]);
                   } else {
                      sb.nlLvl(bcse[k][i]);
@@ -2152,7 +2152,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
          int[] ids = dataSources[i].getValidIDs();
          boc.getUCtx().getIU().toStringIntArray1Line(sb, "IDs", ids, ",");
          //we have a branch
-         if (boc.toStringHasToStringFlag(IFlagsToStringBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
+         if (boc.toStringHasToStringFlag(IToStringFlagsBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
             dataSources[k].toString1Line(sb);
          } else {
             sb.nlLvl(dataSources[k]);
@@ -2187,7 +2187,7 @@ public class ByteController extends ByteObjectManaged implements ITechByteContro
             sb.append("null");
          } else {
             //
-            if (boc.toStringHasToStringFlag(IFlagsToStringBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
+            if (boc.toStringHasToStringFlag(IToStringFlagsBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
                agentsRefArray[i].toString1Line(sb);
             } else {
                agentsRefArray[i].toString(sb.newLevel());

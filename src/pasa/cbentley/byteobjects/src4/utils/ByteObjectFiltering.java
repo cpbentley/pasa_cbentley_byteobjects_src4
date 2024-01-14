@@ -5,7 +5,7 @@
 package pasa.cbentley.byteobjects.src4.utils;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.functions.Acceptor;
+import pasa.cbentley.byteobjects.src4.objects.function.Acceptor;
 
 /**
  * Filters Accepts/Rejects {@link ByteObject}.

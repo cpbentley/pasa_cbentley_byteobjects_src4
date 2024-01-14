@@ -4,8 +4,8 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -28,7 +28,7 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  * @author Charles Bentley
  *
  */
-public class LockManager implements ITechObjectManaged, IStringable {
+public class LockManager implements IBOAgentManaged, IStringable {
 
    IntToObjects  locksBom;
 

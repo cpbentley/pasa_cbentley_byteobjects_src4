@@ -4,17 +4,16 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IDebugStringable;
-import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactory;
-import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
+import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
-
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.ShortUtils;
 
@@ -27,39 +26,47 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * <p>
  * Each application module that uses the {@link ByteObject} framework, creates a subclass of this class and registers it.
  * </p>
+ * That class implements the following key methods. It will inspect the {@link ByteObject} and
+ * look up if it knows it type,extension.
  * <p>
- * <li> {@link BOModuleAbstract#getDefaultFactory()}
- * <li> {@link BOModuleAbstract#getDV()}
- * <li> {@link BOModuleAbstract#getUI()}
+ * <li> {@link BOModuleAbstract#getFlagOrderedBO(ByteObject, int, int)}
+ * <li> {@link BOModuleAbstract#toStringGetDIDString(int, int)}
+ * <li> {@link BOModuleAbstract#merge(ByteObject, ByteObject)}
+ * <li> {@link BOModuleAbstract#toString(Dctx, ByteObject)}
+ * <li> {@link BOModuleAbstract#toString1Line(Dctx, ByteObject)}
+ * <li> {@link BOModuleAbstract#toStringOffset(ByteObject, int)}
+ * <li> {@link BOModuleAbstract#toStringType(int)}
  * </p>
- * <br>
- * <br>
+ * <p>
  * Template for all modules wanting to plug into the debug architecture of {@link ByteObject}s.
- * <br>
- * <br>
- * 
- * All users Implements the module {@link IStaticObjCtrl}
- * Provides "instance" method for generic {@link ByteObject}.
- * <br>
+ * </p>
+ * <p>
+ * When a user want to toString a ByteObject, it called the {@link BOModulesManager#toString(Dctx, ByteObject)} which
+ * in turn asks all its {@link BOModuleAbstract} if they are able to process that {@link ByteObject}
+ * </p>
+ * <p>
+ *
  * For example, a {@link ByteObject} cannot tell the String meaning of an integer field. The first use of those ByteObject
  * is for debugging purposes to map a int ID to a String.
  * <li>Debug
  * <li>Merge {@link ByteObject}
  * <li>
+ * </p>
+ * 
  * @author Charles Bentley
  *
- * BOEngine, BOInterpreter, 
  */
-public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringable, IStringable {
+public abstract class BOModuleAbstract implements IByteObject, IDebugStringable, IStringable {
 
-   protected BOCtx            boc;
+   protected BOCtx boc;
 
-   private IJavaObjectFactory defFac;
-
-   protected int              moduleIndex;
+   protected int   moduleIndex;
 
    /**
-    * 
+    * Register this module to the {@link BOModulesManager#addModule(BOModuleAbstract)}.
+    * <p>
+    * This process 
+    * </p>
     * @param boc
     * @param root is null.. then this BOModule is its own root
     */
@@ -68,19 +75,46 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
       boc.getBOModuleManager().addModule(this);
    }
 
-   public IJavaObjectFactory getDefaultFactory() {
-      return defFac;
+   /**
+    * Method to be sub-classed by the Module.
+    * <br>
+    * <br>
+    *  
+    * @param type
+    * @param def
+    * @return
+    */
+   public Object createExtension(int type, ByteObject def) {
+      return null;
    }
 
-   public abstract ByteObject getFlagOrdered(ByteObject bo, int offset, int flag);
-
-   public void setDynamicDIDData(int did, String[] strings) {
-      boc.getBOModuleManager().setDynamicDIDData(did, strings);
+   /**
+    * For specification see {@link BOModulesManager#getArrayFrom(ByteObject, int[])}
+    * <p>
+    * Do not call directly unless you know the {@link ByteObject} to belongs to this module instance.
+    * </p>
+    * @param bo
+    * @param param
+    * @return
+    */
+   public int[] getArrayFrom(ByteObject bo, int[] param) {
+      return null;
    }
 
-   ByteObject mergeNoCheck(ByteObject root, ByteObject merge) {
-      return merge(root, merge);
-   }
+   /**
+    * For specification see {@link BOModulesManager#getByteObjectFlagOrdered(ByteObject, int, int))}
+    * <p>
+    * Do not call directly unless you know the {@link ByteObject} to belongs to this module instance.
+    * </p>
+    * 
+    * @param bo
+    * @param offset
+    * @param flag
+    * @return null if {@link ByteObject} is not know
+    * 
+    * @see IBOPointer#POINTER_FLAG_8_FLAG_ORDERING
+    */
+   public abstract ByteObject getFlagOrderedBO(ByteObject bo, int offset, int flag);
 
    /**
     * Takes root {@link ByteObject} and merge object. Similar to 2 image layers
@@ -106,55 +140,21 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
    public abstract ByteObject merge(ByteObject root, ByteObject merge);
 
    /**
+    * 
+    * @param root
+    * @param merge
+    * @return
+    */
+   ByteObject mergeNoCheck(ByteObject root, ByteObject merge) {
+      return merge(root, merge);
+   }
+
+   /**
     * Called by the {@link BOModulesManager} when module registers.
     * @param index
     */
    void setManagerIndex(int index) {
       moduleIndex = index;
-   }
-
-   /**
-    * Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    *  
-    * @param type
-    * @param def
-    * @return
-    */
-   public Object subExtension(int type, ByteObject def) {
-      return null;
-   }
-
-   /**
-    * Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    *  
-    * @param bo
-    * @param param
-    * @return
-    */
-   public int[] subGenerateArray(ByteObject bo, int[] param) {
-      return null;
-   }
-
-   //#mdebug
-   /**
-    *  Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    *  
-    * @param bo
-    * @param nl
-    * @return
-    */
-   public String subToString(ByteObject bo, String nl) {
-      return null;
-   }
-
-   public String subToStringLinkSub(int link) {
-      return null;
    }
 
    /**
@@ -182,23 +182,22 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
       return Dctx.toString(this);
    }
 
+   //#mdebug
+
    public void toString(Dctx dc) {
       dc.root(this, "BOModuleAbstract");
       toStringPrivate(dc);
-      dc.nlLvlNullTitle("IJavaObjectFactory", defFac);
-   }
-
-   private void toStringPrivate(Dctx dc) {
-      dc.appendVarWithSpace("moduleIndex", moduleIndex);
    }
 
    /**
-    * Appends {@link Dctx} with a string representation of {@link ByteObject}
-    * <br>
-    * <br>
+    * For specification see {@link BOModulesManager#toString(Dctx, ByteObject)}
+    * <p>
+    * Do not call directly unless you know the {@link ByteObject} to belongs to this module instance.
+    * </p>
+    *
     * @param dc
     * @param bo
-    * @return false if module implementation failed to recognize {@link ByteObject}
+    * @return false if module failed to recognize {@link ByteObject}
     */
    public abstract boolean toString(Dctx dc, ByteObject bo);
 
@@ -214,16 +213,15 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
       toStringPrivate(dc);
    }
 
-   public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
-   }
-
    /**
-    * Appends {@link Dctx} with a 1line string representation of {@link ByteObject}
-    * 
+    * For specification see {@link BOModulesManager#toString1Line(Dctx, ByteObject)}
+    * <p>
+    * Do not call directly unless you know the {@link ByteObject} to belongs to this module instance.
+    * </p>
+    *
     * @param dc
     * @param bo
-    * @return false if module implementation failed to recognize {@link ByteObject}
+    * @return false if module failed to recognize {@link ByteObject}
     */
    public abstract boolean toString1Line(Dctx dc, ByteObject bo);
 
@@ -236,7 +234,29 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
       return null;
    }
 
-   public String toStringModuleLink(int link) {
+   /**
+    * {@link BOModuleAbstract} 
+    * Specified by {@link IDebugStringable}
+    */
+   public abstract String toStringGetDIDString(int did, int value);
+
+   public int toStringGetDynamicDIDMax() {
+      return boc.getBOModuleManager().toStringGetDynamicDIDMax();
+   }
+
+   public UCtx toStringGetUCtx() {
+      return boc.getUCtx();
+   }
+
+   /**
+    * For specification see {@link BOModulesManager#toStringLink(int)}
+    * <p>
+    * Do not call directly unless you know the {@link ByteObject} to belongs to this module instance.
+    * </p>
+    * @param link
+    * @return
+    */
+   public String toStringLink(int link) {
       return null;
    }
 
@@ -246,9 +266,17 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
     * Reflection on the field of the byteobject.
     * <br>
     * @param offset
-    * @return null if none
+    * @return null if not known
     */
    public abstract String toStringOffset(ByteObject o, int offset);
+
+   private void toStringPrivate(Dctx dc) {
+      dc.appendVarWithSpace("moduleIndex", moduleIndex);
+   }
+
+   public boolean toStringSubType(Dctx dc, ByteObject bo, int subType) {
+      return false;
+   }
 
    /**
     * 
@@ -256,10 +284,6 @@ public abstract class BOModuleAbstract implements ITechByteObject, IDebugStringa
     * @return null if not known
     */
    public abstract String toStringType(int type);
-
-   public boolean toStringSubType(Dctx dc, ByteObject bo, int subType) {
-      return false;
-   }
 
    //#enddebug
 

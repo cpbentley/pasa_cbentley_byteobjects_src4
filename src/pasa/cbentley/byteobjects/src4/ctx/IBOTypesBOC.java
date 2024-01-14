@@ -6,11 +6,11 @@ package pasa.cbentley.byteobjects.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
-import pasa.cbentley.byteobjects.src4.tech.ITechCtxSettings;
-import pasa.cbentley.byteobjects.src4.tech.ITechFunction;
-import pasa.cbentley.byteobjects.src4.tech.ITechMergeMask;
-import pasa.cbentley.byteobjects.src4.tech.ITechPointer;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
+import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
 
 /**
  * Small objects have the privilege to have a unique Root type.
@@ -47,29 +47,26 @@ public interface IBOTypesBOC {
    public static final int SID_BASETYPE_Z                = 40;
 
    /**
-    * The static ID of the BaseType
-    */
-   public static final int SID_BOTYPE_3                  = 1;
-
-   public static final int SID_DIDTYPE_2                 = 2;
-
-   /**
     * Reserved for NULL Type.
     */
    public static final int TYPE_000_UNKNOWN              = 0;
 
    /**
-    * Extension point for module not part of the base framework.
-    * <br>
-    * or not extending another module.
-    * <br>
-    * The base 255 types
-    * <br>
+    * This type is used when creating a new base type not part of the framework
+    * 
+    * <p>
+    * 
+    * </p>
+    * 
+    * Extension point for module 
     * <br>
     * Links to the module to be used.
     * <br>
     * <br>
     * The base framework will not be able to differentiate their types
+    * 
+    * 
+    * For extending an existing type like the {@link IBOTypesBOC#TYPE_021_FUNCTION}
     */
    public static final int TYPE_001_EXTENSION            = 1;
 
@@ -111,12 +108,12 @@ public interface IBOTypesBOC {
     * <br>
     * <br>
     * Bytes
-    * @see {@link ITechPointer}.
+    * @see {@link IBOPointer}.
     */
    public static final int TYPE_010_POINTER              = 10;
 
    /**
-    * Describes an incomplete {@link ByteObject}. See {@link ITechMergeMask}.
+    * Describes an incomplete {@link ByteObject}. See {@link IBOMergeMask}.
     * <br>
     * <br>
     * It tells which flags and values are opaque/defined in a description.
@@ -148,7 +145,7 @@ public interface IBOTypesBOC {
    public static final int TYPE_011_MERGE_MASK           = 11;
 
    /**
-    * {@link ITechCtxSettings}
+    * {@link IBOCtxSettings}
     */
    public static final int TYPE_012_CTX_SETTINGS      = 12;
 
@@ -200,7 +197,7 @@ public interface IBOTypesBOC {
     * Action on Pointers. 
     * <br>
     * <li> Toggles a flag of a {@link ByteObject}
-    * <li> Swap values from 2 {@link ByteObject} with a {@link ITechPointer}.
+    * <li> Swap values from 2 {@link ByteObject} with a {@link IBOPointer}.
     * <li> Applies a {@link ITechFunction} to a {@link ByteObject}.
     */
    public static final int TYPE_025_ACTION               = 25;
@@ -221,9 +218,9 @@ public interface IBOTypesBOC {
     * Each object will only have a 2 byte length header?
     * <br>
     * All objects share
-    * <li> {@link ITechByteObject#A_OBJECT_OFFSET_1_TYPE1}
-    * <li> {@link ITechByteObject#A_OBJECT_OFFSET_2_FLAG}
-    * <li> {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}
+    * <li> {@link IByteObject#A_OBJECT_OFFSET_1_TYPE1}
+    * <li> {@link IByteObject#A_OBJECT_OFFSET_2_FLAG}
+    * <li> {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}
     * <br>
     * Thus this is only valid for fixed size {@link ByteObject}
     * 
@@ -234,12 +231,12 @@ public interface IBOTypesBOC {
     * only once.
     * <br>
     */
-   public static final int TYPE_028_ARRAY                = 14;
+   public static final int TYPE_028_ARRAY                = 28;
 
    /**
     * 
     */
-   public static final int TYPE_029_ARRAY_MAP            = 14;
+   public static final int TYPE_029_ARRAY_MAP            = 29;
 
    /**
     * Max 65k

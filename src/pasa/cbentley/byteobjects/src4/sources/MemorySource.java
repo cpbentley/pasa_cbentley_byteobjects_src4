@@ -10,10 +10,10 @@ import java.io.OutputStream;
 
 import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IMemorySource;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOByteControler;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.interfaces.IMemorySource;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteControler;
-import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -34,10 +34,10 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * Trie works with {@link MemorySource} without bothering whether it is coming from Disk/Jar/Internet/RAM.
  * <br>
  * <br>
- * A {@link MemorySource} is identified by a {@link ITechByteControler} header.
+ * A {@link MemorySource} is identified by a {@link IBOByteControler} header.
  * <br>
- * the {@link ITechObjectManaged#AGENT_OFFSET_06_GSOURCE_ID2} of each agents is the same value as
- * {@link ITechByteControler#MEMC_OFFSET_11_SOURCE_ID2}
+ * the {@link IBOAgentManaged#AGENT_OFFSET_06_GSOURCE_ID2} of each agents is the same value as
+ * {@link IBOByteControler#MEMC_OFFSET_11_SOURCE_ID2}
  * <br>
  * <br>
  * A memory source can be used by several {@link ByteController} but a byte array only loads to one

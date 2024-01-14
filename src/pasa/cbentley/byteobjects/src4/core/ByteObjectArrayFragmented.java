@@ -4,17 +4,17 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOArray;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObjectArray;
 import pasa.cbentley.core.src4.helpers.BytesIterator;
 
 /**
  * Generic implementation.
  * 
  * One could create a specific implementation with a factory to deal specifically with given flags
- * {@link ITechByteObjectArray#BOA_FLAG_1_VARIABLE_SIZE} and
- * {@link ITechByteObjectArray#BOA_FLAG_2_SHARED_HEADER}
+ * {@link IBOArray#BOA_FLAG_1_VARIABLE_SIZE} and
+ * {@link IBOArray#BOA_FLAG_2_SHARED_HEADER}
  * 
  * <li> {@link IBOTypesBOC#TYPE_034_ARRAY_BIG}
  * 
@@ -23,7 +23,7 @@ import pasa.cbentley.core.src4.helpers.BytesIterator;
  * @author Charles Bentley
  *
  */
-public class ByteObjectArrayFragmented extends ByteObject implements ITechByteObjectArray {
+public class ByteObjectArrayFragmented extends ByteObject implements IBOArray {
 
    private ByteObject sharedHeader;
 

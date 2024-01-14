@@ -5,16 +5,16 @@
 package pasa.cbentley.byteobjects.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.byteobjects.src4.tech.ITechCtxSettings;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.IConfig;
 import pasa.cbentley.core.src4.interfaces.IAInitable;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
- * When settings of the code context ( {@link ITechCtxSettings} are modeled by a {@link ByteObject}
+ * When settings of the code context ( {@link IBOCtxSettings} are modeled by a {@link ByteObject}
  * 
- * When first created without the knowledge of previous state, a default {@link ITechCtxSettings} is
+ * When first created without the knowledge of previous state, a default {@link IBOCtxSettings} is
  * created
  * <p>
  * Q: What is the difference between ByteObject settings and IConfigBO ?
@@ -154,9 +154,9 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
          }
          settings = new ByteObject(boc, data);
          //assert
-         if (settings.get3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3) != getCtxID()) {
+         if (settings.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3) != getCtxID()) {
             //wrong
-            throw new IllegalStateException("Saved data is corrupted CtxIDs don't match" + settings.get3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3) + " != " + getCtxID());
+            throw new IllegalStateException("Saved data is corrupted CtxIDs don't match" + settings.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3) + " != " + getCtxID());
          }
       }
       return settings;
@@ -188,7 +188,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
       int type = IBOTypesBOC.TYPE_012_CTX_SETTINGS;
       ByteObject settings = new ByteObject(boc, type, size);
       int ctxID = getCtxID();
-      settings.set3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3, ctxID);
+      settings.set3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3, ctxID);
       return settings;
    }
 
@@ -223,10 +223,10 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
 
    public void toStringCtxSettings(Dctx dc, ByteObject bo) {
       dc.rootN(bo, "CtxSettingsBO", ABOCtx.class, 174);
-      dc.appendVarWithSpace("ctxid", bo.get3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3));
-      int typesub = bo.get1(ITechCtxSettings.CTX_OFFSET_02_TYPE_SUB1);
+      dc.appendVarWithSpace("ctxid", bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3));
+      int typesub = bo.get1(IBOCtxSettings.CTX_OFFSET_02_TYPE_SUB1);
       dc.appendVarWithSpace("typesub", typesub);
-      dc.appendVarWithSpace("isUSed", bo.hasFlag(ITechCtxSettings.CTX_OFFSET_01_FLAG, ITechCtxSettings.CTX_FLAG_01_USED));
+      dc.appendVarWithSpace("isUSed", bo.hasFlag(IBOCtxSettings.CTX_OFFSET_01_FLAG, IBOCtxSettings.CTX_FLAG_01_USED));
       if (typesub != 0) {
          dc.nl();
          boc.getBOModuleManager().toStringSubType(dc, bo, typesub);

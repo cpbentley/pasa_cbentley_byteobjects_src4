@@ -4,13 +4,13 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IFlagsToStringBO;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
+import pasa.cbentley.byteobjects.src4.ctx.IToStringFlagsBO;
 import pasa.cbentley.byteobjects.src4.utils.ByteObjectUtilz;
 import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
-import pasa.cbentley.core.src4.ctx.IFlagsToString;
+import pasa.cbentley.core.src4.ctx.IToStringFlags;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.io.BADataOS;
@@ -27,7 +27,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
 
 /**
  * The mighty ByteObject encapsulate a byte array and one offset. All {@link ByteObject} are defined
- * by an interface definition that extends {@link ITechByteObject}
+ * by an interface definition that extends {@link IByteObject}
  * <br>
  * For a discussion on why this ByteObject concept was created, see {@link BOCtx}.
  * <br>
@@ -38,7 +38,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * Uses Big Endian for storing multi bytes data.
  * <br>
  * This class is to be used in monolitique applications. Typing is saved as a single byte
- * at {@link ITechByteObject#A_OBJECT_OFFSET_1_TYPE1}
+ * at {@link IByteObject#A_OBJECT_OFFSET_1_TYPE1}
  * <br>
  * <br>
  * Whereas Java uses package and class name for typing, {@link ByteObject} uses a single byte.
@@ -112,7 +112,7 @@ import pasa.cbentley.core.src4.utils.StringUtils;
  * @author Charles Bentley
  *
  */
-public class ByteObject implements ITechByteObject, IStringable {
+public class ByteObject implements IByteObject, IStringable {
 
    public static final int INT_ARRAY_HEADER_SIZE  = 3;
 
@@ -127,7 +127,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    protected BOCtx         boc;
 
    /**
-    * Length of ByteObject is defined by {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}
+    * Length of ByteObject is defined by {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}
     */
    protected byte[]        data;
 
@@ -166,7 +166,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * Creates a byte object reading data at offset zero.
     * <br>
     * <br>
-    * The {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2} is supposed to be unknown, thus it is set with
+    * The {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2} is supposed to be unknown, thus it is set with
     * the length of the byte array.
     * <br>
     * <br>
@@ -271,7 +271,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * created byte array.
     * <br>
     * <br>
-    * This constructor sets the {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}.
+    * This constructor sets the {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}.
     * <br>
     * <br>
     * 
@@ -449,10 +449,10 @@ public class ByteObject implements ITechByteObject, IStringable {
    /**
     * Clone without cloning param array. ByteObject is not in the repository.
     * <br>
-    * Removes {@link ITechByteObject#A_OBJECT_FLAG_5_HAS_SUBS}.
+    * Removes {@link IByteObject#A_OBJECT_FLAG_5_HAS_SUBS}.
     * <br>
     * <br>
-    * Clone using the {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}.
+    * Clone using the {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}.
     * <br>
     * <br>
     * 
@@ -576,7 +576,7 @@ public class ByteObject implements ITechByteObject, IStringable {
             //now write 
          }
          int serialOffset = bo.getSerialziedOffset();
-         bo.set1(serialOffset, ITechByteObject.MAGIC_BYTE_DEF);
+         bo.set1(serialOffset, IByteObject.MAGIC_BYTE_DEF);
          bo.set2(serialOffset + 1, numParams);
       }
       return bo.getLength();
@@ -1167,8 +1167,8 @@ public class ByteObject implements ITechByteObject, IStringable {
     * <br>
     * <br>
     * Length is stored in 2 bytes at the begining or computed.
-    * It includes the {@link ITechByteObject#A_OBJECT_BASIC_SIZE} bytes of the header and the suffix trailers that may be appended
-    * by {@link ByteObject} code for {@link ITechByteObject#A_OBJECT_FLAG_3_VERSIONING}.
+    * It includes the {@link IByteObject#A_OBJECT_BASIC_SIZE} bytes of the header and the suffix trailers that may be appended
+    * by {@link ByteObject} code for {@link IByteObject#A_OBJECT_FLAG_3_VERSIONING}.
     * <br>
     * <br>
     * Sub classes extending {@link ByteObject} functionality or maximum stored bytes will sub class this method.
@@ -1300,7 +1300,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    public int getSerializedMagicByte() {
       if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_4_SERIALIZED)) {
          int len = getLength();
-         return get1(len - ITechByteObject.TRAILER_LENGTH);
+         return get1(len - IByteObject.TRAILER_LENGTH);
       }
       return -1;
    }
@@ -1311,12 +1311,12 @@ public class ByteObject implements ITechByteObject, IStringable {
     */
    public int getSerializedNumParam() {
       int len = getLength();
-      return ShortUtils.readShortBEUnsigned(data, index + len - ITechByteObject.TRAILER_LENGTH + 1);
+      return ShortUtils.readShortBEUnsigned(data, index + len - IByteObject.TRAILER_LENGTH + 1);
    }
 
    public int getSerialziedOffset() {
       int len = getLength();
-      return len - ITechByteObject.TRAILER_LENGTH;
+      return len - IByteObject.TRAILER_LENGTH;
    }
 
    /**
@@ -1397,6 +1397,17 @@ public class ByteObject implements ITechByteObject, IStringable {
    public ByteObject getSubFirst(int type) {
       ByteObject p = getSubOrder(type, 0);
       return p;
+   }
+
+   public ByteObject getSubFirstEx(int type, int typeEx) {
+      if (param == null)
+         return null;
+      for (int i = 0; i < param.length; i++) {
+         if (param[i] != null && param[i].getType() == type) {
+            return param[i];
+         }
+      }
+      return null;
    }
 
    public int getSubFirstIndex(int type) {
@@ -1496,7 +1507,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Look up the <code>num</code> th {@link ByteObject} of {@link ITechByteObject#A_OBJECT_OFFSET_1_TYPE1}
+    * Look up the <code>num</code> th {@link ByteObject} of {@link IByteObject#A_OBJECT_OFFSET_1_TYPE1}
     * <code>type</code>.
     * <br>
     * Zero based index
@@ -1525,7 +1536,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Look up the <code>num</code> th {@link ByteObject} of {@link ITechByteObject#A_OBJECT_OFFSET_1_TYPE1}
+    * Look up the <code>num</code> th {@link ByteObject} of {@link IByteObject#A_OBJECT_OFFSET_1_TYPE1}
     * <code>type</code>.
     * <br>
     * Zero based index
@@ -1795,8 +1806,8 @@ public class ByteObject implements ITechByteObject, IStringable {
     * Returns the size of the trailer.
     * <br>
     * This is decided by several flags
-    * <li> {@link ITechByteObject#A_OBJECT_FLAG_3_VERSIONING}
-    * <li> {@link ITechByteObject#A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE}
+    * <li> {@link IByteObject#A_OBJECT_FLAG_3_VERSIONING}
+    * <li> {@link IByteObject#A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE}
     * 
     * @return
     */
@@ -1989,7 +2000,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * Value that identifies the number of times this {@link ByteObject} has been modified. 0 if versioning is disabled.
     * <br>
     * <br>
-    * {@link ITechByteObject#A_OBJECT_FLAG_3_VERSIONING}
+    * {@link IByteObject#A_OBJECT_FLAG_3_VERSIONING}
     */
    public int getVersion() {
       if (hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_3_VERSIONING)) {
@@ -2012,7 +2023,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Check flag {@link ITechByteObject#A_OBJECT_OFFSET_2_FLAG}
+    * Check flag {@link IByteObject#A_OBJECT_OFFSET_2_FLAG}
     * <br>
     * @param flag
     * @return
@@ -2078,7 +2089,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Increment the field {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}
+    * Increment the field {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}
     * <br>
     * 
     * @param incr
@@ -2556,7 +2567,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    }
 
    /**
-    * Sets the {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2}. The constructor must set this field.
+    * Sets the {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2}. The constructor must set this field.
     * <br>
     * <br>
     * 
@@ -2736,7 +2747,7 @@ public class ByteObject implements ITechByteObject, IStringable {
    /**
     * Enable/Disable version counting
     * <br>
-    * When false->true, the {@link ITechByteObject#A_OBJECT_OFFSET_3_LENGTH2} is increment by 2
+    * When false->true, the {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2} is increment by 2
     * <br>
     * <br>
     * When setting it false, removes the flag
@@ -2784,7 +2795,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * <br>
     * <br>
     * A ByteObject is known to have extra byteobject when 
-    * {@link ITechByteObject#A_OBJECT_FLAG_5_HAS_SUBS} is set.
+    * {@link IByteObject#A_OBJECT_FLAG_5_HAS_SUBS} is set.
     * <br>
     * <br>
     * Created when using {@link ByteObject#ByteObject(byte[])}
@@ -2803,7 +2814,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     * When a byte array is floating around, a flag serialization is set?
     * <br>
     * <br>
-    * When flag {@link ITechByteObject#A_OBJECT_FLAG_4_SERIALIZED}, the array is returned? No a copy is created. Because
+    * When flag {@link IByteObject#A_OBJECT_FLAG_4_SERIALIZED}, the array is returned? No a copy is created. Because
     * you never know if the {@link ByteObject} is already part of a bigger array.
     * <br>
     * Since this method is used to write this and only one {@link ByteObject}'s data, the method cannot
@@ -2982,7 +2993,7 @@ public class ByteObject implements ITechByteObject, IStringable {
       dc.append("]");
       dc.appendVarWithSpace("getLength", getLength());
       dc.appendVarWithSpace("lenByteField", get2(A_OBJECT_OFFSET_3_LENGTH2));
-      if (dc.hasFlagData(boc.getUCtx(), IFlagsToString.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (dc.hasFlagData(boc.getUCtx(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
          dc.append(" [Absolutes Ignored]");
       } else {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
@@ -2996,14 +3007,14 @@ public class ByteObject implements ITechByteObject, IStringable {
       dc.appendWithSpaceArrayNullOnly(param, "Params");
 
       //check if flag wants to hide actual content of byte object
-      if (dc.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_3_IGNORE_CONTENT)) {
+      if (dc.hasFlagData(boc, IToStringFlagsBO.TOSTRING_FLAG_3_IGNORE_CONTENT)) {
          dc.append("[BOModuleManager.String Ignored]");
       } else {
          dc.nl();
          boc.getBOModuleManager().toString(dc, this); //stringing the actual content of the byte object
       }
 
-      if (dc.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_2_IGNORE_PARAMS)) {
+      if (dc.hasFlagData(boc, IToStringFlagsBO.TOSTRING_FLAG_2_IGNORE_PARAMS)) {
          dc.nlArrayRaw(param, "Params Ignored");
       } else {
          dc.nlLvlArrayNullIgnore(param, "Params");
@@ -3025,7 +3036,7 @@ public class ByteObject implements ITechByteObject, IStringable {
     */
    public void toStringBackUp(Dctx dc) {
       dc.append("Header Type=" + get1(A_OBJECT_OFFSET_1_TYPE1) + " Length=" + getLength() + " [ByteField=" + get2(A_OBJECT_OFFSET_3_LENGTH2) + "]");
-      if (!dc.hasFlagData(boc.getUCtx(), IFlagsToString.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (!dc.hasFlagData(boc.getUCtx(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
       }
       this.toStringFlags(dc);
@@ -3125,7 +3136,7 @@ public class ByteObject implements ITechByteObject, IStringable {
       bou.toStringAppend(sb, this, "IntraRef", A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE);
       bou.toStringAppend(sb, this, "Immutable", A_OBJECT_FLAG_7_IMMUTABLE);
       //
-      if (sb.hasFlagData(boc, IFlagsToStringBO.TOSTRING_FLAG_1_SERIALIZE)) {
+      if (sb.hasFlagData(boc, IToStringFlagsBO.TOSTRING_FLAG_1_SERIALIZE)) {
          bou.toStringAppend(sb, this, "Serialized", A_OBJECT_FLAG_4_SERIALIZED);
       }
    }

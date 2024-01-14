@@ -4,14 +4,21 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IDebugStringable;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
-import pasa.cbentley.byteobjects.src4.tech.ITechCtxSettings;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.byteobjects.src4.ctx.IToStringsDIDsBocFun;
+import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
+import pasa.cbentley.byteobjects.src4.objects.color.GradientFunction;
+import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.ToStringStaticUc;
+import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDebugStringable;
 
 /**
  * For {@link BOCtx} {@link ByteObject}s
@@ -21,19 +28,96 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, IBOTypesBOC {
+public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToStringsDIDsBocFun {
 
    public BOModuleCore(BOCtx boc) {
       super(boc);
    }
 
-   public ByteObject getFlagOrdered(ByteObject bo, int offset, int flag) {
-      // TODO Auto-generated method stub
+   public ByteObject getFlagOrderedBO(ByteObject bo, int offset, int flag) {
       return null;
    }
 
-   public String getIDString(int did, int value) {
-      // TODO Auto-generated method stub
+   /**
+    * Method to be sub-classed by the Module.
+    * <br>
+    * <br>
+    *  
+    * @param type
+    * @param def
+    * @return
+    */
+   public Object createExtension(int type, ByteObject def) {
+      switch (type) {
+         case IBOTypesBOC.TYPE_021_FUNCTION:
+            //check the def if gradient create
+            int ftype = def.get1(ITechFunction.FUN_OFFSET_09_EXTENSION_TYPE2);
+            switch (ftype) {
+               case IBOTypesDrw.TYPE_057_COLOR_FUNCTION:
+                  return boc.getColorFunctionFactory().createColorFunction(def);
+               case IBOTypesDrw.TYPE_059_GRADIENT:
+                  return new GradientFunction(boc);
+               default:
+                  return null;
+            }
+         default:
+            break;
+      }
+      return null;
+   }
+
+   /**
+    * Returns the String associated with the DID.
+    * 
+    * We do the DIDs for {@link UCtx}
+    */
+   public String toStringGetDIDString(int did, int value) {
+      switch (did) {
+         case DID_01_FUNCTION_TYPE:
+            return ToStringStaticBO.toStringFunType(value);
+         case DID_02_POST_OP:
+            return ToStringStaticBO.toStringPostOp(value);
+         case DID_03_COUNTER_OP:
+            return ToStringStaticBO.toStringCounterOp(value);
+         case DID_04_ACCEPTOR_OPERAND:
+            return ToStringStaticBO.toStringOperand(value);
+         case DID_05_ACCEPTOR_OP:
+            return ToStringStaticBO.toStringOp(value);
+         case DID_01_GRAD_RECT:
+            return ToStringStaticBO.toStringGradRect(value);
+         case DID_02_GRAD_TRIG:
+            return ToStringStaticBO.toStringGradTrig(value);
+         case DID_04_GRAD_ELLIPSE:
+            return ToStringStaticBO.toStringGradEllipse(value);
+         case DID_09_BLEND_OP:
+            return ToStringStaticBO.toStringBlend(value);
+         case DID_13_RND_COLORS:
+            return ToStringStaticBO.toStringColorRndType(value);
+         case DID_15_FILTER_TYPE:
+            return ToStringStaticBO.toStringFilterType(value);
+         case DID_16_GRAD_PREDEFINES:
+            return ToStringStaticBO.toStringGradPre(value);
+         case DID_17_BLEND_OP_ALPHA:
+            return ToStringStaticBO.toStringAlpha(value);
+         case DID_18_BLEND_OP_DUFF:
+            return ToStringStaticBO.toStringOpDuff(value);
+         case DID_19_BLEND_OPACITY:
+            return ToStringStaticBO.toStringOpacity(value);
+         default:
+            return null;
+      }
+   }
+
+   public int[] getArrayFrom(ByteObject bo, int[] param) {
+      final int type = bo.getType();
+      switch (type) {
+         case IBOTypesDrw.TYPE_059_GRADIENT:
+            GradientFunction gf = new GradientFunction(boc);
+            int gradSize = param[0];
+            int primaryColor = param[1];
+            gf.init(primaryColor, gradSize, bo);
+            return gf.getColors();
+      }
       return null;
    }
 
@@ -44,6 +128,8 @@ public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, 
          //               return module.mergeByteObject(merge);
          case TYPE_025_ACTION:
             return boc.getActionOp().mergeAction(root, merge);
+         case IBOTypesDrw.TYPE_059_GRADIENT:
+            return boc.getGradientOperator().mergeGradient(root, merge);
          default:
             //not found here
             return null;
@@ -86,17 +172,10 @@ public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, 
             boc.getLitteralStringFactory().toStringLitteralName(dc, bo);
             break;
          case TYPE_012_CTX_SETTINGS:
-            int ctxID = bo.get3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3);
-            ICtx ctx = boc.getUCtx().getCtxManager().getCtx(ctxID);
-            if (ctx instanceof ABOCtx) {
-               ABOCtx boctx = (ABOCtx) ctx;
-               boctx.toStringCtxSettings(dc, bo);
-            } else {
-               dc.append("CtxSettings error. Ctx is not a ABOCtx for CTX_ID="+ctxID);
-            }
+            toStringCtxSettings(dc, bo);
             break;
          case TYPE_011_MERGE_MASK:
-            boc.getMergeMaskFactory().toStringMergeMask(dc, bo);
+            toString1LineMergeMask(dc, bo);
             break;
          case TYPE_021_FUNCTION:
             boc.getFunctionFactory().toStringFunction(dc, bo);
@@ -108,18 +187,50 @@ public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, 
             boc.getActionFactory().toStringAction(dc, bo);
             break;
          case TYPE_010_POINTER:
-            boc.getPointerOperator().toStringPointer(dc, bo);
+            toString1LinePointer(dc, bo);
             break;
          case TYPE_035_OBJECT_MANAGED:
-            dc.append("Struct");
+            toString1LineObjectManaged(dc);
             break;
          case TYPE_036_BYTE_CONTROLLER:
-            boc.getByteControllerFactory().toStringByteController(dc, bo);
+            toStringByteController(dc, bo);
+            break;
+         case IBOTypesDrw.TYPE_056_COLOR_FILTER:
+            toStringColorFilter(dc, bo);
+            break;
+         case IBOTypesDrw.TYPE_059_GRADIENT:
+            toStringGradient(dc, bo);
+            break;
+         case IBOTypesDrw.TYPE_061_COLOR_RANDOM:
+            toStringColorRandom(dc, bo);
             break;
          default:
             return false;
       }
       return true;
+   }
+
+   private void toStringCtxSettings(Dctx dc, ByteObject bo) {
+      int ctxID = bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3);
+      ICtx ctx = boc.getUCtx().getCtxManager().getCtx(ctxID);
+      if (ctx instanceof ABOCtx) {
+         ABOCtx boctx = (ABOCtx) ctx;
+         boctx.toStringCtxSettings(dc, bo);
+      } else {
+         dc.append("CtxSettings error. Ctx is not a ABOCtx for CTX_ID=" + ctxID);
+      }
+   }
+
+   private void toStringColorRandom(Dctx dc, ByteObject bo) {
+      boc.getColorFunctionFactory().toStringColorRandom(bo, dc);
+   }
+
+   private void toStringGradient(Dctx dc, ByteObject bo) {
+      boc.getGradientFactory().toStringGradient(bo, dc);
+   }
+
+   private void toStringByteController(Dctx dc, ByteObject bo) {
+      boc.getByteControllerFactory().toStringByteController(dc, bo);
    }
 
    public void toString1Line(Dctx dc) {
@@ -152,20 +263,13 @@ public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, 
             boc.getLitteralStringFactory().toStringLitteralName(dc, bo);
             break;
          case TYPE_010_POINTER:
-            boc.getPointerOperator().toStringPointer(dc, bo);
+            toString1LinePointer(dc, bo);
             break;
          case TYPE_011_MERGE_MASK:
-            boc.getMergeMaskFactory().toStringMergeMask(dc, bo);
+            toString1LineMergeMask(dc, bo);
             break;
          case TYPE_012_CTX_SETTINGS:
-            int ctxID = bo.get3(ITechCtxSettings.CTX_OFFSET_03_CTXID_3);
-            ICtx ctx = boc.getUCtx().getCtxManager().getCtx(ctxID);
-            if (ctx instanceof ABOCtx) {
-               ABOCtx boctx = (ABOCtx) ctx;
-               boctx.toStringCtxSettings(dc, bo);
-            } else {
-               dc.append("CtxSettings error. Ctx is not a ABOCtx");
-            }
+            toString1LineCtxSettings(dc, bo);
             break;
          case TYPE_021_FUNCTION:
             boc.getFunctionFactory().toStringFunction(dc, bo);
@@ -178,15 +282,55 @@ public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, 
             dc.append("Action");
             break;
          case TYPE_035_OBJECT_MANAGED:
-            dc.append("Struct");
+            toString1LineObjectManaged(dc);
             break;
          case TYPE_036_BYTE_CONTROLLER:
-            boc.getByteControllerFactory().toStringB1Line(dc, bo);
+            toString1LineByteController(dc, bo);
+            break;
+         case IBOTypesDrw.TYPE_056_COLOR_FILTER:
+            toStringColorFilter(dc, bo);
+            break;
+         case IBOTypesDrw.TYPE_059_GRADIENT:
+            toStringGradient(dc, bo);
+            break;
+         case IBOTypesDrw.TYPE_061_COLOR_RANDOM:
+            toStringColorRandom(dc, bo);
             break;
          default:
             return false;
       }
       return true;
+   }
+
+   private void toString1LineObjectManaged(Dctx dc) {
+      dc.append("Struct");
+   }
+
+   private void toString1LinePointer(Dctx dc, ByteObject bo) {
+      boc.getPointerOperator().toStringPointer(dc, bo);
+   }
+
+   private void toString1LineMergeMask(Dctx dc, ByteObject bo) {
+      boc.getMergeMaskFactory().toStringMergeMask(dc, bo);
+   }
+
+   private void toString1LineCtxSettings(Dctx dc, ByteObject bo) {
+      int ctxID = bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3);
+      ICtx ctx = boc.getUCtx().getCtxManager().getCtx(ctxID);
+      if (ctx instanceof ABOCtx) {
+         ABOCtx boctx = (ABOCtx) ctx;
+         boctx.toStringCtxSettings(dc, bo);
+      } else {
+         dc.append("CtxSettings error. Ctx is not a ABOCtx");
+      }
+   }
+
+   private void toStringColorFilter(Dctx dc, ByteObject bo) {
+      boc.getFilterFactory().toStringFilter(bo, dc);
+   }
+
+   private void toString1LineByteController(Dctx dc, ByteObject bo) {
+      boc.getByteControllerFactory().toStringB1Line(dc, bo);
    }
 
    /**
@@ -198,11 +342,11 @@ public class BOModuleCore extends BOModuleAbstract implements IDebugStringable, 
    public String toStringOffset(ByteObject o, int offset) {
       //first look up in module types
       switch (offset) {
-         case ITechByteObject.A_OBJECT_OFFSET_1_TYPE1:
+         case IByteObject.A_OBJECT_OFFSET_1_TYPE1:
             return "Type";
-         case ITechByteObject.A_OBJECT_OFFSET_2_FLAG:
+         case IByteObject.A_OBJECT_OFFSET_2_FLAG:
             return "FlagRoot";
-         case ITechByteObject.A_OBJECT_OFFSET_3_LENGTH2:
+         case IByteObject.A_OBJECT_OFFSET_3_LENGTH2:
             return "Length";
          default:
             return null;

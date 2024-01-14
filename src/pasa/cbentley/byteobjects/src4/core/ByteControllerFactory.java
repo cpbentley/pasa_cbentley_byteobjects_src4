@@ -4,13 +4,13 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IJavaObjectFactory;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOByteControler;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
 import pasa.cbentley.byteobjects.src4.sources.ByteArraySource;
 import pasa.cbentley.byteobjects.src4.sources.MemorySource;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteControler;
-import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
 import pasa.cbentley.core.src4.helpers.BytesIterator;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.utils.ShortUtils;
@@ -20,7 +20,7 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * @author Charles Bentley
  *
  */
-public class ByteControllerFactory extends BOAbstractFactory implements ITechByteControler {
+public class ByteControllerFactory extends BOAbstractFactory implements IBOByteControler {
 
    public ByteControllerFactory(BOCtx boc) {
       super(boc);
@@ -52,7 +52,7 @@ public class ByteControllerFactory extends BOAbstractFactory implements ITechByt
       byte[] data = new byte[MEMC_BASIC_SIZE + buffSize];
       ByteObjectManaged bo = new ByteObjectManaged(boc, data);
       bo.set1(A_OBJECT_OFFSET_1_TYPE1, IBOTypesBOC.TYPE_036_BYTE_CONTROLLER);
-      bo.set2(AGENT_OFFSET_17_MAGIC2, ITechObjectManaged.AGENT_MAGIC_WORD);
+      bo.set2(AGENT_OFFSET_17_MAGIC2, IBOAgentManaged.AGENT_MAGIC_WORD);
       bo.set2(AGENT_OFFSET_13_LEN_HEADER2, MEMC_HEADER_SIZE);
       bo.set3(AGENT_OFFSET_15_LEN_BUFFER_3, buffSize);
       bo.set3(MEMC_OFFSET_05_NUM_AGENTS3, numAgents);
@@ -80,11 +80,11 @@ public class ByteControllerFactory extends BOAbstractFactory implements ITechByt
    }
 
    /**
-    * Tech default of a {@link ITechByteControler}
+    * Tech default of a {@link IBOByteControler}
     * @return
     */
    public ByteObjectManaged getTechDefault() {
-      ByteObjectManaged bo = boc.getByteObjectManagedFactory().createByteObject(ITechByteControler.MEMC_BASIC_SIZE);
+      ByteObjectManaged bo = boc.getByteObjectManagedFactory().createByteObject(IBOByteControler.MEMC_BASIC_SIZE);
       bo.set1(A_OBJECT_OFFSET_1_TYPE1, IBOTypesBOC.TYPE_036_BYTE_CONTROLLER);
       bo.set2(AGENT_OFFSET_13_LEN_HEADER2, MEMC_HEADER_SIZE);
       bo.set1(MEMC_OFFSET_07_ARRAY_START1, 1);

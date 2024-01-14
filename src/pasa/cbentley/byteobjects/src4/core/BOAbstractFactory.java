@@ -5,7 +5,7 @@
 package pasa.cbentley.byteobjects.src4.core;
 
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.byteobjects.src4.ctx.ObjectBoc;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
 
@@ -16,45 +16,36 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public class BOAbstractFactory implements IStringable {
-
-   protected final BOCtx boc;
+public class BOAbstractFactory extends ObjectBoc implements IStringable {
 
    public BOAbstractFactory(BOCtx boc) {
-      this.boc = boc;
-
+      super(boc);
    }
 
    public ByteObjectFactory getBOFactory() {
       return boc.getByteObjectFactory();
    }
 
+
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "FactoryCtxInstance");
+      dc.root(this, BOAbstractFactory.class, "@line5");
       toStringPrivate(dc);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      super.toString(dc.sup());
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "FactoryCtxInstance");
+      dc.root1Line(this, BOAbstractFactory.class);
       toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
-   public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
-   }
    //#enddebug
+   
+
 
 }

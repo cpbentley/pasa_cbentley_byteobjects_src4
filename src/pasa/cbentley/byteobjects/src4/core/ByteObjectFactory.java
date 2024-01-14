@@ -4,9 +4,9 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.core.src4.helpers.BytesIterator;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -24,7 +24,7 @@ import pasa.cbentley.core.src4.utils.IntUtils;
  * @author Charles Bentley
  *
  */
-public class ByteObjectFactory extends BOAbstractFactory implements ITechByteObject {
+public class ByteObjectFactory extends BOAbstractFactory implements IByteObject {
 
    public ByteObjectFactory(BOCtx boc) {
       super(boc);
@@ -124,7 +124,7 @@ public class ByteObjectFactory extends BOAbstractFactory implements ITechByteObj
       ByteObject bo = new ByteObject(boc, bc.getArray(), bc.getPosition());
       int type = bo.getType();
       if (type == IBOTypesBOC.TYPE_015_REFERENCE_32) {
-         int reference = bo.get4(ITechByteObject.A_OBJECT_OFFSET_2_REFERENCE4);
+         int reference = bo.get4(IByteObject.A_OBJECT_OFFSET_2_REFERENCE4);
          if (reference == -1) {
             bc.skipBytes(5);
             return null;
@@ -159,7 +159,7 @@ public class ByteObjectFactory extends BOAbstractFactory implements ITechByteObj
          int magicByte = bo.getSerializedMagicByte();
          if (magicByte != -1) {
             //we have sub parameters.
-            if (magicByte != ITechByteObject.MAGIC_BYTE_DEF) {
+            if (magicByte != IByteObject.MAGIC_BYTE_DEF) {
                throw new IllegalArgumentException("ByteObject is malformed. Wrong MagicByte");
             }
             //last 2 bytes are used to code for the number of parameters.
@@ -180,7 +180,7 @@ public class ByteObjectFactory extends BOAbstractFactory implements ITechByteObj
       ByteObject bo = new ByteObject(boc, bc.getArray(), bc.getPosition());
       int type = bo.getType();
       if (type == IBOTypesBOC.TYPE_015_REFERENCE_32) {
-         int reference = bo.get4(ITechByteObject.A_OBJECT_OFFSET_2_REFERENCE4);
+         int reference = bo.get4(IByteObject.A_OBJECT_OFFSET_2_REFERENCE4);
          if (reference == -1) {
             bc.incrementBy(5);
             return null;
@@ -215,7 +215,7 @@ public class ByteObjectFactory extends BOAbstractFactory implements ITechByteObj
          int magicByte = bo.getSerializedMagicByte();
          if (magicByte != -1) {
             //we have sub parameters.
-            if (magicByte != ITechByteObject.MAGIC_BYTE_DEF) {
+            if (magicByte != IByteObject.MAGIC_BYTE_DEF) {
                throw new IllegalArgumentException("ByteObject is malformed. Wrong MagicByte");
             }
             //last 2 bytes are used to code for the number of parameters.

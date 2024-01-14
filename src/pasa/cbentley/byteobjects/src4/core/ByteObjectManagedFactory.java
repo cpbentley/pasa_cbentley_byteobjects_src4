@@ -4,9 +4,9 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.tech.ITechObjectManaged;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
@@ -14,7 +14,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class ByteObjectManagedFactory extends BOAbstractFactory implements ITechObjectManaged {
+public class ByteObjectManagedFactory extends BOAbstractFactory implements IBOAgentManaged {
 
    public ByteObjectManagedFactory(BOCtx boc) {
       super(boc);
@@ -45,7 +45,7 @@ public class ByteObjectManagedFactory extends BOAbstractFactory implements ITech
    /**
     * 
     * @param mod
-    * @param extraHeaderSize in addition to {@link ITechObjectManaged#AGENT_BASIC_SIZE}
+    * @param extraHeaderSize in addition to {@link IBOAgentManaged#AGENT_BASIC_SIZE}
     * @param datalength
     * @return
     */
@@ -63,7 +63,7 @@ public class ByteObjectManagedFactory extends BOAbstractFactory implements ITech
    }
 
    /**
-    * Starts with {@link ITechObjectManaged#AGENT_HEADER_SIZE}, 1 for class id and 0 for interface
+    * Starts with {@link IBOAgentManaged#AGENT_HEADER_SIZE}, 1 for class id and 0 for interface
     * <br>
     * <br>
     * 

@@ -7,17 +7,20 @@ package pasa.cbentley.byteobjects.src4.core;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IJavaObjectFactory;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IDebugIDsBOC;
-import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
+import pasa.cbentley.byteobjects.src4.ctx.IToStringsDIDsBoc;
+import pasa.cbentley.byteobjects.src4.ctx.ObjectBoc;
 import pasa.cbentley.byteobjects.src4.sources.RootSource;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
-import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.ctx.CtxManager;
+import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.IToStringDIDs;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
+import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.structs.IntToObjects;
 import pasa.cbentley.core.src4.utils.ShortUtils;
@@ -27,18 +30,19 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * <br>
  * The default manager is provided by the {@link BOCtx#getBOModuleManager()}
  * <br>
- * {@link IJavaObjectFactory}
+ * {@link IJavaObjectFactory}.
+ * 
+ * {@link CtxManager} registers {@link ICtx} and their static IDs.
+ * 
+ * Here the {@link BOModulesManager} provides a communication link
+ * 
+ * <li> {@link IJavaObjectFactory}, allows a definition of a {@link ByteObject} to be mapped its Java class.
+ * 
  * @author Charles Bentley
  *
  */
-public class BOModulesManager implements IStringable, ITechByteObject, IJavaObjectFactory, IDebugIDsBOC {
+public class BOModulesManager extends ObjectBoc implements IStringable, IDebugStringable, IByteObject, IJavaObjectFactory, IToStringsDIDsBoc {
 
-   private BOCtx              boc;
-
-   /**
-    * Hosts the dynamics DID
-    */
-   private String[][]         dynamicDID = new String[10][];
 
    /**
     * Hash table of {@link IJavaObjectFactory}.
@@ -61,7 +65,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * But it also allows the merging of types. So moduling loading is EXTREMELY important.
     * 
     */
-   private BOModuleAbstract[] modules    = new BOModuleAbstract[0];
+   private BOModuleAbstract[] modules               = new BOModuleAbstract[0];
 
    protected RootSource       rootSource;
 
@@ -71,10 +75,13 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
     * @param root is null.. then this BOModule is its own root
     */
    public BOModulesManager(BOCtx boc) {
-      this.boc = boc;
+      super(boc);
       factoriesStr = new Hashtable();
       rootSource = new RootSource(boc);
       javaObjectFactories = new IntToObjects(boc.getUCtx(), 5);
+      
+      //#debug
+      boc.getUCtx().toStringGetDIDManager().registerDIDer(this);
    }
 
    /**
@@ -114,15 +121,20 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    }
 
    /**
+    * Factory method for create Java objects of the {@link ByteObject} definition.
+    * 
     * Ask extension module to create an extension {@link ByteObject} given its definition.
     * <br>
-    * @param type
+    * Every {@link BOModuleAbstract} switches on the type and if they are aware of such a type having
+    * an extension mechanism, use it to create a Java object for it.
+    * 
+    * @param type a known base type such as {@link IBOTypesBOC#TYPE_021_FUNCTION}
     * @param def
-    * @return
+    * @return null if none of the {@link BOModuleAbstract} could recognize
     */
    public Object createExtension(int type, ByteObject def) {
       for (int i = 0; i < modules.length; i++) {
-         Object ex = modules[i].subExtension(type, def);
+         Object ex = modules[i].createExtension(type, def);
          if (ex != null) {
             return ex;
          }
@@ -178,17 +190,21 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    //#enddebug
 
    /**
-    * Asks all {@link BOModuleAbstract} to handle flag ordered ByteObject search.
+    * Method to be sub-classed by the Module.
+    * <br>
+    * <br>
+    *  <p>
+    *  {@link BOModuleAbstract#getArrayFrom(ByteObject, int[])}
+    *  </p>
     * @param bo
-    * @param offset
-    * @param flag
+    * @param param
     * @return
     */
-   public ByteObject getByteObjectFlagOrdered(ByteObject bo, int offset, int flag) {
+   public int[] getArrayFrom(ByteObject bo, int[] param) {
       for (int i = 0; i < modules.length; i++) {
-         ByteObject bos = modules[i].getFlagOrdered(bo, offset, flag);
-         if (bos != null) {
-            return bos;
+         int[] ar = modules[i].getArrayFrom(bo, param);
+         if (ar != null) {
+            return ar;
          }
       }
       return null;
@@ -213,6 +229,30 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
          throw new NullPointerException(" " + facID);
       }
       return fac;
+   }
+
+   /**
+    * Asks all {@link BOModuleAbstract} to handle flag ordered ByteObject search.
+    * This happens when a {@link ByteObject} stores  a lot of {@link ByteObject}s in its param array.
+    * Retrieval is not done using {@link ByteObject#getSubFirst(int)} kind of methods.
+    * It is done by module specific methods using specific flags that only the {@link ByteObject} definition
+    * knows about.
+    * <p>
+    * Calls its registered modules on {@link BOModuleAbstract#getFlagOrderedBO(ByteObject, int, int)}
+    * </p>
+    * @param bo
+    * @param offset
+    * @param flag
+    * @return
+    */
+   public ByteObject getFlagOrderedBO(ByteObject bo, int offset, int flag) {
+      for (int i = 0; i < modules.length; i++) {
+         ByteObject bos = modules[i].getFlagOrderedBO(bo, offset, flag);
+         if (bos != null) {
+            return bos;
+         }
+      }
+      return null;
    }
 
    public BOModuleAbstract getMod(Class cl) {
@@ -344,55 +384,6 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
 
    }
 
-   public void setDynamicDIDData(int did, String[] strings) {
-      dynamicDID[did] = strings;
-   }
-
-   /**
-    * Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    *  
-    * @param type
-    * @param def
-    * @return
-    */
-   public Object subExtension(int type, ByteObject def) {
-      return null;
-   }
-
-   /**
-    * Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    *  
-    * @param bo
-    * @param param
-    * @return
-    */
-   public int[] subGenerateArray(ByteObject bo, int[] param) {
-      return null;
-   }
-
-   protected ByteObject subGetByteObjectFlagOrdered(ByteObject bo, int offset, int flag) {
-      return null;
-   }
-
-   //#mdebug
-   /**
-    *  Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    *  
-    * @param bo
-    * @param nl
-    * @return
-    */
-
-   public String subToStringLinkSub(int link) {
-      return null;
-   }
-
    /**
     * Tries to read a ByteObject from byte array
     * <br>
@@ -411,13 +402,6 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    }
 
    //#mdebug
-   public IDLog toDLog() {
-      return boc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
 
    public void toString(Dctx dc) {
       dc.root(this, BOModulesManager.class);
@@ -439,6 +423,8 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       dc.nlLvlArray("SubModules", modules);
    }
 
+   //#mdebug
+
    public void toString(Dctx dc, ByteObject bo) {
       for (int i = 0; i < modules.length; i++) {
          boolean isDone = modules[i].toString(dc, bo);
@@ -449,14 +435,15 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       //TODO error no to String
    }
 
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BOModulesManager");
-   }
-
+   /**
+    * Appends {@link Dctx} with a 1line string representation of {@link ByteObject}
+    * 
+    * <p>
+    * Calls its registered modules on {@link BOModuleAbstract#toString1Line(Dctx, ByteObject)}
+    * </p>
+    * @param dc
+    * @param bo
+    */
    public void toString1Line(Dctx dc, ByteObject bo) {
       for (int i = 0; i < modules.length; i++) {
          boolean isDone = modules[i].toString1Line(dc, bo);
@@ -489,17 +476,9 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return null;
    }
 
-   public String toStringGetIDString(int did, int value) {
-      if (did <= DYN_9) {
-         if (dynamicDID[did] != null) {
-            if (value < 0 || value >= dynamicDID[did].length) {
-               return "BOModule#getIDString DID < DYNAMIC " + value;
-            }
-            return dynamicDID[did][value];
-         }
-      }
+   public String toStringGetDIDString(int did, int value) {
       for (int i = 0; i < modules.length; i++) {
-         String idString = modules[i].getIDString(did, value);
+         String idString = modules[i].toStringGetDIDString(did, value);
          if (idString != null) {
             return idString;
          }
@@ -507,18 +486,21 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return null;
    }
 
-   public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+   public int toStringGetDynamicDIDMax() {
+      return DID_DYNAMIC_MAX_VALUE;
    }
 
    /**
     * Allows to put a String to link ids such as 
+    * <p>
+    * {@link BOModuleAbstract#toStringLink(int)}
+    * </p>
     * @param link
     * @return
     */
    public String toStringLink(int link) {
       for (int i = 0; i < modules.length; i++) {
-         String debugType = modules[i].subToStringLinkSub(link);
+         String debugType = modules[i].toStringLink(link);
          if (debugType != null) {
             return debugType;
          }
@@ -526,16 +508,17 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       return null;
    }
 
-   public String toStringModuleLink(int link) {
-      for (int i = 0; i < modules.length; i++) {
-         String debugType = modules[i].subToStringLinkSub(link);
-         if (debugType != null) {
-            return debugType;
-         }
-      }
-      return null;
-   }
-
+   /**
+    * Return a String representation of the data that resides at the position.
+    * <br>
+    * Reflection on the field of the byteobject.
+    * <br>
+    * <p>
+    * {@link BOModuleAbstract#toStringOffset(ByteObject, int)}
+    * </p>
+    * @param offset
+    * @return null if {@link ByteObject} is not known by any of the {@link BOModuleAbstract}
+    */
    public String toStringOffset(ByteObject bo, int offset) {
       for (int i = 0; i < modules.length; i++) {
          String str = modules[i].toStringOffset(bo, offset);
@@ -545,6 +528,7 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
       }
       return "Type [" + bo.getType() + "] offset " + offset + " not found";
    }
+
 
    public void toStringSubType(Dctx dc, ByteObject bo, int subType) {
       for (int i = 0; i < modules.length; i++) {
@@ -558,9 +542,12 @@ public class BOModulesManager implements IStringable, ITechByteObject, IJavaObje
    }
 
    /**
-    * Handles the fetching of the string.
-    * @param type
-    * @return
+    * Return a String representation of the data that resides at the position.
+    * <br>
+    * Reflection on the field of the byteobject.
+    * <br>
+    * @param offset
+    * @return null if not known
     */
    public String toStringType(int type) {
       //asks the registered modules for the string of the type

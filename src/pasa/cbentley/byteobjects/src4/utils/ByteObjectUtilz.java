@@ -7,10 +7,10 @@ package pasa.cbentley.byteobjects.src4.utils;
 import pasa.cbentley.byteobjects.src4.core.BOModuleAbstract;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IJavaObjectFactory;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.interfaces.IJavaObjectFactory;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
@@ -19,7 +19,7 @@ import pasa.cbentley.core.src4.utils.ArrayUtils;
 import pasa.cbentley.core.src4.utils.IntUtils;
 import pasa.cbentley.core.src4.utils.ShortUtils;
 
-public class ByteObjectUtilz implements ITechByteObject {
+public class ByteObjectUtilz implements IByteObject {
 
    private BOCtx boc;
 
@@ -249,22 +249,6 @@ public class ByteObjectUtilz implements ITechByteObject {
       }
    }
 
-   //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   public void toString(Dctx dc) {
-      dc.root(this, "ByteObjectUtilz");
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "ByteObjectUtilz");
-   }
 
    public void toStringAppend(Dctx dc, ByteObject bo, String str, int flag) {
       if (bo.hasFlag(A_OBJECT_OFFSET_2_FLAG, flag)) {
@@ -273,10 +257,6 @@ public class ByteObjectUtilz implements ITechByteObject {
       }
    }
 
-   public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
-   }
-   //#enddebug
 
    /**
     * 

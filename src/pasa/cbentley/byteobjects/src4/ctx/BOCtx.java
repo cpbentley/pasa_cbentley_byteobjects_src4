@@ -4,6 +4,8 @@
  */
 package pasa.cbentley.byteobjects.src4.ctx;
 
+import java.util.Random;
+
 import pasa.cbentley.byteobjects.src4.core.BOModuleAbstract;
 import pasa.cbentley.byteobjects.src4.core.BOModuleCore;
 import pasa.cbentley.byteobjects.src4.core.BOModulesManager;
@@ -14,33 +16,40 @@ import pasa.cbentley.byteobjects.src4.core.ByteObjectFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManagedFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectRef;
+import pasa.cbentley.byteobjects.src4.core.FactoryByteObject;
 import pasa.cbentley.byteobjects.src4.core.LitteralManager;
 import pasa.cbentley.byteobjects.src4.core.LockManager;
-import pasa.cbentley.byteobjects.src4.extra.MergeMaskFactory;
-import pasa.cbentley.byteobjects.src4.extra.PointerFactory;
-import pasa.cbentley.byteobjects.src4.extra.PointerOperator;
-import pasa.cbentley.byteobjects.src4.factory.FactoryByteObject;
-import pasa.cbentley.byteobjects.src4.functions.AcceptorFactory;
-import pasa.cbentley.byteobjects.src4.functions.AcceptorOperator;
-import pasa.cbentley.byteobjects.src4.functions.ActionFactory;
-import pasa.cbentley.byteobjects.src4.functions.ActionOperator;
-import pasa.cbentley.byteobjects.src4.functions.FunctionFactory;
-import pasa.cbentley.byteobjects.src4.litteral.LitteralIntFactory;
-import pasa.cbentley.byteobjects.src4.litteral.LitteralIntOperator;
-import pasa.cbentley.byteobjects.src4.litteral.LitteralStringFactory;
-import pasa.cbentley.byteobjects.src4.litteral.LitteralStringOperator;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.objects.color.ColorFunctionFactory;
+import pasa.cbentley.byteobjects.src4.objects.color.FilterFactory;
+import pasa.cbentley.byteobjects.src4.objects.color.FilterOperator;
+import pasa.cbentley.byteobjects.src4.objects.color.GradientFactory;
+import pasa.cbentley.byteobjects.src4.objects.color.GradientOperator;
+import pasa.cbentley.byteobjects.src4.objects.function.AcceptorFactory;
+import pasa.cbentley.byteobjects.src4.objects.function.AcceptorOperator;
+import pasa.cbentley.byteobjects.src4.objects.function.ActionFactory;
+import pasa.cbentley.byteobjects.src4.objects.function.ActionOperator;
+import pasa.cbentley.byteobjects.src4.objects.function.FunctionFactory;
+import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralIntFactory;
+import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralIntOperator;
+import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralStringFactory;
+import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralStringOperator;
+import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
+import pasa.cbentley.byteobjects.src4.objects.pointer.PointerFactory;
+import pasa.cbentley.byteobjects.src4.objects.pointer.PointerOperator;
 import pasa.cbentley.byteobjects.src4.sources.RootSource;
-import pasa.cbentley.byteobjects.src4.tech.ITechByteObject;
 import pasa.cbentley.byteobjects.src4.utils.ByteObjectUtilz;
 import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
 import pasa.cbentley.core.src4.ctx.ACtx;
 import pasa.cbentley.core.src4.ctx.CtxManager;
 import pasa.cbentley.core.src4.ctx.IConfig;
 import pasa.cbentley.core.src4.ctx.ICtx;
+import pasa.cbentley.core.src4.ctx.IStaticIDs;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.event.EventBusArray;
 import pasa.cbentley.core.src4.event.IEventBus;
 import pasa.cbentley.core.src4.logging.Dctx;
+import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.IStringable;
 
 /**
@@ -83,51 +92,51 @@ import pasa.cbentley.core.src4.logging.IStringable;
  * @author Charles Bentley
  *
  */
-public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, IDebugIDsBOC, IEventsBO {
+public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToStringsDIDsBoc, IEventsBO {
 
    //what about sub classing? isA relationship.. subclass must keep the same ID
-   public static final int    CTX_ID = 6;
+   public static final int          CTX_ID  = 6;
 
-   private AcceptorFactory    acceptorC;
+   private AcceptorFactory          acceptorC;
 
-   private AcceptorOperator   acceptorStatic;
+   private AcceptorOperator         acceptorStatic;
 
-   private ActionOperator     actionOp;
+   private ActionOperator           actionOp;
 
-   private ActionFactory          actionFactory;
+   private ActionFactory            actionFactory;
 
-   private ByteObjectUtilz    boU;
+   private ByteObjectUtilz          boU;
 
-   private ByteControllerFactory byteControllerFactory;
+   private ByteControllerFactory    byteControllerFactory;
 
-   private ByteObjectFactory  byteObjectC;
+   private ByteObjectFactory        byteObjectC;
 
    private ByteObjectManagedFactory byteObjectManagedFactory;
 
-   private EventBusArray          eventBus;
+   private EventBusArray            eventBus;
 
-   private FunctionFactory    functionC;
+   private FunctionFactory          functionC;
 
-   private LitteralManager    litteral;
+   private LitteralManager          litteral;
 
-   private LitteralIntFactory     litteralIntFactory;
+   private LitteralIntFactory       litteralIntFactory;
 
-   private LitteralIntOperator    litteralIntStatic;
+   private LitteralIntOperator      litteralIntStatic;
 
-   private LitteralStringFactory  litteralStringFactory;
+   private LitteralStringFactory    litteralStringFactory;
 
-   private LitteralStringOperator litteralStringOperator;
+   private LitteralStringOperator   litteralStringOperator;
 
-   private LockManager        lockManager;
+   private LockManager              lockManager;
 
-   private MergeMaskFactory mergeMask;
+   private MergeMaskFactory         mergeMask;
 
    /**
     * Know specifics about {@link ByteObject}
     */
-   private BOModuleAbstract   module;
+   private BOModuleAbstract         module;
 
-   private BOModulesManager   moduleManager;
+   private BOModulesManager         moduleManager;
 
    /**
     * Each module will define its own {@link ByteObject}s in the scope of their {@link BOCtx}. 
@@ -144,15 +153,15 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
     * But it also allows the merging of types. So moduling loading is EXTREMELY important.
     * 
     */
-   public BOCtx[]             modules  = new BOCtx[0];
+   public BOCtx[]                   modules = new BOCtx[0];
 
-   private PointerFactory         pointerFactory;
+   private PointerFactory           pointerFactory;
 
-   private PointerOperator    pointerOperator;
+   private PointerOperator          pointerOperator;
 
    private ByteObjectRef            rootRefs;
 
-   private ValuesInArrayReader    valueReadCache;
+   private ValuesInArrayReader      valueReadCache;
 
    public BOCtx(UCtx uc) {
       super(uc);
@@ -170,7 +179,18 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       acceptorStatic = new AcceptorOperator(this);
       byteObjectC = new ByteObjectFactory(this);
       mergeMask = new MergeMaskFactory(this);
-      
+
+      CtxManager c = uc.getCtxManager();
+
+      c.registerStaticID(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES);
+
+      c.registerStaticRange(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES, IBOTypesBOC.SID_BASETYPE_A, IBOTypesBOC.SID_BASETYPE_Z);
+
+      //#debug
+      c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBoc.A_DID_OFFSET_A_BOC, IToStringsDIDsBoc.A_DID_OFFSET_Z_BOC);
+      //#debug
+      c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBocFun.A_DID_OFFSET_A_BOC_FUN, IToStringsDIDsBocFun.A_DID_OFFSET_Z_BOC_FUN);
+
       //#debug
       toDLog().pInit("Created", this, BOCtx.class, "BOCtx", LVL_05_FINE, true);
    }
@@ -188,7 +208,7 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
    }
 
    public ActionOperator getActionOp() {
-      if(actionOp == null) {
+      if (actionOp == null) {
          actionOp = new ActionOperator(this);
       }
       return actionOp;
@@ -220,7 +240,17 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       return boU;
    }
 
-   private FactoryByteObject factoryByteObject;
+   private FactoryByteObject    factoryByteObject;
+
+   private ColorFunctionFactory colorFunctionFactory;
+
+   private GradientOperator     gradientOperator;
+
+   private GradientFactory      gradientFactory;
+
+   private FilterFactory        filterFactory;
+
+   private FilterOperator       filterOperator;
 
    public FactoryByteObject getFactoryByteObject() {
       if (factoryByteObject == null) {
@@ -273,21 +303,14 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       return functionC;
    }
 
-   //#mdebug
-   public String getIDString(int did, int value) {
-      switch (did) {
-         case DID_01_FUNCTION_TYPE:
-            return getFunctionFactory().toStringFunType(value);
-         case DID_02_POST_OP:
-            return getFunctionFactory().toStringPostOp(value);
-         case DID_03_COUNTER_OP:
-            return getFunctionFactory().toStringCounterOp(value);
-         default:
-            return null;
-      }
+   public Random getRandom() {
+      return uc.getRandom();
    }
-   //#enddebug
 
+   public IDebugStringable getDIDer() {
+      return getBOModuleManager();
+   }
+   
    public LitteralIntFactory getLitteralIntFactory() {
       if (litteralIntFactory == null) {
          litteralIntFactory = new LitteralIntFactory(this);
@@ -307,6 +330,41 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
          litteralStringFactory = new LitteralStringFactory(this);
       }
       return litteralStringFactory;
+   }
+
+   public FilterFactory getFilterFactory() {
+      if (filterFactory == null) {
+         filterFactory = new FilterFactory(this);
+      }
+      return filterFactory;
+   }
+
+   public FilterOperator getFilterOperator() {
+      if (filterOperator == null) {
+         filterOperator = new FilterOperator(this);
+      }
+      return filterOperator;
+   }
+
+   public GradientFactory getGradientFactory() {
+      if (gradientFactory == null) {
+         gradientFactory = new GradientFactory(this);
+      }
+      return gradientFactory;
+   }
+
+   public GradientOperator getGradientOperator() {
+      if (gradientOperator == null) {
+         gradientOperator = new GradientOperator(this);
+      }
+      return gradientOperator;
+   }
+
+   public ColorFunctionFactory getColorFunctionFactory() {
+      if (colorFunctionFactory == null) {
+         colorFunctionFactory = new ColorFunctionFactory(this);
+      }
+      return colorFunctionFactory;
    }
 
    public LitteralStringOperator getLitteralStringOperator() {
@@ -371,25 +429,13 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       this.byteObjectC = boc;
    }
 
-   /**
-    * Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    * 
-    * @param root
-    * @param merge
-    * @return
-    */
-   public ByteObject subMergeByteObject(ByteObject root, ByteObject merge) {
-      return null;
-   }
 
    //#mdebug
    public void toString(Dctx dc) {
       dc.root(this, "BOCtx");
       toStringPrivate(dc);
       super.toString(dc.sup());
-      
+
       dc.nlLvl(eventBus, "eventBus");
       dc.nlLvl(moduleManager, "moduleManager");
       dc.nlLvl(lockManager, "lockManager");
@@ -402,10 +448,10 @@ public class BOCtx extends ACtx implements ICtx, ITechByteObject, IStringable, I
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
-   //#enddebug
 
    private void toStringPrivate(Dctx dc) {
 
    }
+   //#enddebug
 
 }

@@ -316,6 +316,38 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
+    * Adds non null {@link ByteObject}s.
+    * <br>
+    * <br>
+    * 
+    * @param bos
+    */
+   public void addByteObject(ByteObject[] bos) {
+      for (int i = 0; i < bos.length; i++) {
+         addByteObject(bos[i]);
+      }
+   }
+
+   /**
+    * Appends {@link ByteObject} to the array. Accept nulls.
+    * @param bo
+    * @return
+    */
+   public int addByteObjectNull(ByteObject bo) {
+      immutableCheck();
+      if (param == null) {
+         param = new ByteObject[] { bo };
+         setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, true);
+         return 0;
+      } else {
+         //the flag is already set
+         param = boc.getBOU().increaseCapacity(param, 1);
+         param[param.length - 1] = bo;
+         return param.length - 1;
+      }
+   }
+
+   /**
     * Replace existing {@link ByteObject} that has the same type.
     * <p>
     * When {@link ByteObject} is null, nothing happens and return -1;
@@ -341,38 +373,6 @@ public class ByteObject implements IByteObject, IStringable {
                return i;
             }
          }
-         //the flag is already set
-         param = boc.getBOU().increaseCapacity(param, 1);
-         param[param.length - 1] = bo;
-         return param.length - 1;
-      }
-   }
-
-   /**
-    * Adds non null {@link ByteObject}s.
-    * <br>
-    * <br>
-    * 
-    * @param bos
-    */
-   public void addByteObject(ByteObject[] bos) {
-      for (int i = 0; i < bos.length; i++) {
-         addByteObject(bos[i]);
-      }
-   }
-
-   /**
-    * Appends {@link ByteObject} to the array. Accept nulls.
-    * @param bo
-    * @return
-    */
-   public int addByteObjectNull(ByteObject bo) {
-      immutableCheck();
-      if (param == null) {
-         param = new ByteObject[] { bo };
-         setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, true);
-         return 0;
-      } else {
          //the flag is already set
          param = boc.getBOU().increaseCapacity(param, 1);
          param[param.length - 1] = bo;
@@ -465,24 +465,6 @@ public class ByteObject implements IByteObject, IStringable {
       ByteObject clone = new ByteObject(boc, d, 0);
       clone.setFlagNoVersion(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, false);
       return clone;
-   }
-
-   /**
-    * Create a tail if none.
-    * @param flag
-    * @param b
-    */
-   public void setTailFlag(int flag, boolean b) {
-      if (!hasFlagObject(A_OBJECT_FLAG_8_TAILER)) {
-
-      }
-      int index = getTailFlagIndex();
-      setFlag(index, flag, b);
-   }
-
-   public int getTailFlagIndex() {
-      int len = getLength();
-      return index + len - A_OBJECT_TAIL_OFFSET_2_SIZE1;
    }
 
    /**
@@ -591,6 +573,25 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public void copyToIndexFromObject(int destIndex, ByteObject bo, int srcOffset, int len) {
       System.arraycopy(bo.data, bo.index + srcOffset, data, index + destIndex, len);
+   }
+
+   public void decrementMin(int index, int size, int incr, int min) {
+      int val = getValue(index, size);
+      val -= incr;
+      if (val < min) {
+         val = min;
+      }
+      setValue(index, val, size);
+   }
+
+   /**
+    * Decrement the index value, not below zero
+    * @param index
+    * @param size
+    * @param incr
+    */
+   public void decrementZero(int index, int size, int incr) {
+      decrementMin(index, size, incr, 0);
    }
 
    /**
@@ -763,6 +764,15 @@ public class ByteObject implements IByteObject, IStringable {
       return get1Unsigned(index);
    }
 
+   /**
+    * Get byte as signed value
+    * @param index
+    * @return
+    */
+   public int get1Signed(int index) {
+      return data[this.index + index];
+   }
+
    public int get1Unsigned(int index) {
       /*
        * Provided we have 1100 1000 at index
@@ -783,15 +793,6 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
-    * Get byte as signed value
-    * @param index
-    * @return
-    */
-   public int get1Signed(int index) {
-      return data[this.index + index];
-   }
-
-   /**
     * Gets a value according to {@link ByteObject#getValue(int, int)} convention
     * Legacy.. signed
     * Signed 2 bytes value
@@ -802,19 +803,6 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public int get2(int index) {
       return getShortInt(index);
-   }
-
-   public int get2Signed(int index) {
-      return getShortInt(index);
-   }
-
-   /**
-    * Unsigned data
-    * @param index
-    * @return
-    */
-   public int get2Unsigned(int index) {
-      return ShortUtils.readShortBEUnsigned(data, this.index + index);
    }
 
    /**
@@ -853,6 +841,19 @@ public class ByteObject implements IByteObject, IStringable {
       return data[this.index + index] >> 6 & 0x03;
    }
 
+   public int get2Signed(int index) {
+      return getShortInt(index);
+   }
+
+   /**
+    * Unsigned data
+    * @param index
+    * @return
+    */
+   public int get2Unsigned(int index) {
+      return ShortUtils.readShortBEUnsigned(data, this.index + index);
+   }
+
    /**
     * Gets a value according to {@link ByteObject#getValue(int, int)} convention
     * Legacy.. unsigned
@@ -885,19 +886,6 @@ public class ByteObject implements IByteObject, IStringable {
       return get4Signed(index);
    }
 
-   public int get4Signed(int index) {
-      return IntUtils.readIntBE(data, this.index + index);
-   }
-
-   /**
-    * Returns a long because Java int literral is signed 
-    * @param index
-    * @return
-    */
-   public long get4Unsigned(int index) {
-      return IntUtils.readIntBEUnsigned(data, this.index + index);
-   }
-
    /**
     * Reading a single byte, gets the unsigned value of the 87654321 4321 bits
     * 
@@ -919,6 +907,29 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public int get4Bits2(int index) {
       return data[this.index + index] >> 4 & 0x0F;
+   }
+
+   public float get4Float(int index) {
+      int v = get4(index);
+      return Float.intBitsToFloat(v);
+   }
+
+   public int get4Signed(int index) {
+      return IntUtils.readIntBE(data, this.index + index);
+   }
+
+   /**
+    * Returns a long because Java int literral is signed 
+    * @param index
+    * @return
+    */
+   public long get4Unsigned(int index) {
+      return IntUtils.readIntBEUnsigned(data, this.index + index);
+   }
+
+   public double get8Double(int index) {
+      long v = getLong(index);
+      return Double.longBitsToDouble(v);
    }
 
    public BOCtx getBOC() {
@@ -1348,6 +1359,34 @@ public class ByteObject implements IByteObject, IStringable {
       return null;
    }
 
+   /**
+    * Returns the first object whose type is type, and whose value at index of size size is equal
+    * to the given value
+    * @param type
+    * @param index
+    * @param size
+    * @param value
+    * @param num
+    * @return
+    */
+   public ByteObject getSub(int type, int index, int size, int value, int num) {
+      if (param == null)
+         return null;
+      int count = 0;
+      for (int i = 0; i < param.length; i++) {
+         ByteObject subObject = param[i];
+         if (subObject != null && subObject.getType() == type) {
+            if (subObject.getValue(index, size) == value) {
+               if (count == num) {
+                  return subObject;
+               }
+               count++;
+            }
+         }
+      }
+      return null;
+   }
+
    public ByteObject getSubAtIndex(int index) {
       //TODO reads if we have subs in pointer table
       return param[index];
@@ -1399,6 +1438,10 @@ public class ByteObject implements IByteObject, IStringable {
       return p;
    }
 
+   public ByteObject getSubFirst(int type, int index, int size, int value) {
+      return getSub(type, index, size, value, 0);
+   }
+
    public ByteObject getSubFirstEx(int type, int typeEx) {
       if (param == null)
          return null;
@@ -1413,38 +1456,6 @@ public class ByteObject implements IByteObject, IStringable {
    public int getSubFirstIndex(int type) {
       int p = getSubOrderIndex(type, 0);
       return p;
-   }
-
-   public ByteObject getSubFirst(int type, int index, int size, int value) {
-      return getSub(type, index, size, value, 0);
-   }
-
-   /**
-    * Returns the first object whose type is type, and whose value at index of size size is equal
-    * to the given value
-    * @param type
-    * @param index
-    * @param size
-    * @param value
-    * @param num
-    * @return
-    */
-   public ByteObject getSub(int type, int index, int size, int value, int num) {
-      if (param == null)
-         return null;
-      int count = 0;
-      for (int i = 0; i < param.length; i++) {
-         ByteObject subObject = param[i];
-         if (subObject != null && subObject.getType() == type) {
-            if (subObject.getValue(index, size) == value) {
-               if (count == num) {
-                  return subObject;
-               }
-               count++;
-            }
-         }
-      }
-      return null;
    }
 
    /**
@@ -1507,6 +1518,24 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
+    * The Number of subs with given type
+    * @param type
+    * @return
+    */
+   public int getSubNum(int type) {
+      if (param == null) {
+         return 0;
+      }
+      int count = 0;
+      for (int i = 0; i < param.length; i++) {
+         if (param[i] != null && param[i].getType() == type) {
+            count++;
+         }
+      }
+      return count;
+   }
+
+   /**
     * Look up the <code>num</code> th {@link ByteObject} of {@link IByteObject#A_OBJECT_OFFSET_1_TYPE1}
     * <code>type</code>.
     * <br>
@@ -1564,17 +1593,6 @@ public class ByteObject implements IByteObject, IStringable {
       return -1;
    }
 
-   public boolean hasSubType(int type) {
-      if (param == null)
-         return false;
-      for (int i = 0; i < param.length; i++) {
-         if (param[i] != null && param[i].getType() == type) {
-            return true;
-         }
-      }
-      return false;
-   }
-
    /**
     * what happens with bigger types?
     * @param type
@@ -1627,24 +1645,6 @@ public class ByteObject implements IByteObject, IStringable {
          }
       }
       return p;
-   }
-
-   /**
-    * The Number of subs with given type
-    * @param type
-    * @return
-    */
-   public int getSubNum(int type) {
-      if (param == null) {
-         return 0;
-      }
-      int count = 0;
-      for (int i = 0; i < param.length; i++) {
-         if (param[i] != null && param[i].getType() == type) {
-            count++;
-         }
-      }
-      return count;
    }
 
    /**
@@ -1724,6 +1724,11 @@ public class ByteObject implements IByteObject, IStringable {
          len = len - INTRA_REF_BYTE_SIZE;
       }
       return len;
+   }
+
+   public int getTailFlagIndex() {
+      int len = getLength();
+      return index + len - A_OBJECT_TAIL_OFFSET_2_SIZE1;
    }
 
    /**
@@ -2032,6 +2037,17 @@ public class ByteObject implements IByteObject, IStringable {
       return hasFlag(A_OBJECT_OFFSET_2_FLAG, flag);
    }
 
+   public boolean hasFlagTailer(int flag) {
+      if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_TAILER)) {
+         int len = getLength();
+         int tailFlagsIndex = this.index + len - A_OBJECT_TAIL_OFFSET_1_FLAG;
+         int tailFlags = this.get1(tailFlagsIndex);
+         return BitUtils.hasFlag(tailFlags, flag);
+      } else {
+         return false;
+      }
+   }
+
    /**
     * True when subs and root {@link ByteObject} reference each other
     * at least once in a loop.
@@ -2041,6 +2057,17 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public boolean hasReferenceLoop() {
       // TODO Auto-generated method stub
+      return false;
+   }
+
+   public boolean hasSubType(int type) {
+      if (param == null)
+         return false;
+      for (int i = 0; i < param.length; i++) {
+         if (param[i] != null && param[i].getType() == type) {
+            return true;
+         }
+      }
       return false;
    }
 
@@ -2066,25 +2093,6 @@ public class ByteObject implements IByteObject, IStringable {
    public void increment(int index, int size, int incr) {
       int val = getValue(index, size);
       val += incr;
-      setValue(index, val, size);
-   }
-
-   /**
-    * Decrement the index value, not below zero
-    * @param index
-    * @param size
-    * @param incr
-    */
-   public void decrementZero(int index, int size, int incr) {
-      decrementMin(index, size, incr, 0);
-   }
-
-   public void decrementMin(int index, int size, int incr, int min) {
-      int val = getValue(index, size);
-      val -= incr;
-      if (val < min) {
-         val = min;
-      }
       setValue(index, val, size);
    }
 
@@ -2200,6 +2208,18 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
+    * if(index >= equality) then set index=value
+    * @param equality
+    * @param index
+    * @param value
+    */
+   public void set2IfBiggerOrEqual(int equality, int index, int value) {
+      if (get2(index) >= equality) {
+         set2(index, value);
+      }
+   }
+
+   /**
     * if(index == equality) then set index=value
     * @param equality
     * @param index
@@ -2219,18 +2239,6 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public void set2IfSmallerOrEqual(int equality, int index, int value) {
       if (get2(index) <= equality) {
-         set2(index, value);
-      }
-   }
-
-   /**
-    * if(index >= equality) then set index=value
-    * @param equality
-    * @param index
-    * @param value
-    */
-   public void set2IfBiggerOrEqual(int equality, int index, int value) {
-      if (get2(index) >= equality) {
          set2(index, value);
       }
    }
@@ -2278,6 +2286,20 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public void set4(int index, int value) {
       setValue(index, value, 4);
+   }
+
+   public void set4Float(int index, float v) {
+      int intf = Float.floatToIntBits(v);
+      set4(index, intf);
+   }
+
+   public void set8Double(int index, double v) {
+      long intf = Double.doubleToLongBits(v);
+      setLong(index, intf);
+   }
+
+   public void set8Long(int index, long v) {
+      this.setLong(index, v);
    }
 
    /**
@@ -2577,6 +2599,10 @@ public class ByteObject implements IByteObject, IStringable {
       set2Unsigned(A_OBJECT_OFFSET_3_LENGTH2, size);
    }
 
+   private void setLong(int index, long value) {
+      LongUtils.writeLongBE(data, this.index + index, value);
+   }
+
    public void setSerializedNumParam(int num) {
       int offset = getSerialziedOffset();
       ShortUtils.writeShortBEUnsigned(data, index + offset + 1, num);
@@ -2664,6 +2690,19 @@ public class ByteObject implements IByteObject, IStringable {
    public void setSubs(ByteObject[] subs) {
       immutableCheck();
       this.param = subs;
+   }
+
+   /**
+    * Create a tail if none.
+    * @param flag
+    * @param b
+    */
+   public void setTailFlag(int flag, boolean b) {
+      if (!hasFlagObject(A_OBJECT_FLAG_8_TAILER)) {
+
+      }
+      int index = getTailFlagIndex();
+      setFlag(index, flag, b);
    }
 
    /**
@@ -2964,17 +3003,17 @@ public class ByteObject implements IByteObject, IStringable {
       return bytes;
    }
 
+   //#mdebug
+   public IDLog toDLog() {
+      return boc.toDLog();
+   }
+
    public void toggleFlag(int index, int flag) {
       if (hasFlag(index, flag)) {
          setFlag(index, flag, false);
       } else {
          setFlag(index, flag, true);
       }
-   }
-
-   //#mdebug
-   public IDLog toDLog() {
-      return boc.toDLog();
    }
 
    public String toString() {
@@ -3084,17 +3123,6 @@ public class ByteObject implements IByteObject, IStringable {
             sb.append(" Serialized");
          }
          sb.append("");
-      }
-   }
-
-   public boolean hasFlagTailer(int flag) {
-      if (this.hasFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_8_TAILER)) {
-         int len = getLength();
-         int tailFlagsIndex = this.index + len - A_OBJECT_TAIL_OFFSET_1_FLAG;
-         int tailFlags = this.get1(tailFlagsIndex);
-         return BitUtils.hasFlag(tailFlags, flag);
-      } else {
-         return false;
       }
    }
 

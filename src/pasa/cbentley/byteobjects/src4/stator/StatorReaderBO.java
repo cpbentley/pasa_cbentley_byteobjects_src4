@@ -16,55 +16,47 @@ import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.stator.StatorReader;
+import pasa.cbentley.core.src4.structs.IntToObjects;
 
 /**
  * {@link StatorReader} for {@link ByteObject} and {@link BOCtx}.
  * 
- * It can have a parent {@link StatorReaderBO}
+ * It can have a parent {@link StatorReaderBO}.
+ * 
+ * <p>
+ * About the Type. See explanation at {@link ITechStatorBO#TYPE_3_CTX}
+ * </p>
+ * 
  * @author Charles Bentley
  *
  */
-public class StatorReaderBO extends StatorReader implements ITechStateBO {
+public class StatorReaderBO extends StatorReader implements ITechStatorBO {
 
    protected final BOCtx    boc;
 
    protected StatorReaderBO parent;
 
-   public StatorReaderBO(BOCtx boc) {
-      super(boc.getUCtx());
-      this.boc = boc;
-   }
+   private IntToObjects     itos;
 
-   public boolean hasModel() {
-      // TODO Auto-generated method stub
-      return false;
+   public StatorReaderBO(StatorBO stator, int type) {
+      super(stator, type);
+      this.boc = stator.boc;
+      itos = new IntToObjects(uc);
    }
 
    /**
-    * Returns the {@link StatorReaderBO} associated with the type of data
-    * @param type
+    * inverse of {@link StatorWriterBO#writeByteObject(ByteObject)}
     * @return
     */
-   public StatorReaderBO getStateReader(int type) {
-      return this;
-   }
-
-   public IPrefsReader getKeyValuePairs() {
-      if (prefs == null && parent != null) {
-         return parent.getKeyValuePairs();
-      }
-      return prefs;
-   }
-
    public ByteObject readByteObject() {
-      byte[] data = getDataReader().readByteArray();
-      ByteObject bo = new ByteObject(boc, data);
+      BADataIS dis = getReader();
+      ByteObject bo = boc.getByteObjectFactory().createByteObjectFromWrapIto(dis,itos);
       return bo;
    }
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "StatorReaderBO");
+      dc.root(this, StatorReaderBO.class, "@line5");
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
@@ -74,7 +66,7 @@ public class StatorReaderBO extends StatorReader implements ITechStateBO {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "StatorReaderBO");
+      dc.root1Line(this, StatorReaderBO.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

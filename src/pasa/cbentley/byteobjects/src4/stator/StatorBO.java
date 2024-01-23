@@ -6,247 +6,210 @@ package pasa.cbentley.byteobjects.src4.stator;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.byteobjects.src4.utils.ByteObjectTuple;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
+import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.stator.Stator;
-import pasa.cbentley.core.src4.structs.IntBuffer;
-import pasa.cbentley.core.src4.structs.IntToObjects;
+import pasa.cbentley.core.src4.stator.StatorReader;
+import pasa.cbentley.core.src4.stator.StatorWriter;
+import pasa.cbentley.core.src4.structs.BufferObject;
 
 /**
  * 
  * @author Charles Bentley
  *
  */
-public class StatorBO extends Stator {
+public class StatorBO extends Stator implements ITechStatorBO {
 
-  public StatorBO[]      allstates;
+   protected final BOCtx boc;
 
+   private BufferObject  bufferTuples;
 
-   private IntBuffer       integers;
-
-   /**
-    * 
-    */
-   public IntToObjects     itos;
-
-   private int             subIndex              = 0;
-
-   /**
-    * First is Drawable, then depending on the class Hierarchy
-    */
-   public Object[]         subStates             = new Object[5];
-
-   /**
-    * Type of state
-    */
-   private int             type;
-
-   protected final BOCtx           boc;
-
-
-   protected final UCtx uc;
-   
-   private int index;
-
-   public StatorBO(BOCtx boc, int type) {
+   public StatorBO(BOCtx boc) {
       super(boc.getUCtx());
-      this.boc=boc;
-      this.uc=boc.getUCtx();
-      this.type = type;
-      itos = new IntToObjects(uc);
-      integers = new IntBuffer(uc);
+      this.boc = boc;
    }
 
-   public int getIndex() {
-      return index;
+   public StatorWriterBO getWriterBO(int type) {
+      return (StatorWriterBO) getWriter(type);
    }
-   
-   public StatorBO getState(int type) {
-      if(this.type == type) {
-         return this;
-      } else {
-         for (int i = 0; i < allstates.length; i++) {
-            if(allstates[i].getType() == type) {
-               return allstates[i];
+
+   public StatorReaderBO getReaderBO(int type) {
+      return (StatorReaderBO) getReader(type);
+   }
+
+   protected StatorReader createReader(int type) {
+      return new StatorReaderBO(this, type);
+   }
+
+   protected StatorWriter createWriter(int type) {
+      return new StatorWriterBO(this, type);
+   }
+
+   /**
+    * Return null if no keyed Readers for key/type
+    * <p>
+    * 
+    * While {@link StatorBO#getStatorWriterKeyedTo(ByteObject, int)} never returns null
+    * as it creates one when needed,
+    * 
+    * </p>
+    * @param key
+    * @param type
+    * @return
+    */
+   public StatorReaderBO getStatorReaderKeyedToExisting(ByteObject key, int type) {
+      if (bufferTuples != null) {
+         int len = bufferTuples.getLength();
+         for (int i = 0; i < len; i++) {
+            ByteObjectTuple bot = (ByteObjectTuple) bufferTuples.get(i);
+            if (bot.getId() == type) {
+               if (bot.getBo().equalsContent(key)) {
+                  return (StatorReaderBO) bot.getO2();
+               }
             }
          }
-         //create new state
-         StatorBO newState = new StatorBO(boc, type);
-         add(newState);
-         return newState;
       }
+      return null;
    }
 
+   /**
+    * Return null if nothing keyed to 
+    * @param key
+    * @param type
+    * @return
+    */
+   public StatorWriterBO getStatorWriterKeyedToExisting(ByteObject key, int type) {
+      if (bufferTuples != null) {
+         int len = bufferTuples.getLength();
+         for (int i = 0; i < len; i++) {
+            ByteObjectTuple bot = (ByteObjectTuple) bufferTuples.get(i);
+            if (bot.getId() == type) {
+               if (bot.getBo().equalsContent(key)) {
+                  return (StatorWriterBO) bot.getO1();
+               }
+            }
+         }
+      }
+      return null;
+   }
 
    /**
-    * Check if object is not already there
-    * @param bo
+    * A {@link StatorWriterBO} linked to a {@link ByteObject}.
+    * 
+    * <p>
+    *  This allows to save settings for
+    * </p>
+    * When loading a windows, we want to reuse its coord associated with the screen configuration.
+    * If a screen is not there anymore, we do not want the windows so be shown on invisible coordiantes.
+    * So the saved coordinates must come from the saved state of windows coordinates associated with current
+    * screen configuration.
+    * 
+    * So {@link StatorBO} can associate a given Writer to not only a type but also a ByteObject
+    * @param key
+    * @return
+    * 
+    * <li> {@link ITechStatorBO#TYPE_0_MASTER}
+    * <li> {@link ITechStatorBO#TYPE_1_VIEW}
+    * <li> {@link ITechStatorBO#TYPE_2_MODEL}
+    * <li> {@link ITechStatorBO#TYPE_3_CTX}
+    * @param key
+    * @param type
+    * @return
     */
-   public void addBOUnique(ByteObject bo) {
-      if(!itos.hasObject(bo)) {
-         itos.add(bo);
+   public StatorWriterBO getStatorWriterKeyedTo(ByteObject key, int type) {
+      if (bufferTuples == null) {
+         bufferTuples = new BufferObject(uc, 1);
       } else {
-         
+         StatorWriterBO writer = getStatorWriterKeyedToExisting(key, type);
+         if (writer != null) {
+            return writer;
+         }
       }
+      ByteObjectTuple bot = new ByteObjectTuple(boc);
+      bot.setId(type);
+      bot.setBo(key);
+      StatorWriterBO writer = (StatorWriterBO) createWriter(type);
+      bot.setO1(writer);
+      bufferTuples.add(bot);
+      return writer;
    }
-   
-   public void addBO(ByteObject bo) {
-      itos.add(bo);
-   }
-   /**
-    * 
-    * @param vsd
-    */
-   public void add(StatorBO vsd) {
-      subStates[subIndex] = vsd;
-      subIndex++;
-      if (subIndex >= subStates.length) {
-         subStates = getUCtx().getMem().increaseCapacity(subStates, 5);
+
+   protected void serializeAllSub(BADataOS out) {
+      out.writeInt(MAGIC_WORD_STATORBO);
+      if (bufferTuples != null) {
+         int num = bufferTuples.getLength();
+         out.writeInt(num);
+         for (int index = 0; index < num; index++) {
+            ByteObjectTuple bot = (ByteObjectTuple) bufferTuples.get(index);
+
+            //serialize byteobject
+            ByteObject bo = bot.getBo();
+            bo.serialize(out);
+
+            StatorWriterBO writer = (StatorWriterBO) bot.getO1();
+            writer.serialize(out);
+         }
+      } else {
+         out.writeInt(0);
       }
-   }
-
-   public UCtx getUCtx() {
-      return boc.getUCtx();
-   }
-
-   /**
-    * Adds a null marker for ordered view state stacking.
-    */
-   public void addNull() {
-      add(null);
-   }
-
-
-   public int getType() {
-      return type;
-   }
-
-   /**
-    * 
-    * @param i
-    * @return
-    */
-   public StatorBO getMyState(int i) {
-      if (allstates == null || i >= allstates.length) {
-         return null;
-      }
-      return (StatorBO) allstates[i];
    }
 
    /**
     * 
-    * @return
     */
-   public ByteObject getState() {
-      int num = itos.nextempty;
-      int size = 0;
-      ByteObject bo = new ByteObject(boc, IBOTypesBOC.TYPE_037_CLASS_STATE, size);
-      return bo;
+   protected boolean switchMagicSub(int magic, BADataIS dis) {
+      if (magic == MAGIC_WORD_STATORBO) {
+         int readNum = dis.readInt();
+         if (readNum != 0) {
+            bufferTuples = new BufferObject(uc, readNum);
+            for (int i = 0; i < readNum; i++) {
+               ByteObjectTuple bot = new ByteObjectTuple(boc);
+
+               ByteObject bo = boc.getByteObjectFactory().serializeReverse(dis);
+               bot.setBo(bo);
+
+               int magicToken = dis.readInt();
+               if (magicToken != MAGIC_WORD_WRITER) {
+                  throw new IllegalArgumentException();
+               }
+               StatorReader reader = super.readStatorReader(dis);
+               int type = reader.getType();
+               bot.setId(type);
+
+               bot.setO2(reader);
+
+               bufferTuples.add(bot);
+            }
+         }
+         return true;
+      } else {
+         //#debug
+         toDLog().pAlways("Wrong Magic " + magic, this, Stator.class, "switchMagic", LVL_05_FINE, true);
+         return false;
+      }
    }
 
-   /**
-    * Serialize to the form of a {@link ByteObject}.
-    * @return
-    */
-   public byte[] serialize() {
-      return null;
+   //#mdebug
+   public void toString(Dctx dc) {
+      dc.root(this, StatorBO.class, 120);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
+
+      dc.nlLvl(bufferTuples, "KeysToTuples");
    }
 
-   public ByteObject serializeBO() {
-      return null;
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, StatorBO.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
-   private BADataOS dos;
-
-   private BADataIS dis;
-
-   /**
-    * Serialize the ViewState. We cannot use Java Object serialization? No
-    * because it is not portable between Java2ME
-    * @param ito
-    * @param dos
-    * @return
-    */
-   public byte[] serialize(IntToObjects ito, BADataOS dos) {
-      return null;
-   }
-
-   /**
-    * Add Object as bytes
-    * @param data
-    */
-   public void addBytes(byte[] data) {
-      // TODO Auto-generated method stub
-
-   }
-
-   public ByteObject readNextByteObject() {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   public byte[] readNextObject() {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   /**
-    * Tells {@link StatorBO}, class is going to add x objects
-    * @param size
-    */
-   public void addObjects(int size) {
-      // TODO Auto-generated method stub
+   private void toStringPrivate(Dctx dc) {
 
    }
 
-   /**
-    * Call after {@link StatorBO#addObjects(int)}
-    * Finalize Array of Objects
-    */
-   public void closeArrayObjects() {
-      // TODO Auto-generated method stub
-
-   }
-
-   /**
-    * Read object and flag it for deletion.
-    * <br>
-    * @return null if no data for key
-    */
-   public byte[] readObjectDel(int key) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   public void setVersion(int ver) {
-      // TODO Auto-generated method stub
-
-   }
-
-   public int readVersion() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
-   public void wrongVersion(int ver) {
-      throw new IllegalArgumentException("Wrong Version" + ver);
-   }
-
-   public int readInt() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
-   public void writeByteObject(ByteObject bo) {
-      bo.serializeTo(itos, dos);
-   }
-
-   public void writeInt(int behaviors) {
-      // TODO Auto-generated method stub
-
-   }
-
+   //#enddebug
 
 }

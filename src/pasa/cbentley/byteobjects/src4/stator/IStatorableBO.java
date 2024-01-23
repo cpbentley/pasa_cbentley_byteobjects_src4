@@ -19,18 +19,5 @@ import pasa.cbentley.core.src4.stator.IStatorable;
  */
 public interface IStatorableBO extends IStatorable, IStringable {
 
-   /**
-    * Write currently state.
-    * 
-    * Call this method on its children that are {@link IStatorableBO} 
-    * @param boState
-    */
-   public void setStateTo(StatorBO boState);
-
-   /**
-    * 
-    * @param boState
-    */
-   public void setStateFrom(StatorBO boState);
 
 }

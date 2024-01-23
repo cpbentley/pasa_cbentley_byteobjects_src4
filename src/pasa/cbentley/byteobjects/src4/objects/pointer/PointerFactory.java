@@ -20,7 +20,6 @@ import pasa.cbentley.core.src4.logging.Dctx;
  */
 public class PointerFactory extends BOAbstractFactory implements IBOPointer {
 
-
    public PointerFactory(BOCtx boc) {
       super(boc);
    }
@@ -37,6 +36,31 @@ public class PointerFactory extends BOAbstractFactory implements IBOPointer {
 
    public ByteObject getPointer(int offset, int size) {
       return createPointer(offset, size, 0, 0);
+   }
+
+   /**
+    * For getter {@link ByteObject#get2(int)}
+    * @param offset
+    * @return
+    */
+   public ByteObject getPointerSize2(int offset) {
+      return createPointer(offset, 2, 0, 0);
+   }
+   /**
+    * For getter {@link ByteObject#get1(int)}
+    * @param offset
+    * @return
+    */
+   public ByteObject getPointerSize1(int offset) {
+      return createPointer(offset, 1, 0, 0);
+   }
+   /**
+    * For getter {@link ByteObject#get4(int)}
+    * @param offset
+    * @return
+    */
+   public ByteObject getPointerSize4(int offset) {
+      return createPointer(offset, 4, 0, 0);
    }
 
    public ByteObject getPointer(int offset, int size, int boType) {

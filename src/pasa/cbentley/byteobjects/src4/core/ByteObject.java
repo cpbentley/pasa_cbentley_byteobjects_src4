@@ -13,6 +13,7 @@ import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
 import pasa.cbentley.core.src4.ctx.IToStringFlags;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
+import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDLog;
@@ -730,7 +731,7 @@ public class ByteObject implements IByteObject, IStringable {
     * Serialize both objects and check them bytes by bytes.
     * <br>
     * <br>
-    * 
+    *  {@link ByteObject#toByteArray()}
     * @param p1
     * @param p2
     * @return
@@ -2157,6 +2158,10 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   /**
+    * Inverse method  {@link ByteObjectFactory#serializeReverse(BADataIS)}
+    * @param dos
+    */
    public void serialize(BADataOS dos) {
       byte[] data = this.toByteArray();
       byte[] header = IntUtils.byteArrayBEFromInt(data.length);
@@ -2380,6 +2385,16 @@ public class ByteObject implements IByteObject, IStringable {
          ShortUtils.writeShortBEUnsigned(data, this.index + index, value);
          index += 2;
       }
+   }
+
+   /**
+    * Inverse of {@link ByteObject#getVarCharString(int, int)}
+    * @param index index at wich to start writing
+    * @param numMax number maximum of characters
+    * @param str
+    */
+   public void setVarCharString(int index, int numMax, String str) {
+      setDynMaxFixedString(index, numMax, str);
    }
 
    /**
@@ -2877,6 +2892,7 @@ public class ByteObject implements IByteObject, IStringable {
     * <br>
     * No serial descriptor
     * <br>
+    * 
     * @param globalrefs
     * @return
     */

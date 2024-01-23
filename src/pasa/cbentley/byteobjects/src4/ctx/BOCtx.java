@@ -195,10 +195,6 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       toDLog().pInit("Created", this, BOCtx.class, "BOCtx", LVL_05_FINE, true);
    }
 
-   public BOCtx(UCtx uc, CtxManager m) {
-      super(uc, m);
-   }
-
    public AcceptorFactory getAcceptorFactory() {
       return acceptorC;
    }
@@ -441,6 +437,15 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       dc.nlLvl(lockManager, "lockManager");
       dc.nlLvl(rootRefs, "rootRefs");
       dc.nlLvl(valueReadCache, "valueReadCache");
+   }
+   
+   public String toStringStaticID(int staticID) {
+      switch (staticID) {
+         case IStaticIDsBO.SID_BYTEOBJECT_TYPES:
+            return "BoTypes";
+         default:
+            return null;
+      }
    }
 
    public void toString1Line(Dctx dc) {

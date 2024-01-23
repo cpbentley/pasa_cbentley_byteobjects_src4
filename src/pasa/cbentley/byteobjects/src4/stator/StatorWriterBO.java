@@ -6,61 +6,56 @@ package pasa.cbentley.byteobjects.src4.stator;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
-import pasa.cbentley.core.src4.helpers.BasicPrefs;
-import pasa.cbentley.core.src4.interfaces.IPrefs;
-import pasa.cbentley.core.src4.interfaces.IPrefsReader;
-import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
-import pasa.cbentley.core.src4.logging.IStringable;
-import pasa.cbentley.core.src4.stator.StatorReader;
 import pasa.cbentley.core.src4.stator.StatorWriter;
+import pasa.cbentley.core.src4.structs.IntToObjects;
 
-public class StatorWriterBO extends StatorWriter implements ITechStateBO {
+/**
+ * 
+ * Goal: Dissociate state types.
+ * 
+ * Implement type based Writer
+ * <li> {@link ITechStatorBO#TYPE_0_MASTER}
+ * <li> {@link ITechStatorBO#TYPE_1_VIEW}
+ * <li> {@link ITechStatorBO#TYPE_2_MODEL}
+ * <li> {@link ITechStatorBO#TYPE_3_CTX}
+ * 
+ * <p>
+ * What's the parent about ?
+ * </p>
+ * @author Charles Bentley
+ *
+ */
+public class StatorWriterBO extends StatorWriter implements ITechStatorBO {
 
    protected final BOCtx    boc;
 
    protected StatorWriterBO parent;
 
-   public StatorWriterBO(BOCtx boc) {
-      super(boc.getUCtx());
-      this.boc = boc;
+   /**
+    * Control objects that were already serialized in this {@link StatorBO}
+    */
+   private IntToObjects     itos;
+
+   public StatorWriterBO(StatorBO stator, int type) {
+      super(stator, type);
+      this.boc = stator.boc;
+      itos = new IntToObjects(uc);
    }
 
    /**
-    * <li> {@link ITechStateBO#TYPE_0_MASTER}
-    * <li> {@link ITechStateBO#TYPE_1_VIEW}
-    * <li> {@link ITechStateBO#TYPE_2_MODEL}
-    * <li> {@link ITechStateBO#TYPE_3_CTX}
-    * @param key
-    * @param type
-    * @return
+    * Oppositve of {@link StatorReaderBO#readNextByteObject()}
+    * @param bo
     */
-   public StatorWriterBO createStatorKeyedTo(ByteObject key, int type) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   public StatorWriterBO getStateWriter(int type) {
-      return this;
-   }
-
-   /**
-    * A Stator for views
-    * 
-    * @param key
-    * @return
-    */
-   public StatorWriterBO createKeyedStatorView(ByteObject key) {
-      // TODO Auto-generated method stub
-      return null;
+   public void writeByteObject(ByteObject bo) {
+      BADataOS dos = getWriter();
+      bo.serializeTo(itos, dos);
    }
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "StatorReaderBO");
+      dc.root(this, StatorWriterBO.class, 74);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
@@ -70,7 +65,7 @@ public class StatorWriterBO extends StatorWriter implements ITechStateBO {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "StatorReaderBO");
+      dc.root1Line(this, StatorWriterBO.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

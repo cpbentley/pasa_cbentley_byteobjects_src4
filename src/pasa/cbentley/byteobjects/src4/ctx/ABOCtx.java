@@ -28,17 +28,15 @@ import pasa.cbentley.core.src4.logging.Dctx;
  */
 public abstract class ABOCtx extends ACtx implements IAInitable {
 
-   protected final BOCtx     boc;
+   protected final BOCtx boc;
 
-   protected final IConfigBO configBO;
-
-   private ByteObject        previousSettings;
+   private ByteObject    previousSettings;
 
    /**
     * Tech Settings
     * Won't be null after the {@link ABOCtx#a_Init()}
     */
-   private ByteObject        settingsBO;
+   private ByteObject    settingsBO;
 
    /**
     * Takes the def
@@ -47,16 +45,12 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
     * @param boc
     */
    public ABOCtx(IConfigBO config, BOCtx boc) {
-      super(boc.getUCtx()); //registers the module and get the saved byte data
-      this.boc = boc;
-      this.configBO = config;
-      //take the default size
+      this(config, boc, null);
    }
 
    public ABOCtx(IConfigBO config, BOCtx boc, ByteObject settings) {
-      super(boc.getUCtx()); //registers the module and get the saved byte data
+      super(config, boc.getUCtx()); //registers the module and get the saved byte data
       this.boc = boc;
-      this.configBO = config;
       this.settingsBO = settings;
    }
 
@@ -79,12 +73,13 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
     * </p>
     */
    public void a_Init() {
+      IConfigBO configBO = getConfigBO();
       ByteObject settings = null;
-      
+
       if (configBO.isIgnoreSettings() || uc.getConfigU().isIgnoreSettingsAll()) {
          //#debug
          toDLog().pInit("Ignoring Ctx Settings for " + this.getClass().getName(), this, ABOCtx.class, "a_Init", LVL_05_FINE, true);
-         
+
          //flags tell us to ignored user saved config settings.. 
          settings = getSettingsBOEmpty();
          //so create empty shell and burn hardcoded config
@@ -133,8 +128,8 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
     */
    public abstract int getBOCtxSettingSize();
 
-   public IConfig getConfig() {
-      return configBO;
+   public IConfigBO getConfigBO() {
+      return (IConfigBO) config;
    }
 
    /**
@@ -146,7 +141,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
       ByteObject settings = null;
       if (data == null) {
          settings = getSettingsBOEmpty();
-         matchConfig(configBO, settings);
+         matchConfig(getConfigBO(), settings);
       } else { //data is not null, was read from saved. what is different draw context?
          int size = getBOCtxSettingSize();
          if (data.length < size) {
@@ -211,12 +206,12 @@ public abstract class ABOCtx extends ACtx implements IAInitable {
       toStringPrivate(dc);
       super.toString(dc.sup());
       dc.nlLvl(settingsBO, "CtxSettings");
+      dc.nlLvl(previousSettings, "previousSettings");
 
-      dc.nlLvl(boc, BOCtx.class);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "ABOCtx");
+      dc.root1Line(this, ABOCtx.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

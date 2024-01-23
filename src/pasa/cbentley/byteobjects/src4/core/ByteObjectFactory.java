@@ -237,7 +237,7 @@ public class ByteObjectFactory extends BOAbstractFactory implements IByteObject 
    }
 
    /**
-    * Inverse function of {@link ByteObject#serializeTo(IntToObjects, DataBAOutputStream)}
+    * Inverse function of {@link ByteObject#serializeTo(IntToObjects, pasa.cbentley.core.src4.io.BADataOS)}
     * @param dos
     */
    public ByteObject serializeReverse(BADataIS dis) {

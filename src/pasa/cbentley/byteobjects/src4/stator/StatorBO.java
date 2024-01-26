@@ -43,7 +43,7 @@ public class StatorBO extends Stator implements ITechStatorBO {
       return new StatorReaderBO(this, type);
    }
 
-   protected StatorWriter createWriter(int type) {
+   public StatorWriter createWriter(int type) {
       return new StatorWriterBO(this, type);
    }
 
@@ -149,7 +149,7 @@ public class StatorBO extends Stator implements ITechStatorBO {
             bo.serialize(out);
 
             StatorWriterBO writer = (StatorWriterBO) bot.getO1();
-            writer.serialize(out);
+            writer.serializeWhole(out);
          }
       } else {
          out.writeInt(0);

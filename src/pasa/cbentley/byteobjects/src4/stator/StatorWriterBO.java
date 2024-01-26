@@ -46,7 +46,7 @@ public class StatorWriterBO extends StatorWriter implements ITechStatorBO {
 
    /**
     * Oppositve of {@link StatorReaderBO#readNextByteObject()}
-    * @param bo
+    * @param bo cannot be null ?
     */
    public void writeByteObject(ByteObject bo) {
       BADataOS dos = getWriter();

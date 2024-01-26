@@ -6,6 +6,7 @@ package pasa.cbentley.byteobjects.src4.core;
 
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOAgentManaged;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
+import pasa.cbentley.byteobjects.src4.ctx.ObjectBoc;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IStringable;
@@ -28,16 +29,14 @@ import pasa.cbentley.core.src4.structs.IntToObjects;
  * @author Charles Bentley
  *
  */
-public class LockManager implements IBOAgentManaged, IStringable {
+public class LockManager extends ObjectBoc implements IBOAgentManaged, IStringable {
 
-   IntToObjects  locksBom;
+   IntToObjects locksBom;
 
-   IntToObjects  locksMonitorThread;
-
-   private BOCtx boc;
+   IntToObjects locksMonitorThread;
 
    public LockManager(BOCtx boc) {
-      this.boc = boc;
+      super(boc);
       locksBom = new IntToObjects(boc.getUCtx(), 1);
       locksMonitorThread = new IntToObjects(boc.getUCtx(), 1);
    }
@@ -153,26 +152,22 @@ public class LockManager implements IBOAgentManaged, IStringable {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "LockManager");
+      dc.root(this, LockManager.class, 160);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
       dc.nlLvl(locksBom);
       dc.nlLvl(locksMonitorThread);
    }
 
+   private void toStringPrivate(Dctx dc) {
+
+   }
+
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "LockManager");
+      dc.root1Line(this, LockManager.class);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    //#enddebug

@@ -306,7 +306,7 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
    public IDebugStringable getDIDer() {
       return getBOModuleManager();
    }
-   
+
    public LitteralIntFactory getLitteralIntFactory() {
       if (litteralIntFactory == null) {
          litteralIntFactory = new LitteralIntFactory(this);
@@ -425,10 +425,9 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       this.byteObjectC = boc;
    }
 
-
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, "BOCtx");
+      dc.root(this, BOCtx.class, 431);
       toStringPrivate(dc);
       super.toString(dc.sup());
 
@@ -438,7 +437,7 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       dc.nlLvl(rootRefs, "rootRefs");
       dc.nlLvl(valueReadCache, "valueReadCache");
    }
-   
+
    public String toStringStaticID(int staticID) {
       switch (staticID) {
          case IStaticIDsBO.SID_BYTEOBJECT_TYPES:
@@ -449,7 +448,7 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BOCtx");
+      dc.root1Line(this, BOCtx.class);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

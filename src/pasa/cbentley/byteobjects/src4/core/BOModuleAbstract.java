@@ -7,12 +7,11 @@ package pasa.cbentley.byteobjects.src4.core;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
+import pasa.cbentley.byteobjects.src4.ctx.ObjectBoc;
 import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
 import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDLog;
 import pasa.cbentley.core.src4.logging.IDebugStringable;
 import pasa.cbentley.core.src4.logging.IStringable;
 import pasa.cbentley.core.src4.utils.ShortUtils;
@@ -56,11 +55,9 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  * @author Charles Bentley
  *
  */
-public abstract class BOModuleAbstract implements IByteObject, IDebugStringable, IStringable {
+public abstract class BOModuleAbstract extends ObjectBoc implements IByteObject, IDebugStringable, IStringable {
 
-   protected BOCtx boc;
-
-   protected int   moduleIndex;
+   protected int moduleIndex;
 
    /**
     * Register this module to the {@link BOModulesManager#addModule(BOModuleAbstract)}.
@@ -71,7 +68,7 @@ public abstract class BOModuleAbstract implements IByteObject, IDebugStringable,
     * @param root is null.. then this BOModule is its own root
     */
    public BOModuleAbstract(BOCtx boc) {
-      this.boc = boc;
+      super(boc);
       boc.getBOModuleManager().addModule(this);
    }
 
@@ -174,19 +171,11 @@ public abstract class BOModuleAbstract implements IByteObject, IDebugStringable,
       return null;
    }
 
-   public IDLog toDLog() {
-      return boc.toDLog();
-   }
-
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    //#mdebug
-
    public void toString(Dctx dc) {
-      dc.root(this, "BOModuleAbstract");
+      dc.root(this, BOModuleAbstract.class, 250);
       toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
    /**
@@ -201,16 +190,10 @@ public abstract class BOModuleAbstract implements IByteObject, IDebugStringable,
     */
    public abstract boolean toString(Dctx dc, ByteObject bo);
 
-   /**
-    * 
-    */
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
-   }
-
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BOModuleAbstract");
+      dc.root1Line(this, BOModuleAbstract.class);
       toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    /**
@@ -244,9 +227,7 @@ public abstract class BOModuleAbstract implements IByteObject, IDebugStringable,
       return boc.getBOModuleManager().toStringGetDynamicDIDMax();
    }
 
-   public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
-   }
+   //#enddebug
 
    /**
     * For specification see {@link BOModulesManager#toStringLink(int)}
@@ -274,6 +255,14 @@ public abstract class BOModuleAbstract implements IByteObject, IDebugStringable,
       dc.appendVarWithSpace("moduleIndex", moduleIndex);
    }
 
+   /**
+    * When Module knows that a given type is designed to be extended, it looks the extension field type
+    * and request {@link BOModuleAbstract#toStringSubType(Dctx, ByteObject, int)}
+    * @param dc
+    * @param bo
+    * @param subType
+    * @return
+    */
    public boolean toStringSubType(Dctx dc, ByteObject bo, int subType) {
       return false;
    }

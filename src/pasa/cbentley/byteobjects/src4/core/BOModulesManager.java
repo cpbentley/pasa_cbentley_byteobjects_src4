@@ -43,7 +43,6 @@ import pasa.cbentley.core.src4.utils.ShortUtils;
  */
 public class BOModulesManager extends ObjectBoc implements IStringable, IDebugStringable, IByteObject, IJavaObjectFactory, IToStringsDIDsBoc {
 
-
    /**
     * Hash table of {@link IJavaObjectFactory}.
     * <br>
@@ -65,7 +64,7 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
     * But it also allows the merging of types. So moduling loading is EXTREMELY important.
     * 
     */
-   private BOModuleAbstract[] modules               = new BOModuleAbstract[0];
+   private BOModuleAbstract[] modules = new BOModuleAbstract[0];
 
    protected RootSource       rootSource;
 
@@ -79,7 +78,7 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
       factoriesStr = new Hashtable();
       rootSource = new RootSource(boc);
       javaObjectFactories = new IntToObjects(boc.getUCtx(), 5);
-      
+
       //#debug
       boc.getUCtx().toStringGetDIDManager().registerDIDer(this);
    }
@@ -529,7 +528,6 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
       return "Type [" + bo.getType() + "] offset " + offset + " not found";
    }
 
-
    public void toStringSubType(Dctx dc, ByteObject bo, int subType) {
       for (int i = 0; i < modules.length; i++) {
          boolean isDone = modules[i].toStringSubType(dc, bo, subType);
@@ -537,6 +535,8 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
             return;
          }
       }
+      //#debug
+      toDLog().pNull("subtype " + subType + " not found for type" + bo.getType(), this, BOModulesManager.class, "toStringSubType", LVL_05_FINE, false);
       throw new RuntimeException("toStringSubType ByteObject subtype " + subType + " -> Module not found or implemented");
 
    }

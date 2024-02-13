@@ -17,8 +17,7 @@ import pasa.cbentley.core.src4.structs.IntBuffer;
 import pasa.cbentley.core.src4.utils.IntUtils;
 
 public class ColorFunctionFactory extends BOAbstractFactory implements ITechColorFunction, ITechFunction, IBOColorRnd {
-   
-   
+
    public ColorFunctionFactory(BOCtx boc) {
       super(boc);
 
@@ -188,7 +187,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
       p.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_6_EXTENSION, true);
       p.setValue(FUN_OFFSET_09_EXTENSION_TYPE2, IBOTypesDrw.TYPE_057_COLOR_FUNCTION, 1);
       if (postop != 0) {
-         p.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_1POSTOP, true);
+         p.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_1_POSTOP, true);
          p.setValue(FUN_OFFSET_08_POST_OPERATOR1, postop, 1);
       }
       return p;
@@ -248,11 +247,41 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
       ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_061_COLOR_RANDOM, RND_COLORS_BASIC_SIZE);
       if (perchannel) {
          p.setValue(RND_COLORS_OFFSET_06_TYPE1, RND_COLORS_TYPE_1_CHANNEL, 1);
+         p.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_1_RED_CHANNEL, true);
+         p.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_2_GREEN_CHANNEL, true);
+         p.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_3_BLUE_CHANNEL, true);
+         p.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_4_ALPHA_CHANNEL, true);
       } else {
          p.setValue(RND_COLORS_OFFSET_06_TYPE1, RND_COLORS_TYPE_0_RND_32BITS, 1);
       }
       p.setFlag(RND_COLORS_OFFSET_03_FLAGC, RND_COLORS_FLAG_C_8_ALL_COLOR, true);
       return p;
+   }
+
+   public ByteObject getColorRandom(int type) {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_061_COLOR_RANDOM, RND_COLORS_BASIC_SIZE);
+      p.setValue(RND_COLORS_OFFSET_06_TYPE1, type, 1);
+      return p;
+   }
+
+   public ByteObject getColorRandomGrayscaled() {
+      return getColorRandom(RND_COLORS_TYPE_4_GRAYSCALE);
+   }
+
+   public ByteObject getColorRandomWeb() {
+      return getColorRandom(RND_COLORS_TYPE_0_RND_32BITS);
+   }
+
+   public ByteObject getColorRandomChannelMode(int channelMod) {
+      ByteObject bo = getColorRandom(RND_COLORS_TYPE_3_CHANNEL_MOD);
+
+      bo.set2(RND_COLORS_OFFSET_08_CHANNEL_MOD2, channelMod);
+      bo.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_1_RED_CHANNEL, true);
+      bo.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_2_GREEN_CHANNEL, true);
+      bo.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_3_BLUE_CHANNEL, true);
+      bo.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_4_ALPHA_CHANNEL, true);
+
+      return bo;
    }
 
    public ColorFunction createColorFunction(ByteObject def) {
@@ -268,8 +297,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
    public ColorFunction getColorFunctionRandom() {
       return createColorFunction(getColorFunctionRandom(false));
    }
-   
-   
+
    public void toStringColorRandom(ByteObject bo, Dctx dc) {
       dc.rootN(bo, "ColorRandom");
 

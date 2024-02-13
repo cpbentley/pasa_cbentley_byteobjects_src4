@@ -176,7 +176,7 @@ public class ByteObjectManagedFactory extends BOAbstractFactory implements IBOAg
             if (tech.byteCon == null) {
                sb.append("[Null ByteController]");
             } else {
-               sb.append("[" + tech.byteCon.toStringOneLine() + "]");
+               sb.append("[" + tech.byteCon.toString1Line() + "]");
             }
             sb.append(" [Length of ");
             sb.append(" Agent=" + len);

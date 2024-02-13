@@ -108,6 +108,16 @@ public class ByteObjectFactory extends BOAbstractFactory implements IByteObject 
    }
 
    /**
+    * {@link IBOTypesBOC#TYPE_020_PARAMATERS}
+    * 
+    * @param size
+    * @return
+    */
+   public ByteObject createParameter(int size) {
+      return createByteObject(IBOTypesBOC.TYPE_020_PARAMATERS, size);
+   }
+
+   /**
     * See {@link ByteObject#createByteObjectFromWrap(byte[], int)}
     * <br>
     * <br>

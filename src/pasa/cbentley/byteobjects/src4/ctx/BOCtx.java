@@ -113,7 +113,6 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    private ByteObjectManagedFactory byteObjectManagedFactory;
 
-   private EventBusArray            eventBus;
 
    private FunctionFactory          functionC;
 
@@ -185,14 +184,14 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       c.registerStaticID(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES);
 
       c.registerStaticRange(this, IStaticIDsBO.SID_BYTEOBJECT_TYPES, IBOTypesBOC.SID_BASETYPE_A, IBOTypesBOC.SID_BASETYPE_Z);
+      c.registerStaticRange(this, IStaticIDs.SID_EVENTS, IEventsBO.A_SID_BO_EVENT_A, IEventsBO.A_SID_BO_EVENT_Z);
 
-      //#debug
+      //#mdebug
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBoc.A_DID_OFFSET_A_BOC, IToStringsDIDsBoc.A_DID_OFFSET_Z_BOC);
-      //#debug
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBocFun.A_DID_OFFSET_A_BOC_FUN, IToStringsDIDsBocFun.A_DID_OFFSET_Z_BOC_FUN);
-
-      //#debug
-      toDLog().pInit("Created", this, BOCtx.class, "BOCtx", LVL_05_FINE, true);
+      toDLog().pInit("", this, BOCtx.class, "Created@192", LVL_04_FINER, true);
+      
+      //#enddebug
    }
 
    public AcceptorFactory getAcceptorFactory() {
@@ -248,6 +247,8 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    private FilterOperator       filterOperator;
 
+   private EventBusArray eventBus;
+
    public FactoryByteObject getFactoryByteObject() {
       if (factoryByteObject == null) {
          factoryByteObject = new FactoryByteObject();
@@ -283,14 +284,14 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    public int[] getEventBaseTopology() {
       int[] events = new int[IEventsBO.BASE_EVENTS];
-      events[IEventsBO.PID_0_ANY] = PID_0_ANY_X_NUM;
-      events[IEventsBO.PID_1_CTX] = PID_1_CTX_X_NUM;
+      events[IEventsBO.PID_00] = PID_00_XX;
+      events[IEventsBO.PID_01] = PID_01_XX;
       return events;
    }
 
    public IEventBus getEventBus() {
       if (eventBus == null) {
-         eventBus = new EventBusArray(uc, this, getEventBaseTopology());
+         eventBus = new EventBusArray(getUC(), this, getEventBaseTopology(), IEventsBO.A_SID_BO_EVENT_A);
       }
       return eventBus;
    }
@@ -431,7 +432,6 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       toStringPrivate(dc);
       super.toString(dc.sup());
 
-      dc.nlLvl(eventBus, "eventBus");
       dc.nlLvl(moduleManager, "moduleManager");
       dc.nlLvl(lockManager, "lockManager");
       dc.nlLvl(rootRefs, "rootRefs");

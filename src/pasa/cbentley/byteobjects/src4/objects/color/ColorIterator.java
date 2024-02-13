@@ -36,8 +36,8 @@ import pasa.cbentley.core.src4.utils.ColorUtils;
 public class ColorIterator extends ObjectBoc implements IStringable {
 
 
-   public ColorIterator(BOCtx drc) {
-      super(drc);
+   public ColorIterator(BOCtx boc) {
+      super(boc);
    }
 
    public ColorIterator(BOCtx drc, int[] colors) {

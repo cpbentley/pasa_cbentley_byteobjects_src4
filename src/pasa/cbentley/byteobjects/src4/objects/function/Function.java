@@ -590,7 +590,7 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
    public void reset(ByteObject def) {
       resetFields();
       this.def = def;
-      setLooping(def.hasFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_3LOOPING));
+      setLooping(def.hasFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_3_LOOPING));
       postOp = def.get1(FUN_OFFSET_08_POST_OPERATOR1);
       typeFct = def.get1(FUN_OFFSET_01_TYPE1);
       setupAcceptor(def);

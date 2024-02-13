@@ -5,6 +5,7 @@
 package pasa.cbentley.byteobjects.src4.core.interfaces;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.core.src4.ctx.ACtx;
 
@@ -41,6 +42,9 @@ public interface IBOCtxSettings extends IByteObject {
 
    public static final int CTX_OFFSET_01_FLAG      = A_OBJECT_BASIC_SIZE + 0;
 
+   /**
+    * Value of sub type for sub classes of {@link ABOCtx}.
+    */
    public static final int CTX_OFFSET_02_TYPE_SUB1 = A_OBJECT_BASIC_SIZE + 1;
 
    /**

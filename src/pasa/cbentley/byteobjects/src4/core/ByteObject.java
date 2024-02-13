@@ -154,6 +154,9 @@ public class ByteObject implements IByteObject, IStringable {
     */
    protected ByteObject[]  param;
 
+   //#debug
+   private String          toStringName           = null;
+
    /**
     * Subclass control the init of data,offset 
     * @param mod
@@ -330,25 +333,6 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
-    * Appends {@link ByteObject} to the array. Accept nulls.
-    * @param bo
-    * @return
-    */
-   public int addByteObjectNull(ByteObject bo) {
-      immutableCheck();
-      if (param == null) {
-         param = new ByteObject[] { bo };
-         setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, true);
-         return 0;
-      } else {
-         //the flag is already set
-         param = boc.getBOU().increaseCapacity(param, 1);
-         param[param.length - 1] = bo;
-         return param.length - 1;
-      }
-   }
-
-   /**
     * Replace existing {@link ByteObject} that has the same type.
     * <p>
     * When {@link ByteObject} is null, nothing happens and return -1;
@@ -374,6 +358,25 @@ public class ByteObject implements IByteObject, IStringable {
                return i;
             }
          }
+         //the flag is already set
+         param = boc.getBOU().increaseCapacity(param, 1);
+         param[param.length - 1] = bo;
+         return param.length - 1;
+      }
+   }
+
+   /**
+    * Appends {@link ByteObject} to the array. Accept nulls.
+    * @param bo
+    * @return
+    */
+   public int addByteObjectWithNullAccepted(ByteObject bo) {
+      immutableCheck();
+      if (param == null) {
+         param = new ByteObject[] { bo };
+         setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, true);
+         return 0;
+      } else {
          //the flag is already set
          param = boc.getBOU().increaseCapacity(param, 1);
          param[param.length - 1] = bo;
@@ -2388,16 +2391,6 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
-    * Inverse of {@link ByteObject#getVarCharString(int, int)}
-    * @param index index at wich to start writing
-    * @param numMax number maximum of characters
-    * @param str
-    */
-   public void setVarCharString(int index, int numMax, String str) {
-      setDynMaxFixedString(index, numMax, str);
-   }
-
-   /**
     * 
     * @param index at which to starting writing
     * @param numMax like in SQL varchar, the caller must know the maximum allocated space for the String
@@ -2799,6 +2792,16 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
+    * Inverse of {@link ByteObject#getVarCharString(int, int)}
+    * @param index index at wich to start writing
+    * @param numMax number maximum of characters
+    * @param str
+    */
+   public void setVarCharString(int index, int numMax, String str) {
+      setDynMaxFixedString(index, numMax, str);
+   }
+
+   /**
     * Enable/Disable version counting
     * <br>
     * When false->true, the {@link IByteObject#A_OBJECT_OFFSET_3_LENGTH2} is increment by 2
@@ -3032,6 +3035,7 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   //#mdebug
    public String toString() {
       return Dctx.toString(this);
    }
@@ -3040,8 +3044,10 @@ public class ByteObject implements IByteObject, IStringable {
     * To String of a byte Object
     */
    public void toString(Dctx dc) {
-      dc.root(this, ByteObject.class);
-
+      dc.root(this, ByteObject.class, 3050);
+      if (toStringName != null) {
+         dc.appendBracketedWithSpace(toStringName);
+      }
       dc.appendVarWithSpace("Type", toStringType());
       dc.append("[");
       dc.append(get1(A_OBJECT_OFFSET_1_TYPE1));
@@ -3165,6 +3171,10 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   public String toStringGetName() {
+      return toStringName;
+   }
+
    public UCtx toStringGetUCtx() {
       return boc.getUCtx();
    }
@@ -3189,8 +3199,8 @@ public class ByteObject implements IByteObject, IStringable {
       return boc.getBOModuleManager().toStringOffset(this, offset);
    }
 
-   public String toStringOneLine() {
-      return "#ByteObject:" + toStringType();
+   public void toStringSetName(String name) {
+      this.toStringName = name;
    }
 
    /**

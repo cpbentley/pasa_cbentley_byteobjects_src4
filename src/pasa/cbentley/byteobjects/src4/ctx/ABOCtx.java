@@ -122,7 +122,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
    }
 
    private void setSettingsFromConfig(IConfigBO configBO) {
-      ByteObject settings = getSettingsBOEmpty();
+      ByteObject settings = createSettingsBOEmpty();
       matchConfig(configBO, settings);
       configBO.postProcessing(settings, null);
       setSettings(settings);
@@ -158,7 +158,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
 
    public void stateOwnerWrite(Stator stator) {
       StatorWriterBO swbo = (StatorWriterBO) stator.getActiveWriter();
-      ByteObject settings = getSettingsBO();
+      ByteObject settings = getBOCtxSettings();
       swbo.writeByteObject(settings);
    }
 
@@ -186,6 +186,10 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
     */
    public abstract int getBOCtxSettingSize();
 
+   /**
+    * 
+    * @return
+    */
    public IConfigBO getConfigBO() {
       return (IConfigBO) config;
    }
@@ -195,7 +199,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
     * 
     * @return
     */
-   public ByteObject getSettingsBO() {
+   public ByteObject getBOCtxSettings() {
       if (settingsBO == null) {
          throw new IllegalStateException("SettingsBO are initialized in a_Init(). Make sure the call was made for " + this.getClass().getName());
       }
@@ -203,31 +207,34 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
    }
 
    /**
-    * Creates a {@link IBOTypesBOC#TYPE_012_CTX_SETTINGS} {@link ByteObject}
+    * Creates a {@link IBOTypesBOC#TYPE_012_CTX_SETTINGS} {@link ByteObject} using sub class data
+    * <li> {@link ABOCtx#getBOCtxSettingSize()}
+    * <li> {@link ABOCtx#getCtxID()}
     * @return
     */
-   public ByteObject getSettingsBOEmpty() {
-      //#mdebug
+   public ByteObject createSettingsBOEmpty() {
+      int ctxID = getCtxID();
       int size = getBOCtxSettingSize();
+      //#mdebug
       if (size < 4 || size > 1024) {
          throw new IllegalStateException(size + " is probably an invalid size. Make sure implementation returns the value");
       }
       //#enddebug
       int type = IBOTypesBOC.TYPE_012_CTX_SETTINGS;
       ByteObject settings = new ByteObject(boc, type, size);
-      int ctxID = getCtxID();
       settings.set3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3, ctxID);
       return settings;
    }
 
    public ByteObject getSettingsBOForModification() {
-      ByteObject settingsBO = getSettingsBO();
+      ByteObject settingsBO = getBOCtxSettings();
       previousSettings = (ByteObject) settingsBO.cloneCopyHeadCopyParams();
       return settingsBO;
    }
 
    /**
-    * Called by {@link ABOCtx#a_Init()}
+    * Called by {@link ABOCtx#a_Init()}.
+    * 
     * @param config
     * @param settings
     */
@@ -250,15 +257,15 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
    }
 
    public void toStringCtxSettings(Dctx dc, ByteObject bo) {
+      dc.nl();
       dc.rootN(bo, "CtxSettingsBO", ABOCtx.class, 174);
-      dc.appendVarWithSpace("ctxid", bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3));
+      
+      int ctxid = bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3);
+      dc.appendVarWithNewLine("ctxid", ctxid);
+      dc.appendBracketedWithSpace(uc.getCtxManager().toStringCtxID(ctxid));
       int typesub = bo.get1(IBOCtxSettings.CTX_OFFSET_02_TYPE_SUB1);
       dc.appendVarWithSpace("typesub", typesub);
-      dc.appendVarWithSpace("isUSed", bo.hasFlag(IBOCtxSettings.CTX_OFFSET_01_FLAG, IBOCtxSettings.CTX_FLAG_01_USED));
-      if (typesub != 0) {
-         dc.nl();
-         boc.getBOModuleManager().toStringSubType(dc, bo, typesub);
-      }
+      dc.appendVarWithSpace("isUsed", bo.hasFlag(IBOCtxSettings.CTX_OFFSET_01_FLAG, IBOCtxSettings.CTX_FLAG_01_USED));
    }
 
    private void toStringPrivate(Dctx dc) {

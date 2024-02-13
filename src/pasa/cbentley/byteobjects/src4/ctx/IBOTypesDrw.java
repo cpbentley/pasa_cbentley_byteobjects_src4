@@ -138,17 +138,7 @@ public interface IBOTypesDrw extends IBOTypesBOC {
     */
    public static final int TYPE_059_GRADIENT       = 59;
 
-   /**
-    * Type which stores X bytes of Top/Bottom,Left, Right data
-    * 
-    * X is defined by byte #2 
-    * <br>
-    * 
-    * In Swing, java.awt.Insets
-    */
-   public static final int TYPE_060_TBLR           = 60;
-
-   public static final int TYPE_061_COLOR_RANDOM   = 61;
+  public static final int TYPE_061_COLOR_RANDOM   = 61;
 
    public static final int TYPE_062_BLENDER        = 62;
 

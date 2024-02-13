@@ -4,7 +4,6 @@
  */
 package pasa.cbentley.byteobjects.src4.objects.color;
 
-
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
@@ -184,6 +183,7 @@ public class GradientFunction extends Function {
     */
    double             weight2;
 
+   private int        primaryColor;
 
    public GradientFunction(BOCtx drc) {
       super(drc);
@@ -330,6 +330,7 @@ public class GradientFunction extends Function {
          //do a parameter warning
          totalSize = 0;
       }
+      this.primaryColor = primaryColor;
       reset();
       sizeTotal = totalSize;
       if (grad == null) {
@@ -377,9 +378,17 @@ public class GradientFunction extends Function {
       color_1 = primaryColor;
       color_2 = grad.get4(IBOGradient.GRADIENT_OFFSET_04_COLOR4);
       if (grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_8_REVERSE)) {
-         int temp = color_1;
-         color_1 = color_2;
-         color_2 = temp;
+         if (grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_3_THIRD_COLOR)) {
+            ByteObject p = grad.getSubFirst(IBOTypesBOC.TYPE_002_LIT_INT);
+            if (p == null) {
+               throw new NullPointerException("No Third Color");
+            }
+            color_1 = boc.getLitteralIntOperator().getIntValueFromBO(p);
+         } else {
+            int temp = color_1;
+            color_1 = color_2;
+            color_2 = temp;
+         }
       }
       isDoAlpha = grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_4_USEALPHA);
       isCRed = grad.hasFlag(IBOGradient.GRADIENT_OFFSET_03_FLAGC_CHANNELS, IBOGradient.GRADIENT_FLAGC_2_CH_R);
@@ -428,11 +437,15 @@ public class GradientFunction extends Function {
    private void initPart2() {
       isPastMiddle = true;
       if (grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_3_THIRD_COLOR)) {
-         ByteObject p = grad.getSubFirst(IBOTypesBOC.TYPE_002_LIT_INT);
-         if (p == null) {
-            throw new NullPointerException("No Third Color");
+         if (grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_8_REVERSE)) {
+            color_1 = primaryColor;
+         } else {
+            ByteObject p = grad.getSubFirst(IBOTypesBOC.TYPE_002_LIT_INT);
+            if (p == null) {
+               throw new NullPointerException("No Third Color");
+            }
+            color_1 = boc.getLitteralIntOperator().getIntValueFromBO(p);
          }
-         color_1 = boc.getLitteralIntOperator().getIntValueFromBO(p);
       }
       isFullRight = grad.hasFlag(IBOGradient.GRADIENT_OFFSET_02_FLAGK_EXCLUDE, IBOGradient.GRADIENT_FLAGK_2_FULL_RIGHT);
       isFull = isFullRight;

@@ -41,14 +41,14 @@ public interface ITechFunction extends IByteObject {
    /**
     * Set when to use the post operatore
     */
-   public static final int FUN_FLAG_1POSTOP              = 1;
+   public static final int FUN_FLAG_1_POSTOP             = 1 << 0;
 
    /**
     * When set, Function records calls and acceptor rejections
     */
-   public static final int FUN_FLAG_2COUNTER             = 2;
+   public static final int FUN_FLAG_2_COUNTER            = 1 << 1;
 
-   public static final int FUN_FLAG_3LOOPING             = 4;
+   public static final int FUN_FLAG_3_LOOPING            = 1 << 2;
 
    /**
     * When looping, ignore first value/step
@@ -56,12 +56,12 @@ public interface ITechFunction extends IByteObject {
     * This is the same for up and down.<br>
     * This gives the pattern 1 2 3 4 5 4 3 2 1 2 3 4 5 etc.
     */
-   public static final int FUN_FLAG_4_LOOP_IGNORE        = 8;
+   public static final int FUN_FLAG_4_LOOP_IGNORE        = 1 << 3;
 
    /**
     * Should acceptor rejections be counted in the function counter?
     */
-   public static final int FUN_FLAG_5_COUNT_REJECTIONS   = 16;
+   public static final int FUN_FLAG_5_COUNT_REJECTIONS   = 1 << 4;
 
    /**
     * Flag set by Function definition outside this module.
@@ -70,14 +70,14 @@ public interface ITechFunction extends IByteObject {
     * 
     * {@link BOModulesManager#createExtension(int, ByteObject)}
     */
-   public static final int FUN_FLAG_6_EXTENSION          = 32;
+   public static final int FUN_FLAG_6_EXTENSION          = 1 << 5;
 
-   public static final int FUN_FLAG_7_CUSTOM             = 64;
+   public static final int FUN_FLAG_7_CUSTOM             = 1 << 6;
 
    /**
     * Set to true when there is an acceptor {@link ByteObject} definition.
     */
-   public static final int FUN_FLAG_8_ACCEPTOR           = 128;
+   public static final int FUN_FLAG_8_ACCEPTOR           = 1 << 7;
 
    /**
     * 

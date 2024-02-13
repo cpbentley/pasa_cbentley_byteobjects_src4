@@ -140,8 +140,14 @@ public interface ITechGradient extends ITech {
 
    public static final int GRADIENT_TYPE_RECT_10_L_RIGHT             = 10;
 
+   /**
+    * 
+    */
    public static final int GRADIENT_TYPE_RECT_11_TRIG_TOP_LEFT       = 11;
 
+   /**
+    * 
+    */
    public static final int GRADIENT_TYPE_RECT_12_TRIG_BOT_LEFT       = 12;
 
    public static final int GRADIENT_TYPE_RECT_MAX_CK                 = 10;

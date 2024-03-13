@@ -5,7 +5,14 @@
 package pasa.cbentley.byteobjects.src4.objects.color;
 
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 
+/**
+ * {@link IBOTypesBOC#TYPE_040_COLOR_FILTER}
+ * 
+ * @author Charles Bentley
+ *
+ */
 public interface IBOFilter extends IByteObject, ITechFilter {
 
    /**

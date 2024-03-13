@@ -98,13 +98,13 @@ public class LitteralIntFactory extends BOAbstractFactory implements IBOLitteral
    public void toStringLitteralIntArray(Dctx dc, ByteObject bo) {
       int[] ar = boc.getLitteralIntOperator().getLitteralArray(bo);
       dc.append("LitteralArray");
-      boc.getUCtx().getIU().toStringIntArray(dc, ar);
+      boc.getUC().getIU().toStringIntArray(dc, ar);
    }
 
    public void toStringLitteralIntArray1Line(Dctx dc, ByteObject bo) {
       int[] ar = boc.getLitteralIntOperator().getLitteralArray(bo);
       dc.append("LitteralArray");
-      boc.getUCtx().getIU().toStringIntArray(dc, ar);      
+      boc.getUC().getIU().toStringIntArray(dc, ar);      
    }
 
  

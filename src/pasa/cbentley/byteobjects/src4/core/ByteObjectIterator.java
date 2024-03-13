@@ -64,7 +64,7 @@ public class ByteObjectIterator implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    //#enddebug

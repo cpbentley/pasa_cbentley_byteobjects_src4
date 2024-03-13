@@ -187,7 +187,7 @@ public class PointerOperator extends BOAbstractOperator implements IBOPointer {
 
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    public void toStringPointer(ByteObject pointer, StringBBuilder sb, String nl) {

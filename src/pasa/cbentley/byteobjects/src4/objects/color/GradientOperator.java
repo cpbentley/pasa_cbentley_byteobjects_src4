@@ -12,7 +12,7 @@ import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
 import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 
-public class GradientOperator extends BOAbstractOperator implements  ITechGradient, IBOMergeMask {
+public class GradientOperator extends BOAbstractOperator implements ITechGradient, IBOMergeMask {
 
    public GradientOperator(BOCtx drc) {
       super(drc);
@@ -34,6 +34,7 @@ public class GradientOperator extends BOAbstractOperator implements  ITechGradie
       gradient.set2(IBOGradient.GRADIENT_OFFSET_08_OFFSET2, 2);
       gradient.setFlag(IBOGradient.GRADIENT_OFFSET_09_FLAGX1, IBOGradient.GRADIENT_FLAGX_6_OFFSET, true);
    }
+
    /**
     * Merge 2 gradients when a figure with a gradient is merged with another figure with a gradient.
     * <br>
@@ -102,15 +103,65 @@ public class GradientOperator extends BOAbstractOperator implements  ITechGradie
             size = height / 2;
             size -= arcw;
             break;
+         case ITechGradient.GRADIENT_TYPE_RECT_11_TRIG_TOP_LEFT:
+            size = height / 2;
+            size -= arcw;
+            break;
+         case ITechGradient.GRADIENT_TYPE_RECT_12_TRIG_BOT_LEFT:
+            size = height / 2;
+            size -= arcw;
+            break;
+         case ITechGradient.GRADIENT_TYPE_RECT_13_:
+            size = height / 2;
+            size -= arcw;
+            break;
+         case ITechGradient.GRADIENT_TYPE_RECT_14_:
+            size = height / 2;
+            size -= arcw;
+            break;
          default:
             if (arcw == 0 && arch == 0) {
-               size = Math.min(height, width);
+               size = Math.min(height, width) / 2;
             } else {
                size = Math.min(height, width) / 2;
             }
             break;
       }
       return size;
+   }
+
+   /**
+    * {@link IBOGradient#GRADIENT_OFFSET_13_GRADSIZE_TYPE1}
+    * @param type
+    * @param w
+    * @param h
+    * @param grad
+    * @return
+    */
+   public int getGradSize(int type, int w, int h, ByteObject grad) {
+      int divid = grad.get1(IBOGradient.GRADIENT_OFFSET_14_GRADSIZE_OP_V1);
+      if (divid == 0) {
+         divid = 1;
+      }
+      switch (type) {
+         case ITechGradient.GRADSIZE_TYPE_01_W:
+            return w / divid;
+         case ITechGradient.GRADSIZE_TYPE_02_H:
+            return h / divid;
+         case ITechGradient.GRADSIZE_TYPE_03_MAX_WH:
+            return Math.max(w, h) / divid;
+         case ITechGradient.GRADSIZE_TYPE_04_MIN_WH:
+            return Math.min(w, h) / divid;
+         case ITechGradient.GRADSIZE_TYPE_05_W_PLUS_H:
+            return (w + h) / divid;
+         case ITechGradient.GRADSIZE_TYPE_06_W_DIFF_H:
+            return Math.abs(w - h) / divid;
+         case ITechGradient.GRADSIZE_TYPE_07_W_MUL_H:
+            return w * h / divid;
+         default:
+            throw new IllegalArgumentException("" + type);
+      }
+
    }
 
    public static int getEllipseGradSize(int w, int h, ByteObject grad) {
@@ -130,12 +181,28 @@ public class GradientOperator extends BOAbstractOperator implements  ITechGradie
             return h / 2;
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_11_WATER_DROP_TOP:
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_12_WATER_DROP_BOT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_31_WATER_DROP_TOP:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_32_WATER_DROP_BOT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_35_WATER_DROP_TOP:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_36_WATER_DROP_BOT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_40_DROP_H_CENTER:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_41_WATER_DROP_TOP:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_42_WATER_DROP_BOT:
             return w / 2;
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_13_WATER_DROP_LEFT:
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_14_WATER_DROP_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_33_WATER_DROP_LEFT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_34_WATER_DROP_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_37_WATER_DROP_LEFT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_38_WATER_DROP_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_39_DROP_V_CENTER:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_43_WATER_DROP_LEFT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_44_WATER_DROP_RIGHT:
             return h / 2;
+         case GRADIENT_TYPE_ELLIPSE_20_T:
+            return 360;
       }
-      return Math.min(h, w);
+      return Math.min(h, w) / 2;
    }
 
    public static int getGradientColor(int primaryColor, int secondaryColor, int step, int end, double maxSecondary) {

@@ -27,7 +27,7 @@ public class StatorBO extends Stator implements ITechStatorBO {
    private BufferObject  bufferTuples;
 
    public StatorBO(BOCtx boc) {
-      super(boc.getUCtx());
+      super(boc.getUC());
       this.boc = boc;
    }
 

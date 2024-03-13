@@ -437,7 +437,7 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
 
    public Random getRandom() {
       if (random == null) {
-         random = boc.getUCtx().getRandom();
+         random = boc.getUC().getRandom();
       }
       return random;
    }

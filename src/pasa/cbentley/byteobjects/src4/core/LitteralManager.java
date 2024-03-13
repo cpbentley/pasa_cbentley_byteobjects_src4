@@ -58,7 +58,7 @@ public class LitteralManager implements IByteObject {
    }
 
    public ByteObject getLitteralString(char[] c, int offset, int len) {
-      boolean fullZero = boc.getUCtx().getStrU().isFullPlane(0, c, offset, len);
+      boolean fullZero = boc.getUC().getStrU().isFullPlane(0, c, offset, len);
       int maxByteSize = 2;
       if (fullZero) {
          maxByteSize = 1;
@@ -179,7 +179,7 @@ public class LitteralManager implements IByteObject {
          case IBOTypesBOC.TYPE_007_LIT_ARRAY_INT:
             int[] ar = getLitteralArray(bo);
             dc.append("LitteralArray");
-            boc.getUCtx().getIU().toStringIntArray(dc, ar);
+            boc.getUC().getIU().toStringIntArray(dc, ar);
             break;
          case IBOTypesBOC.TYPE_006_LIT_NAME:
             dc.append("Name " + getName(bo));

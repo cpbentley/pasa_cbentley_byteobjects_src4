@@ -4,21 +4,19 @@
  */
 package pasa.cbentley.byteobjects.src4.core;
 
-import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.ABOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesExtendedBOC;
 import pasa.cbentley.byteobjects.src4.ctx.IToStringsDIDsBocFun;
 import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.byteobjects.src4.objects.color.GradientFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.core.src4.ctx.ICtx;
-import pasa.cbentley.core.src4.ctx.ToStringStaticUc;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
-import pasa.cbentley.core.src4.logging.IDebugStringable;
 
 /**
  * For {@link BOCtx} {@link ByteObject}s
@@ -53,9 +51,9 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
             //check the def if gradient create
             int ftype = def.get1(ITechFunction.FUN_OFFSET_09_EXTENSION_TYPE2);
             switch (ftype) {
-               case IBOTypesDrw.TYPE_057_COLOR_FUNCTION:
+               case IBOTypesExtendedBOC.TYPE_057_COLOR_FUNCTION:
                   return boc.getColorFunctionFactory().createColorFunction(def);
-               case IBOTypesDrw.TYPE_059_GRADIENT:
+               case IBOTypesExtendedBOC.TYPE_059_GRADIENT_FUNCTION:
                   return new GradientFunction(boc);
                default:
                   return null;
@@ -111,7 +109,7 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
    public int[] getArrayFrom(ByteObject bo, int[] param) {
       final int type = bo.getType();
       switch (type) {
-         case IBOTypesDrw.TYPE_059_GRADIENT:
+         case IBOTypesBOC.TYPE_038_GRADIENT:
             GradientFunction gf = new GradientFunction(boc);
             int gradSize = param[0];
             int primaryColor = param[1];
@@ -128,7 +126,7 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
          //               return module.mergeByteObject(merge);
          case TYPE_025_ACTION:
             return boc.getActionOp().mergeAction(root, merge);
-         case IBOTypesDrw.TYPE_059_GRADIENT:
+         case IBOTypesBOC.TYPE_038_GRADIENT:
             return boc.getGradientOperator().mergeGradient(root, merge);
          default:
             //not found here
@@ -195,13 +193,13 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
          case TYPE_036_BYTE_CONTROLLER:
             toStringByteController(dc, bo);
             break;
-         case IBOTypesDrw.TYPE_056_COLOR_FILTER:
+         case IBOTypesBOC.TYPE_040_COLOR_FILTER:
             toStringColorFilter(dc, bo);
             break;
-         case IBOTypesDrw.TYPE_059_GRADIENT:
+         case IBOTypesBOC.TYPE_038_GRADIENT:
             toStringGradient(dc, bo);
             break;
-         case IBOTypesDrw.TYPE_061_COLOR_RANDOM:
+         case IBOTypesBOC.TYPE_041_COLOR_RANDOM:
             toStringColorRandom(dc, bo);
             break;
          default:
@@ -212,7 +210,7 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
 
    private void toStringCtxSettings(Dctx dc, ByteObject bo) {
       int ctxID = bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3);
-      ICtx ctx = boc.getUCtx().getCtxManager().getCtx(ctxID);
+      ICtx ctx = boc.getUC().getCtxManager().getCtx(ctxID);
       if (ctx instanceof ABOCtx) {
          ABOCtx boctx = (ABOCtx) ctx;
          boctx.toStringCtxSettings(dc, bo);
@@ -287,13 +285,13 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
          case TYPE_036_BYTE_CONTROLLER:
             toString1LineByteController(dc, bo);
             break;
-         case IBOTypesDrw.TYPE_056_COLOR_FILTER:
+         case IBOTypesBOC.TYPE_040_COLOR_FILTER:
             toStringColorFilter(dc, bo);
             break;
-         case IBOTypesDrw.TYPE_059_GRADIENT:
+         case IBOTypesBOC.TYPE_038_GRADIENT:
             toStringGradient(dc, bo);
             break;
-         case IBOTypesDrw.TYPE_061_COLOR_RANDOM:
+         case IBOTypesBOC.TYPE_041_COLOR_RANDOM:
             toStringColorRandom(dc, bo);
             break;
          default:
@@ -316,7 +314,7 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
 
    private void toString1LineCtxSettings(Dctx dc, ByteObject bo) {
       int ctxID = bo.get3(IBOCtxSettings.CTX_OFFSET_03_CTXID_3);
-      ICtx ctx = boc.getUCtx().getCtxManager().getCtx(ctxID);
+      ICtx ctx = boc.getUC().getCtxManager().getCtx(ctxID);
       if (ctx instanceof ABOCtx) {
          ABOCtx boctx = (ABOCtx) ctx;
          boctx.toStringCtxSettings(dc, bo);

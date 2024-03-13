@@ -97,7 +97,7 @@ public class AcceptorOperator extends BOAbstractOperator implements ITechOperato
 
    public IntToStrings getOperators() {
       if (its == null) {
-         its = new IntToStrings(boc.getUCtx(), 11);
+         its = new IntToStrings(boc.getUC(), 11);
          int i = 0;
          its.ints[i] = OP_ARI_1_PLUS;
          its.strings[i++] = "+";

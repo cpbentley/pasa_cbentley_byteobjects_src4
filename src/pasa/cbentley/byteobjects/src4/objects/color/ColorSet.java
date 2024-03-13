@@ -20,6 +20,9 @@ public class ColorSet extends ObjectBoc implements IColorsKey {
       this.colors = colors;
    }
 
+   public int[] getCopy() {
+      return boc.getUC().getIU().clone(colors);
+   }
    public int getBg1() {
       return getColor(COLOR_06_BG_1);
    }

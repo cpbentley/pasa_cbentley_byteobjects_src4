@@ -91,7 +91,7 @@ public class MergeMaskFactory extends BOAbstractFactory implements IBOMergeMask 
     * root IV merge => flagged in MM root replaced merge
     * <br>
     * <br>
-    * {@link IBOTypesDrw#TYPE_MERGE_MASK}.
+    * {@link IBOTypesBOC#TYPE_011_MERGE_MASK}.
     * <br>
     * <br>
     * @param pointer

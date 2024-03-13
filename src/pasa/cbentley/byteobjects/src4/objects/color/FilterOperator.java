@@ -7,7 +7,7 @@ package pasa.cbentley.byteobjects.src4.objects.color;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.core.src4.utils.ColorUtils;
 import pasa.cbentley.core.src4.utils.RgbUtils;
@@ -26,7 +26,7 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
    public void applyColorFilter(ByteObject filter, int[] rgb, int offset, int scanlength, int m, int n, int w, int h) {
       if (filter == null)
          return;
-      filter.checkType(IBOTypesDrw.TYPE_056_COLOR_FILTER);
+      filter.checkType(IBOTypesBOC.TYPE_040_COLOR_FILTER);
       final int type = filter.getValue(FILTER_OFFSET_01_TYPE1, 1);
       switch (type) {
          case ITechFilter.FILTER_TYPE_00_FUNCTION_ALL:
@@ -81,7 +81,7 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
       //apply subfilters, linked together
       ByteObject subfilter = null;
       int i = 0;
-      while ((subfilter = filter.getSubOrder(IBOTypesDrw.TYPE_056_COLOR_FILTER, i)) != null) {
+      while ((subfilter = filter.getSubOrder(IBOTypesBOC.TYPE_040_COLOR_FILTER, i)) != null) {
          applyColorFilter(subfilter, rgb, offset, scanlength, m, n, w, h);
          i++;
       }
@@ -518,7 +518,7 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
       int blendop = filter.get1(FILTER_OFFSET_10_BLEND1);
       int blendAlpa = filter.get1(FILTER_OFFSET_11_BLEND_ALPHA1);
       if (filter.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_2_BLENDER)) {
-         ByteObject blender = filter.getSubFirst(IBOTypesDrw.TYPE_062_BLENDER);
+         ByteObject blender = filter.getSubFirst(IBOTypesBOC.TYPE_039_BLENDER);
          if (blender != null) {
             int transform = filter.get1(FILTER_OFFSET_08_EXTRA1);
             int wOffset = filter.get2(FILTER_OFFSET_12_W2);

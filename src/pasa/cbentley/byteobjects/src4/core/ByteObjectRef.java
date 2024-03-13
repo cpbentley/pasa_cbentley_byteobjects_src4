@@ -80,7 +80,7 @@ public class ByteObjectRef implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
    //#enddebug
 }

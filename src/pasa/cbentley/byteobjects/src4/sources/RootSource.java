@@ -28,7 +28,7 @@ public class RootSource implements IStringable {
 
    public RootSource(BOCtx boc, int add) {
       this.boc = boc;
-      srcs = new IntToObjects(boc.getUCtx(), add);
+      srcs = new IntToObjects(boc.getUC(), add);
    }
 
    public MemorySource findSource(String name) {
@@ -82,7 +82,7 @@ public class RootSource implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    //#enddebug

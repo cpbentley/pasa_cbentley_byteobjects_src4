@@ -117,7 +117,7 @@ public class ByteArraySource extends MemorySource {
    }
 
    public void save(byte[] memory, int offset, int len, int id) {
-      array = boc.getUCtx().getMem().ensureCapacity(array, id, 2, 0);
+      array = boc.getUC().getMem().ensureCapacity(array, id, 2, 0);
       array[id] = new byte[len];
       System.arraycopy(memory, offset, array[id], 0, len);
    }

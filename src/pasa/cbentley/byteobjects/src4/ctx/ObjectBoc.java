@@ -18,7 +18,7 @@ public class ObjectBoc implements IStringable  {
    }
    
    public UCtx getUC() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
    
    //#mdebug
@@ -49,7 +49,7 @@ public class ObjectBoc implements IStringable  {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    //#enddebug

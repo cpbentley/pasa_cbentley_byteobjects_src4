@@ -318,7 +318,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
          //for each data source, get the header
          byte[] data = dataSources[i].loadHeader(MEMC_BASIC_SIZE);
       }
-      mod.getUCtx().getMem().addMemFreeable(this);
+      mod.getUC().getMem().addMemFreeable(this);
    }
 
    /**
@@ -348,7 +348,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
          //this.arraysByte[i] = dataSources[i].preload();
          this.dataSources[i] = dataSources[i];
       }
-      mod.getUCtx().getMem().addMemFreeable(this);
+      mod.getUC().getMem().addMemFreeable(this);
    }
 
    /**
@@ -680,7 +680,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
     * @return
     */
    public ByteObjectManaged[] findAgents(ByteObjectManaged tech) {
-      IntBuffer buf = new IntBuffer(boc.getUCtx());
+      IntBuffer buf = new IntBuffer(boc.getUC());
       for (int i = 0; i < agentsRefArray.length; i++) {
          ByteObjectManaged bom = agentsRefArray[i];
          if (bom != null) {
@@ -700,7 +700,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
    }
 
    public ByteObjectManaged[] findAgents(int offset, int size, int value) {
-      IntBuffer buf = new IntBuffer(boc.getUCtx());
+      IntBuffer buf = new IntBuffer(boc.getUC());
       for (int i = 0; i < agentsRefArray.length; i++) {
          ByteObjectManaged bom = agentsRefArray[i];
          if (bom != null) {
@@ -1226,7 +1226,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
     * @return
     */
    public ByteObjectManaged[] getSourceAgents(int sid, int iid) {
-      IntBuffer ib = new IntBuffer(boc.getUCtx(), 5);
+      IntBuffer ib = new IntBuffer(boc.getUC(), 5);
       for (int i = 0; i < agentsRefArray.length; i++) {
          if (agentsRefArray[i] != null) {
             if (agentsRefArray[i].memoryMemSrcIndex == sid && agentsRefArray[i].memoryMemSrcID == iid) {
@@ -1351,7 +1351,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
       int[] ints = techPattern.getIDInterfaces();
       if (ints.length != 0) {
          int[] bomInts = bom.getIDInterfaces();
-         if (!boc.getUCtx().getIU().equals(ints, bomInts)) {
+         if (!boc.getUC().getIU().equals(ints, bomInts)) {
             return false;
          }
       }
@@ -1889,7 +1889,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
 
          public void run() {
 
-            MutexSignal se = new MutexSignal(boc.getUCtx());
+            MutexSignal se = new MutexSignal(boc.getUC());
             //asks the the agent to notify this waiting thread
             synchronized (se) {
                //wait for the thread to finish
@@ -2057,7 +2057,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
     * @param array
     */
    private void simpleIncrease(int incr, int position, int agentIndex, byte[] array) {
-      byte[] newArray = boc.getUCtx().getMem().increaseCapacity(array, incr, position);
+      byte[] newArray = boc.getUC().getMem().increaseCapacity(array, incr, position);
       agentsRefArray[agentIndex].setMemory(newArray);
       agentsRefArray[agentIndex].incrementLengthData(incr);
    }
@@ -2150,7 +2150,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
          sb.nl();
          sb.append(k + " : ");
          int[] ids = dataSources[i].getValidIDs();
-         boc.getUCtx().getIU().toStringIntArray1Line(sb, "IDs", ids, ",");
+         boc.getUC().getIU().toStringIntArray1Line(sb, "IDs", ids, ",");
          //we have a branch
          if (boc.toStringHasToStringFlag(IToStringFlagsBO.TOSTRING_FLAG_4_BYTEOBJECT_1LINE)) {
             dataSources[k].toString1Line(sb);
@@ -2181,7 +2181,7 @@ public class ByteController extends ByteObjectManaged implements IBOByteControle
       for (int i = 0; i < agentIndex; i++) {
          sb.nl();
          sb.append("#");
-         sb.append(boc.getUCtx().getStrU().prettyInt0Padd(i, numChars));
+         sb.append(boc.getUC().getStrU().prettyInt0Padd(i, numChars));
          sb.append(" ");
          if (agentsRefArray[i] == null) {
             sb.append("null");

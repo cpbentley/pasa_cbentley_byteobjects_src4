@@ -1319,11 +1319,11 @@ public class ByteObjectManaged extends ByteObject implements IBOAgentManaged, IT
     * @throws IOException
     */
    public BADataOS serializeRawHelper(int dataSize) {
-      BAByteOS bos = new BAByteOS(boc.getUCtx(), dataSize + 100);
+      BAByteOS bos = new BAByteOS(boc.getUC(), dataSize + 100);
       ByteObjectManaged tr = cloneBOMHeader();
       int size = tr.getLength();
       tr.expandResetArrayData(dataSize);
-      BADataOS dos = new BADataOS(boc.getUCtx(), bos);
+      BADataOS dos = new BADataOS(boc.getUC(), bos);
       dos.write(tr.data, tr.index, size);//trick here to copy header
       return dos;
    }
@@ -1441,7 +1441,7 @@ public class ByteObjectManaged extends ByteObject implements IBOAgentManaged, IT
 
    //#mdebug
    public IDLog toLog() {
-      return boc.getUCtx().toDLog();
+      return boc.getUC().toDLog();
    }
 
    public void toString(Dctx dc) {

@@ -4,8 +4,7 @@
  */
 package pasa.cbentley.byteobjects.src4.objects.color;
 
-import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.core.src4.interfaces.ITech;
 
 /**
@@ -15,7 +14,7 @@ import pasa.cbentley.core.src4.interfaces.ITech;
  * <li> x or y coordinates.
  * 
  * <br>
- * Type = {@link IBOTypesDrw#TYPE_059_GRADIENT}
+ * Type = {@link IBOTypesBOC#TYPE_038_GRADIENT}
  * <br>
  * <br>
  * 
@@ -77,11 +76,55 @@ public interface ITechGradient extends ITech {
 
    public static final int GRADIENT_TYPE_ELLIPSE_18_BOT_RIGHT_BUBBLE = 18;
 
+   public static final int GRADIENT_TYPE_ELLIPSE_19_TEST             = 19;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_20_T                = 20;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_21_T                = 21;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_22_T                = 22;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_31_WATER_DROP_TOP   = 31;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_32_WATER_DROP_BOT   = 32;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_33_WATER_DROP_LEFT  = 33;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_34_WATER_DROP_RIGHT = 34;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_35_WATER_DROP_TOP   = 35;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_36_WATER_DROP_BOT   = 36;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_37_WATER_DROP_LEFT  = 37;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_38_WATER_DROP_RIGHT = 38;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_39_DROP_V_CENTER    = 39;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_40_DROP_H_CENTER    = 40;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_41_WATER_DROP_TOP   = 41;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_42_WATER_DROP_BOT   = 42;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_43_WATER_DROP_LEFT  = 43;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_44_WATER_DROP_RIGHT = 44;
+
    public static final int GRADIENT_TYPE_ELLIPSE_MAX_CK              = 18;
 
    public static final int GRADIENT_TYPE_ELLIPSE_MAX_MODULO          = 19;
 
    public static final int GRADIENT_TYPE_LOSANGE_0_SQUARE            = 0;
+
+   public static final int GRADIENT_TYPE_LOSANGE_01_SQUARE           = 11;
+
+   public static final int GRADIENT_TYPE_LOSANGE_02_SQUARE           = 12;
+
+   public static final int GRADIENT_TYPE_LOSANGE_03_SQUARE           = 13;
+
+   public static final int GRADIENT_TYPE_LOSANGE_04_SQUARE           = 14;
 
    public static final int GRADIENT_TYPE_LOSANGE_1_FULLVERTICAL      = 1;
 
@@ -91,16 +134,16 @@ public interface ITechGradient extends ITech {
 
    public static final int GRADIENT_TYPE_LOSANGE_4_FULLDIAGUP        = 4;
 
+   public static final int GRADIENT_TYPE_LOSANGE_5_TOP               = 5;
+
+   public static final int GRADIENT_TYPE_LOSANGE_6_BOT               = 6;
+
    /**
     * Gradient on the Left Triangle
     */
-   public static final int GRADIENT_TYPE_LOSANGE_5_LEFT              = 5;
+   public static final int GRADIENT_TYPE_LOSANGE_7_LEFT              = 7;
 
-   public static final int GRADIENT_TYPE_LOSANGE_6_RIGHT             = 6;
-
-   public static final int GRADIENT_TYPE_LOSANGE_7_TOP               = 7;
-
-   public static final int GRADIENT_TYPE_LOSANGE_8_BOT               = 8;
+   public static final int GRADIENT_TYPE_LOSANGE_8_RIGHT             = 8;
 
    public static final int GRADIENT_TYPE_LOSANGE_MAX_CK              = 8;
 
@@ -150,6 +193,22 @@ public interface ITechGradient extends ITech {
     */
    public static final int GRADIENT_TYPE_RECT_12_TRIG_BOT_LEFT       = 12;
 
+   public static final int GRADIENT_TYPE_RECT_13_                    = 13;
+
+   public static final int GRADIENT_TYPE_RECT_14_                    = 14;
+
+   public static final int GRADIENT_TYPE_RECT_15_                    = 15;
+
+   public static final int GRADIENT_TYPE_RECT_16_                    = 16;
+
+   public static final int GRADIENT_TYPE_RECT_17_                    = 17;
+
+   public static final int GRADIENT_TYPE_RECT_18_                    = 18;
+
+   public static final int GRADIENT_TYPE_RECT_19_                    = 19;
+
+   public static final int GRADIENT_TYPE_RECT_20_SQUARE_THIN         = 20;
+
    public static final int GRADIENT_TYPE_RECT_MAX_CK                 = 10;
 
    public static final int GRADIENT_TYPE_RECT_MAX_MODULO             = 11;
@@ -185,15 +244,45 @@ public interface ITechGradient extends ITech {
 
    public static final int GRADIENT_TYPE_TRIG_08_NORMAL              = 8;
 
-   public static final int GRADIENT_TYPE_TRIG_09_HALO                = 9;
+   public static final int GRADIENT_TYPE_TRIG_09_FAT_HALO            = 9;
 
    /**
     * draws mini triangles
     */
    public static final int GRADIENT_TYPE_TRIG_10_SWIPE               = 10;
 
-   public static final int GRADIENT_TYPE_TRIG_MAX_CK                 = 9;
+   public static final int GRADIENT_TYPE_TRIG_11_FAT_STRIKE          = 11;
 
-   public static final int GRADIENT_TYPE_TRIG_MAX_MODULO             = 7;
+   public static final int GRADIENT_TYPE_TRIG_12_POINTY              = 12;
+
+   public static final int GRADIENT_TYPE_TRIG_13_FAT_ETHER_BASE      = 13;
+
+   public static final int GRADIENT_TYPE_TRIG_14_TRY                 = 14;
+
+   public static final int GRADIENT_TYPE_TRIG_15_POINTY_LYS          = 16;
+
+   public static final int GRADIENT_TYPE_TRIG_16_TENT_SMALL          = 17;
+
+   public static final int GRADIENT_TYPE_TRIG_17_POINTY_DODGE        = 15;
+
+   public static final int GRADIENT_TYPE_TRIG_MAX_CK                 = 34;
+
+   public static final int GRADIENT_TYPE_TRIG_MAX_MODULO             = 35;
+
+   public static final int GRADSIZE_TYPE_00_DEFAULT                  = 0;
+
+   public static final int GRADSIZE_TYPE_01_W                        = 1;
+
+   public static final int GRADSIZE_TYPE_02_H                        = 2;
+
+   public static final int GRADSIZE_TYPE_03_MAX_WH                   = 3;
+
+   public static final int GRADSIZE_TYPE_04_MIN_WH                   = 4;
+
+   public static final int GRADSIZE_TYPE_05_W_PLUS_H                 = 5;
+
+   public static final int GRADSIZE_TYPE_06_W_DIFF_H                 = 6;
+
+   public static final int GRADSIZE_TYPE_07_W_MUL_H                  = 7;
 
 }

@@ -225,10 +225,10 @@ public class AcceptorFactory extends BOAbstractFactory implements ITechFunction,
       }
       if (bo.hasFlag(IBOAcceptor.ACC_OFFSET_01_FLAG, IBOAcceptor.ACC_FLAG_3_ARRAY)) {
          int[] vals = bo.getValues(IBOAcceptor.ACC_OFFSET_05_OPERAND4);
-         boc.getUCtx().getIU().toStringIntArray(sb, vals, ",");
+         boc.getUC().getIU().toStringIntArray(sb, vals, ",");
       } else {
          int val = bo.getValue(IBOAcceptor.ACC_OFFSET_05_OPERAND4, 4);
-         sb.append(boc.getUCtx().getColorU().toStringColor(val));
+         sb.append(boc.getUC().getColorU().toStringColor(val));
       }
       if (bo.hasFlag(IBOAcceptor.ACC_OFFSET_01_FLAG, IBOAcceptor.ACC_FLAG_5_CHANNEL)) {
          sb.append(" 8bitsChannelMode");

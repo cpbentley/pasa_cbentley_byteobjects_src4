@@ -37,8 +37,8 @@ public class LockManager extends ObjectBoc implements IBOAgentManaged, IStringab
 
    public LockManager(BOCtx boc) {
       super(boc);
-      locksBom = new IntToObjects(boc.getUCtx(), 1);
-      locksMonitorThread = new IntToObjects(boc.getUCtx(), 1);
+      locksBom = new IntToObjects(boc.getUC(), 1);
+      locksMonitorThread = new IntToObjects(boc.getUC(), 1);
    }
 
    /**

@@ -18,7 +18,7 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * 1 byte for stepping
     * 1 byte for directional data
     */
-   public static final int GRADIENT_BASIC_SIZE                  = A_OBJECT_BASIC_SIZE + 17;
+   public static final int GRADIENT_BASIC_SIZE                  = A_OBJECT_BASIC_SIZE + 18;
 
    /**
     * Flags for easily switch between two opposing types. <br>
@@ -222,7 +222,7 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * <li> {@link ITechGradient#GRADIENT_TYPE_LOSANGE_0_SQUARE}
     * <li> {@link ITechGradient#GRADIENT_TYPE_RECT_00_SQUARE}
     * <li> {@link ITechGradient#GRADIENT_TYPE_TRIG_00_TENT}
-    * <li> {@link ITechGradient#GRADIENT_TYPE_TRIG_09_HALO}
+    * <li> {@link ITechGradient#GRADIENT_TYPE_TRIG_09_FAT_HALO}
     */
    public static final int GRADIENT_OFFSET_06_TYPE1             = A_OBJECT_BASIC_SIZE + 8;
 
@@ -271,7 +271,26 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * <li> {@link C#DIR_5_TopRight}
     * <li> {@link C#DIR_6_BotLeft}
     * <li> {@link C#DIR_7_BotRight}
+    * 
+    * See 
     */
    public static final int GRADIENT_OFFSET_12_DIR1              = A_OBJECT_BASIC_SIZE + 15;
+
+   /**
+    * Usual suspects are 
+    * 
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_00_DEFAULT}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_01_W}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_02_H}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_03_MAX_WH}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_04_MIN_WH}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_05_HALF_W}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_06_HALF_H}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_07_HALF_MAX_WH}
+    * <li> {@link ITechGradient#GRADSIZE_TYPE_08_HALF_MIN_WH}
+    */
+   public static final int GRADIENT_OFFSET_13_GRADSIZE_TYPE1    = A_OBJECT_BASIC_SIZE + 16;
+
+   public static final int GRADIENT_OFFSET_14_GRADSIZE_OP_V1    = A_OBJECT_BASIC_SIZE + 17;
 
 }

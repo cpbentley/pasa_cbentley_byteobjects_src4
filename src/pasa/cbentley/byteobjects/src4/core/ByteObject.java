@@ -435,6 +435,15 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   public void checkValue(int offset, int size, int value) {
+      if (getValue(offset, size) != value) {
+         //#debug
+         String message = "Value " + value + " should be " + getValue(offset, size) + " offset=" + offset + " size=" + size;
+         //#debug
+         throw new IllegalArgumentException(message);
+      }
+   }
+
    /**
     * A Full clone of everything through the serialization {@link ByteObject#toByteArray()}
     * If object is in repository, clone with be in the repository.
@@ -1210,7 +1219,7 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    protected IMemory getMem() {
-      return boc.getUCtx().getMem();
+      return boc.getUC().getMem();
    }
 
    /**
@@ -1219,7 +1228,7 @@ public class ByteObject implements IByteObject, IStringable {
     * VAL1 VAL2-PARAM.LENGTH-VAL3
     */
    public String getMyHashCode() {
-      StringBBuilder sb = new StringBBuilder(boc.getUCtx(), 10);
+      StringBBuilder sb = new StringBBuilder(boc.getUC(), 10);
       sb.append("[#code=");
       int val1 = 0;
       for (int i = 0; i < A_OBJECT_BASIC_SIZE; i++) {
@@ -1467,7 +1476,7 @@ public class ByteObject implements IByteObject, IStringable {
     * @return
     */
    public ByteObject[] getSubFlatline() {
-      IntToObjects ito = new IntToObjects(boc.getUCtx());
+      IntToObjects ito = new IntToObjects(boc.getUC());
       addFlatLine(ito, ito);
       ByteObject[] ar = new ByteObject[ito.nextempty];
       ito.copy(ar, 0);
@@ -1764,7 +1773,7 @@ public class ByteObject implements IByteObject, IStringable {
     * @return
     */
    public IntToObjects getTopology(IntToObjects refs) {
-      IntToObjects ito = new IntToObjects(boc.getUCtx());
+      IntToObjects ito = new IntToObjects(boc.getUC());
       if (refs == null) {
          refs = ito;
       }
@@ -1847,7 +1856,7 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    public UCtx getUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    /**
@@ -2832,7 +2841,7 @@ public class ByteObject implements IByteObject, IStringable {
     * @param shiftSize
     */
    public void shiftBytesDown(int offset, int len, int shiftSize) {
-      boc.getUCtx().getBU().shiftBytesDown(data, shiftSize, index + offset, index + offset + len - 1);
+      boc.getUC().getBU().shiftBytesDown(data, shiftSize, index + offset, index + offset + len - 1);
    }
 
    /**
@@ -2844,7 +2853,7 @@ public class ByteObject implements IByteObject, IStringable {
     * @param shiftSize
     */
    public void shiftBytesUp(int offset, int len, int shiftSize) {
-      boc.getUCtx().getBU().shiftBytesUp(data, shiftSize, index + offset, index + offset + len - 1);
+      boc.getUC().getBU().shiftBytesUp(data, shiftSize, index + offset, index + offset + len - 1);
    }
 
    /**
@@ -3054,7 +3063,7 @@ public class ByteObject implements IByteObject, IStringable {
       dc.append("]");
       dc.appendVarWithSpace("getLength", getLength());
       dc.appendVarWithSpace("lenByteField", get2(A_OBJECT_OFFSET_3_LENGTH2));
-      if (dc.hasFlagData(boc.getUCtx(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (dc.hasFlagData(boc.getUC(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
          dc.append(" [Absolutes Ignored]");
       } else {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
@@ -3097,7 +3106,7 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public void toStringBackUp(Dctx dc) {
       dc.append("Header Type=" + get1(A_OBJECT_OFFSET_1_TYPE1) + " Length=" + getLength() + " [ByteField=" + get2(A_OBJECT_OFFSET_3_LENGTH2) + "]");
-      if (!dc.hasFlagData(boc.getUCtx(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (!dc.hasFlagData(boc.getUC(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
       }
       this.toStringFlags(dc);
@@ -3176,7 +3185,7 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    public void toStringHeader(Dctx sb) {

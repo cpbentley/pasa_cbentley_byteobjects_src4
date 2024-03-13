@@ -68,7 +68,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
     * @param boc owner {@link ICtx}
     */
    public ABOCtx(IConfigBO config, BOCtx boc) {
-      super(config, boc.getUCtx()); //registers the module and get the saved byte data
+      super(config, boc.getUC()); //registers the module and get the saved byte data
       this.boc = boc;
    }
 

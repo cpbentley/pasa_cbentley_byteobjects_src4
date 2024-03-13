@@ -189,7 +189,7 @@ public class ActionOperator extends BOAbstractOperator implements IBOAction {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    public String toString1Line() {

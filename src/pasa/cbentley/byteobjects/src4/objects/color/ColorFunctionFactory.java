@@ -8,7 +8,7 @@ import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesExtendedBOC;
 import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
@@ -89,7 +89,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
             //we want A to B to C in one def, then C to D to A
             ByteObject ar = grad.getSubFirst(IBOTypesBOC.TYPE_007_LIT_ARRAY_INT); //defines gradient colors
             //TODO 
-            ByteObject[] subs = grad.getSubs(IBOTypesDrw.TYPE_059_GRADIENT);
+            ByteObject[] subs = grad.getSubs(IBOTypesBOC.TYPE_038_GRADIENT);
             //
             int[] arr = boc.getLitteralIntOperator().getLitteralArray(ar);
 
@@ -106,7 +106,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
                int count = 0;
                int primaryColor = color;
                int[] gradSizes = new int[numGrads];
-               IntBuffer buff = new IntBuffer(boc.getUCtx(), gradSize);
+               IntBuffer buff = new IntBuffer(boc.getUC(), gradSize);
 
                //we do an exclude on last color so only 1 step shows boundary colors
                for (int i = 0; i < numGrads; i++) {
@@ -185,7 +185,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
       p.setFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_7_GREEN, green);
       p.setFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_8_BLUE, blue);
       p.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_6_EXTENSION, true);
-      p.setValue(FUN_OFFSET_09_EXTENSION_TYPE2, IBOTypesDrw.TYPE_057_COLOR_FUNCTION, 1);
+      p.setValue(FUN_OFFSET_09_EXTENSION_TYPE2, IBOTypesExtendedBOC.TYPE_057_COLOR_FUNCTION, 1);
       if (postop != 0) {
          p.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_1_POSTOP, true);
          p.setValue(FUN_OFFSET_08_POST_OPERATOR1, postop, 1);
@@ -214,7 +214,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
       fun.setFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_7_GREEN, green);
       fun.setFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_8_BLUE, blue);
       fun.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_6_EXTENSION, true);
-      fun.setValue(FUN_OFFSET_09_EXTENSION_TYPE2, IBOTypesDrw.TYPE_057_COLOR_FUNCTION, 1);
+      fun.setValue(FUN_OFFSET_09_EXTENSION_TYPE2, IBOTypesExtendedBOC.TYPE_057_COLOR_FUNCTION, 1);
       return fun;
    }
 
@@ -239,12 +239,12 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
    }
 
    /**
-    * Create an {@link IBOTypesDrw#TYPE_061_COLOR_RANDOM} of {@link ITechColorFunction}
+    * Create an {@link IBOTypesBOC#TYPE_041_COLOR_RANDOM} of {@link ITechColorFunction}
     * @param perchannel
     * @return
     */
    public ByteObject getColorRandom(boolean perchannel) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_061_COLOR_RANDOM, RND_COLORS_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_041_COLOR_RANDOM, RND_COLORS_BASIC_SIZE);
       if (perchannel) {
          p.setValue(RND_COLORS_OFFSET_06_TYPE1, RND_COLORS_TYPE_1_CHANNEL, 1);
          p.setFlag(RND_COLORS_OFFSET_02_FLAGP, RND_COLORS_FLAG_P_1_RED_CHANNEL, true);
@@ -259,7 +259,7 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
    }
 
    public ByteObject getColorRandom(int type) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_061_COLOR_RANDOM, RND_COLORS_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_041_COLOR_RANDOM, RND_COLORS_BASIC_SIZE);
       p.setValue(RND_COLORS_OFFSET_06_TYPE1, type, 1);
       return p;
    }

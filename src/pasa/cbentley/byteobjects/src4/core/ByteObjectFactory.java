@@ -89,8 +89,8 @@ public class ByteObjectFactory extends BOAbstractFactory implements IByteObject 
     * @return null if there is an error.
     */
    public ByteObject createByteObjectFromWrap(byte[] data, int index) {
-      BytesIterator bc = new BytesIterator(boc.getUCtx(), data, index);
-      IntToObjects its = new IntToObjects(boc.getUCtx(), 5);
+      BytesIterator bc = new BytesIterator(boc.getUC(), data, index);
+      IntToObjects its = new IntToObjects(boc.getUC(), 5);
       ByteObject bo = createByteObjectFromWrapIto(bc, its);
       if (bo == null) {
          //badly formed data
@@ -126,7 +126,7 @@ public class ByteObjectFactory extends BOAbstractFactory implements IByteObject 
     * @return
     */
    public ByteObject createByteObjectFromWrap(BytesIterator bc) {
-      IntToObjects its = new IntToObjects(boc.getUCtx(), 5);
+      IntToObjects its = new IntToObjects(boc.getUC(), 5);
       return createByteObjectFromWrapIto(bc, its);
    }
 

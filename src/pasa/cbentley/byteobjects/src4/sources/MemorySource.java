@@ -241,7 +241,7 @@ public abstract class MemorySource implements IMemorySource, ITechMemorySource, 
 
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    public String toString1Line() {

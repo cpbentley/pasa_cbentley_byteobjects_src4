@@ -250,7 +250,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
    }
 
    public ByteObject getFunctionValues(int size, int start, int end) {
-      return getFunctionValues(boc.getUCtx().getIU().getValues(size, start, end));
+      return getFunctionValues(boc.getUC().getIU().getValues(size, start, end));
    }
 
    /**
@@ -384,6 +384,6 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 }

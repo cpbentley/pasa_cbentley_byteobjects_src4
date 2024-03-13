@@ -115,13 +115,13 @@ public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFu
             return "FullDiagDown";
          case ITechGradient.GRADIENT_TYPE_LOSANGE_4_FULLDIAGUP:
             return "FullDiagUp";
-         case ITechGradient.GRADIENT_TYPE_LOSANGE_5_LEFT:
+         case ITechGradient.GRADIENT_TYPE_LOSANGE_7_LEFT:
             return "Left";
-         case ITechGradient.GRADIENT_TYPE_LOSANGE_6_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_LOSANGE_8_RIGHT:
             return "Right";
-         case ITechGradient.GRADIENT_TYPE_LOSANGE_7_TOP:
+         case ITechGradient.GRADIENT_TYPE_LOSANGE_5_TOP:
             return "Top";
-         case ITechGradient.GRADIENT_TYPE_LOSANGE_8_BOT:
+         case ITechGradient.GRADIENT_TYPE_LOSANGE_6_BOT:
             return "Bot";
          default:
             return "Unknown " + value;
@@ -201,7 +201,7 @@ public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFu
             return "Arrow";
          case ITechGradient.GRADIENT_TYPE_TRIG_08_NORMAL:
             return "Normal";
-         case ITechGradient.GRADIENT_TYPE_TRIG_09_HALO:
+         case ITechGradient.GRADIENT_TYPE_TRIG_09_FAT_HALO:
             return "Halo";
          case ITechGradient.GRADIENT_TYPE_TRIG_10_SWIPE:
             return "Swipe";

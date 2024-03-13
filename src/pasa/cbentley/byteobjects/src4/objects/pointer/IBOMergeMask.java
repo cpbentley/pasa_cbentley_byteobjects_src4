@@ -99,6 +99,8 @@ public interface IBOMergeMask extends IByteObject {
 
    /**
     * Codes for the 8 bit flags.
+    * 
+    * 
     */
    public static final int MERGE_MASK_OFFSET_5VALUES1 = A_OBJECT_BASIC_SIZE + 4;
 

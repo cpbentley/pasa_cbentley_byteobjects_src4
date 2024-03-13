@@ -7,7 +7,6 @@ package pasa.cbentley.byteobjects.src4.objects.color;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
 import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -40,7 +39,7 @@ public class ColorFunction extends Function implements ITechColorFunction, IBOCo
    protected double          operator;
 
    /**
-    * When not null, its the {@link IBOTypesDrw#TYPE_061_COLOR_RANDOM}
+    * When not null, its the {@link IBOTypesBOC#TYPE_041_COLOR_RANDOM}
     */
    private ByteObject        randDef;
 
@@ -360,7 +359,7 @@ public class ColorFunction extends Function implements ITechColorFunction, IBOCo
             }
          }
       } else {
-         randDef = def.getSubFirst(IBOTypesDrw.TYPE_061_COLOR_RANDOM);
+         randDef = def.getSubFirst(IBOTypesBOC.TYPE_041_COLOR_RANDOM);
          if (randDef != null) {
             switchMode = ITechColorFunction.MODE_4_RANDOM;
 

@@ -7,7 +7,7 @@ package pasa.cbentley.byteobjects.src4.objects.color;
 import pasa.cbentley.byteobjects.src4.core.BOAbstractFactory;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesDrw;
+import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -38,7 +38,7 @@ public class GradientFactory extends BOAbstractFactory implements ITechFunction,
    }
 
    public ByteObject getGradient(int[] colors, int step, int[] ratios) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_059_GRADIENT, GRADIENT_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_038_GRADIENT, GRADIENT_BASIC_SIZE);
       p.setValue(GRADIENT_OFFSET_07_STEP1, step, 1);
       p.setFlag(GRADIENT_OFFSET_01_FLAG, GRADIENT_FLAG_5_INT_ARRAY, true);
       p.addByteObject(boc.getLitteralIntFactory().getLitteralArray(colors));
@@ -71,7 +71,7 @@ public class GradientFactory extends BOAbstractFactory implements ITechFunction,
     * @return
     */
    public ByteObject getGradientAlpha(int finalAlpha) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_059_GRADIENT, GRADIENT_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_038_GRADIENT, GRADIENT_BASIC_SIZE);
       return p;
    }
 
@@ -156,9 +156,25 @@ public class GradientFactory extends BOAbstractFactory implements ITechFunction,
       return getGradient(scolor, sec, type, boc.getLitteralIntFactory().getIntBO(color));
    }
 
+   public ByteObject getGradient(int scolor, int sec, int[] types, int step, int tcolor) {
+      ByteObject color3 = boc.getLitteralIntFactory().getLitteralInt(tcolor);
+      ByteObject grad = getGradient(scolor, sec, 0, step, color3);
+
+      ByteObject arr = boc.getLitteralIntFactory().getLitteralArray(types);
+      int index = grad.addByteObject(arr);
+      grad.set1(IBOGradient.GRADIENT_OFFSET_06_TYPE1, index);
+      grad.setFlag(IBOGradient.GRADIENT_OFFSET_09_FLAGX1, IBOGradient.GRADIENT_FLAGX_8_MANY_TYPES, true);
+      return grad;
+   }
+
    public ByteObject getGradient(int scolor, int sec, int type, int step, int tcolor) {
       ByteObject color3 = boc.getLitteralIntFactory().getLitteralInt(tcolor);
       return getGradient(scolor, sec, type, step, color3);
+   }
+
+   public ByteObject getGradient(int scolor, int sec, int type, int step, int tcolor, int size) {
+      ByteObject color3 = boc.getLitteralIntFactory().getLitteralInt(tcolor);
+      return getGradient(scolor, sec, type, step, color3, size);
    }
 
    /**
@@ -171,11 +187,25 @@ public class GradientFactory extends BOAbstractFactory implements ITechFunction,
     * @return
     */
    public ByteObject getGradient(int scolor, int sec, int type, int step, ByteObject tcolor) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_059_GRADIENT, GRADIENT_BASIC_SIZE);
-      p.setValue(GRADIENT_OFFSET_06_TYPE1, type, 1);
-      p.setValue(GRADIENT_OFFSET_05_CURSOR1, sec, 1);
-      p.setValue(GRADIENT_OFFSET_04_COLOR4, scolor, 4);
-      p.setValue(GRADIENT_OFFSET_07_STEP1, step, 1);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_038_GRADIENT, GRADIENT_BASIC_SIZE);
+      p.set4(GRADIENT_OFFSET_04_COLOR4, scolor);
+      p.set1(GRADIENT_OFFSET_05_CURSOR1, sec);
+      p.set1(GRADIENT_OFFSET_06_TYPE1, type);
+      p.set1(GRADIENT_OFFSET_07_STEP1, step);
+      if (tcolor != null) {
+         p.addByteObject(tcolor);
+         p.setFlag(GRADIENT_OFFSET_01_FLAG, GRADIENT_FLAG_3_THIRD_COLOR, true);
+      }
+      return p;
+   }
+
+   public ByteObject getGradient(int scolor, int sec, int type, int step, ByteObject tcolor, int sizeType) {
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_038_GRADIENT, GRADIENT_BASIC_SIZE);
+      p.set4(GRADIENT_OFFSET_04_COLOR4, scolor);
+      p.set1(GRADIENT_OFFSET_05_CURSOR1, sec);
+      p.set1(GRADIENT_OFFSET_06_TYPE1, type);
+      p.set1(GRADIENT_OFFSET_07_STEP1, step);
+      p.set1(GRADIENT_OFFSET_13_GRADSIZE_TYPE1, sizeType);
       if (tcolor != null) {
          p.addByteObject(tcolor);
          p.setFlag(GRADIENT_OFFSET_01_FLAG, GRADIENT_FLAG_3_THIRD_COLOR, true);
@@ -195,7 +225,7 @@ public class GradientFactory extends BOAbstractFactory implements ITechFunction,
     * @return
     */
    public ByteObject getGradient(int scolor, int sec, int type, int mainFlag, int exludeFlags, int channelFlags, ByteObject tcolor) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesDrw.TYPE_059_GRADIENT, GRADIENT_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_038_GRADIENT, GRADIENT_BASIC_SIZE);
       p.setValue(GRADIENT_OFFSET_06_TYPE1, type, 1);
       p.setValue(GRADIENT_OFFSET_05_CURSOR1, sec, 1);
       p.setValue(GRADIENT_OFFSET_04_COLOR4, scolor, 4);

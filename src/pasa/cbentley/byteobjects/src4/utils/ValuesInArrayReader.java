@@ -75,7 +75,7 @@ public class ValuesInArrayReader implements IStringable {
    }
 
    public UCtx toStringGetUCtx() {
-      return boc.getUCtx();
+      return boc.getUC();
    }
 
    public String toString1Line() {

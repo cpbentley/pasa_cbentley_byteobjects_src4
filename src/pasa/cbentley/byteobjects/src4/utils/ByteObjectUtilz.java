@@ -67,7 +67,7 @@ public class ByteObjectUtilz implements IByteObject {
     * @see ArrayUtils#getTrim(Object[])
     */
    public ByteObject[] getTrim(ByteObject[] ar) {
-      return (ByteObject[]) boc.getUCtx().getAU().getTrim(ar, boc.getFactoryByteObject()) ;
+      return (ByteObject[]) boc.getUC().getAU().getTrim(ar, boc.getFactoryByteObject()) ;
    }
 
    /**
@@ -77,7 +77,7 @@ public class ByteObjectUtilz implements IByteObject {
     * @return
     */
    public ByteObject[] getTrimRear(ByteObject[] ar) {
-      int count = boc.getUCtx().getAU().getLastNullIndex(ar);
+      int count = boc.getUC().getAU().getLastNullIndex(ar);
       if (count == -1) {
          count = ar.length;
       }

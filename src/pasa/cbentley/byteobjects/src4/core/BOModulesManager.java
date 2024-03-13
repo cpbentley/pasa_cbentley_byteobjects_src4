@@ -77,10 +77,10 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
       super(boc);
       factoriesStr = new Hashtable();
       rootSource = new RootSource(boc);
-      javaObjectFactories = new IntToObjects(boc.getUCtx(), 5);
+      javaObjectFactories = new IntToObjects(boc.getUC(), 5);
 
       //#debug
-      boc.getUCtx().toStringGetDIDManager().registerDIDer(this);
+      boc.getUC().toStringGetDIDManager().registerDIDer(this);
    }
 
    /**

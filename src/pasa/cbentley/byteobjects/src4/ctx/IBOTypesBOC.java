@@ -6,8 +6,9 @@ package pasa.cbentley.byteobjects.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
-import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
+import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
+import pasa.cbentley.byteobjects.src4.objects.color.GradientFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
 import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
@@ -44,7 +45,7 @@ public interface IBOTypesBOC {
 
    public static final int SID_BASETYPE_A                = 0;
 
-   public static final int SID_BASETYPE_Z                = 40;
+   public static final int SID_BASETYPE_Z                = 50;
 
    /**
     * Reserved for NULL Type.
@@ -147,7 +148,7 @@ public interface IBOTypesBOC {
    /**
     * {@link IBOCtxSettings}
     */
-   public static final int TYPE_012_CTX_SETTINGS      = 12;
+   public static final int TYPE_012_CTX_SETTINGS         = 12;
 
    /**
     * Type for envelopping header returned by {@link ByteObject#toByteArray()}
@@ -269,6 +270,47 @@ public interface IBOTypesBOC {
     * A Factory object is needed to map IDs to class for the module
     */
    public static final int TYPE_037_CLASS_STATE          = 14;
+
+   /**
+    * Defines a color function from between a primary color and secondary color.
+    * <li>Supports {@link IBOTypesBOC#TYPE_011_MERGE_MASK}
+    * <li>
+    * <li>3 colors scheme
+    * <li>stepping from 1 to area size
+    * <li>position
+    * <li>Filling over either side of gradient change position. When both side are filled, act like a split.
+    * <li>Channel gradient switch : gradient may only works on specific ARGB channels
+    * 
+    * How to link the gradent position to the String figure font baseline?
+    * {@link IMFont#getBaselinePosition()}.
+    * String figure overrides when needed
+    * 
+    * {@link IBOTypesExtendedBOC#TYPE_059_GRADIENT_FUNCTION} for {@link GradientFunction}.
+    */
+   public static final int TYPE_038_GRADIENT             = 38;
+
+   /**
+    * Filters a RGB array (RgbImage or Image) using a given function.
+    * An important category is Translucent filters that work on the alpha channel
+    * Several filters may be chained. Each filter will be applied in turn
+    * Function of filtering may be implicit or defined in a Function object
+    * Some filters will use a maskcolor
+    * 
+    * Type which stores data of a translucent filtering function
+    * 1st byte = Flag => maskColor
+    * 2-3 bytes. length of filter
+    * Can apply to all non mask colors. One value.
+    * Random value
+    * To a set of colors
+    * Change only the Border Pixels.
+    * 4 byte: function type Linear, Value Defined
+    * 4 bytes: function values
+    */
+   public static final int TYPE_040_COLOR_FILTER         = 40;
+
+   public static final int TYPE_041_COLOR_RANDOM         = 41;
+
+   public static final int TYPE_039_BLENDER              = 39;
 
    public static final int TYPE_255_RESERVED             = 255;
 

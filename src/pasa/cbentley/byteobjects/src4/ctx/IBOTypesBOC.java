@@ -43,8 +43,14 @@ import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
  */
 public interface IBOTypesBOC {
 
+   /**
+    * Inclusive
+    */
    public static final int SID_BASETYPE_A                = 0;
 
+   /**
+    * Last Type ID inclusive
+    */
    public static final int SID_BASETYPE_Z                = 50;
 
    /**

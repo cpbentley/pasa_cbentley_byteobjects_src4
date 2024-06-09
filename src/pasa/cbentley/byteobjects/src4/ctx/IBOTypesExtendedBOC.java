@@ -1,6 +1,6 @@
 package pasa.cbentley.byteobjects.src4.ctx;
 
-public interface IBOTypesExtendedBOC {
+public interface IBOTypesExtendedBOC extends IBOTypesBOC {
 
    /**
     * 

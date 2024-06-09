@@ -332,6 +332,14 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   public void addByteObjectNotNullFlagged(ByteObject sub, int flagOffset, int flag) {
+      if (sub == null) {
+         return;
+      }
+      this.addByteObject(sub);
+      this.setFlag(flagOffset, flag, true);
+   }
+
    /**
     * Replace existing {@link ByteObject} that has the same type.
     * <p>
@@ -429,7 +437,7 @@ public class ByteObject implements IByteObject, IStringable {
    public void checkType(int type) {
       if (getType() != type) {
          //#debug
-         String message = "Type should be " + boc.getBOModuleManager().toStringType(type) + " and was " + toStringType();
+         String message = "Type should be " + boc.getBOModuleManager().toStringType(type) + " and was " + this.toStringType();
          //#debug
          throw new IllegalArgumentException(message);
       }

@@ -95,12 +95,12 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
 
       if (configBO.isIgnoreSettings()) {
          //#debug
-         toDLog().pInit("IConfigBO asks to ignore CtxSettings. Class=" + this.getClass().getName(), this, ABOCtx.class, "a_Init", LVL_05_FINE, true);
+         toDLog().pInit("Ignoring CtxSettings for class=" + uc.getStrU().getNameObjectClass(this) + ". Request by config:", configBO, ABOCtx.class, "a_Init@98", LVL_05_FINE, true);
 
          setSettingsFromConfig(configBO);
       } else if (uc.getConfigU().isIgnoreSettingsAll()) {
          //#debug
-         toDLog().pInit("IConfigU asks to ignore all CtxSettings. Class=" + this.getClass().getName(), this, ABOCtx.class, "a_Init", LVL_05_FINE, true);
+         toDLog().pInit("Ignoring All CtxSettings. Request by config:", uc.getConfigU(), ABOCtx.class, "a_Init@102", LVL_05_FINE, true);
 
          setSettingsFromConfig(configBO);
       } else {
@@ -122,6 +122,9 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
    }
 
    private void setSettingsFromConfig(IConfigBO configBO) {
+      //#debug
+      toDLog().pInit("", configBO, ABOCtx.class, "setSettingsFromConfig@126", LVL_05_FINE, true);
+
       ByteObject settings = createSettingsBOEmpty();
       matchConfig(configBO, settings);
       configBO.postProcessing(settings, null);

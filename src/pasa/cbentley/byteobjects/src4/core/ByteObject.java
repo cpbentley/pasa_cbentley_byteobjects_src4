@@ -443,6 +443,23 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   public void checkTypeSubType(int type, int offset, int subtype) {
+      if (getType() != type) {
+         //#debug
+         String message = "Type should be " + boc.getBOModuleManager().toStringType(type) + " and was " + this.toStringType();
+         //#debug
+         throw new IllegalArgumentException(message);
+      }
+
+      int v = this.get1(offset);
+      if (v != subtype) {
+         //#debug
+         String message = "SubType should be " + boc.getBOModuleManager().toStringType(subtype) + " and was " + boc.getBOModuleManager().toStringType(v);
+         //#debug
+         throw new IllegalArgumentException(message);
+      }
+   }
+
    public void checkValue(int offset, int size, int value) {
       if (getValue(offset, size) != value) {
          //#debug
@@ -1381,23 +1398,24 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
-    * Returns the first object whose type is type, and whose value at index of size size is equal
+    * Returns the num_th object whose type is type, and whose value at index of size size is equal
     * to the given value
     * @param type
+    * @param subType
     * @param index
     * @param size
-    * @param value
-    * @param num
+    * @param num 0 means first
     * @return
     */
-   public ByteObject getSub(int type, int index, int size, int value, int num) {
+   public ByteObject getSubSub(int type, int subType, int index, int size, int num) {
       if (param == null)
          return null;
       int count = 0;
       for (int i = 0; i < param.length; i++) {
          ByteObject subObject = param[i];
          if (subObject != null && subObject.getType() == type) {
-            if (subObject.getValue(index, size) == value) {
+            int value = subObject.getValue(index, size);
+            if (value == subType) {
                if (count == num) {
                   return subObject;
                }
@@ -1459,8 +1477,16 @@ public class ByteObject implements IByteObject, IStringable {
       return p;
    }
 
-   public ByteObject getSubFirst(int type, int index, int size, int value) {
-      return getSub(type, index, size, value, 0);
+   /**
+    * 
+    * @param type
+    * @param subtype
+    * @param index
+    * @param size
+    * @return
+    */
+   public ByteObject getSubSubFirst(int type, int subtype, int index, int size) {
+      return getSubSub(type, subtype, index, size, 0);
    }
 
    public ByteObject getSubFirstEx(int type, int typeEx) {
@@ -1551,6 +1577,23 @@ public class ByteObject implements IByteObject, IStringable {
       for (int i = 0; i < param.length; i++) {
          if (param[i] != null && param[i].getType() == type) {
             count++;
+         }
+      }
+      return count;
+   }
+
+   public int getSubSubNum(int type, int subTypeOffset, int subTypeSize, int subType) {
+      if (param == null) {
+         return 0;
+      }
+      int count = 0;
+      for (int i = 0; i < param.length; i++) {
+         ByteObject subObject = param[i];
+         if (subObject != null && subObject.getType() == type) {
+            int value = subObject.getValue(subTypeOffset, subTypeSize);
+            if (value == subType) {
+               count++;
+            }
          }
       }
       return count;
@@ -1670,13 +1713,13 @@ public class ByteObject implements IByteObject, IStringable {
 
    /**
     * Append at offset
-    * @param type
     * @param ar
     * @param offset
+    * @param type
     * @return
     * @throws ArrayIndexOutOfBoundsException if ar is not big enough
     */
-   public int getSubsAppend(int type, ByteObject[] ar, int offset) {
+   public int getSubAppend(ByteObject[] ar, int offset, int type) {
       if (param == null) {
          return 0;
       }
@@ -1685,6 +1728,34 @@ public class ByteObject implements IByteObject, IStringable {
          if (param[i] != null && param[i].getType() == type) {
             ar[count] = param[i];
             count++;
+         }
+      }
+      return count - offset;
+   }
+
+   /**
+    * Append 
+    * @param ar
+    * @param offset
+    * @param type
+    * @param subType
+    * @param subTypeOffset
+    * @param subTypeSize
+    * @return the number of appended {@link ByteObject} matching the type
+    */
+   public int getSubSubAppend(ByteObject[] ar, int offset, int type, int subType, int subTypeOffset, int subTypeSize) {
+      if (param == null) {
+         return 0;
+      }
+      int count = offset;
+      for (int i = 0; i < param.length; i++) {
+         ByteObject subObject = param[i];
+         if (subObject != null && subObject.getType() == type) {
+            int v = subObject.getValue(subTypeOffset, subTypeSize);
+            if (v == subType) {
+               ar[count] = subObject;
+               count++;
+            }
          }
       }
       return count - offset;

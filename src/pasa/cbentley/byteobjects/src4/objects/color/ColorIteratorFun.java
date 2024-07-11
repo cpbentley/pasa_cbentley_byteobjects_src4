@@ -17,12 +17,16 @@ public class ColorIteratorFun extends ColorIterator {
       super(boc);
       this.cf = cf;
       colorBuf = new IntBuffer(getUC());
+      this.currentColor = colorStart;
    }
 
    public int getCurrentColor() {
       return currentColor;
    }
 
+   /**
+    * Trimmed.. not a direct reference.
+    */
    public int[] getColors() {
       return colorBuf.getIntsClonedTrimmed();
    }
@@ -44,6 +48,12 @@ public class ColorIteratorFun extends ColorIterator {
       colorPrevious = currentColor;
       this.currentColor = nextColor;
       return nextColor;
+   }
+
+   public void iterate(int times) {
+      for (int i = 0; i < times; i++) {
+         iterateColor();
+      }
    }
 
    public void iterateColor(IColorSettable s) {

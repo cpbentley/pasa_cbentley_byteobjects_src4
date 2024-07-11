@@ -87,6 +87,13 @@ public class GradientOperator extends BOAbstractOperator implements ITechGradien
             size = width;
             size -= arch;
             break;
+         case ITechGradient.GRADIENT_TYPE_RECT_03_TOPLEFT:
+         case ITechGradient.GRADIENT_TYPE_RECT_04_TOPRIGHT:
+         case ITechGradient.GRADIENT_TYPE_RECT_05_BOTLEFT:
+         case ITechGradient.GRADIENT_TYPE_RECT_06_BOTRIGHT:
+            size = Math.min(height, width);
+            size -= Math.max(arch, arcw);
+            break;
          case ITechGradient.GRADIENT_TYPE_RECT_07_L_TOP:
             size = width / 2;
             size -= arcw;
@@ -103,21 +110,45 @@ public class GradientOperator extends BOAbstractOperator implements ITechGradien
             size = height / 2;
             size -= arcw;
             break;
-         case ITechGradient.GRADIENT_TYPE_RECT_11_TRIG_TOP_LEFT:
+         case ITechGradient.GRADIENT_TYPE_RECT_13_L_THIN_LEFT:
             size = height / 2;
             size -= arcw;
             break;
-         case ITechGradient.GRADIENT_TYPE_RECT_12_TRIG_BOT_LEFT:
+         case ITechGradient.GRADIENT_TYPE_RECT_12_L_THIN_BOT:
             size = height / 2;
             size -= arcw;
             break;
-         case ITechGradient.GRADIENT_TYPE_RECT_13_:
-            size = height / 2;
-            size -= arcw;
+         case ITechGradient.GRADIENT_TYPE_RECT_15_PIC_TOP_LEFT:
+         case ITechGradient.GRADIENT_TYPE_RECT_16_PIC_TOP_MID:
+         case ITechGradient.GRADIENT_TYPE_RECT_17_PIC_TOP_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_RECT_18_PIC_MID_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_RECT_19_PIC_BOT_RIGHT:
+         case ITechGradient.GRADIENT_TYPE_RECT_20_PIC_BOT_MID:
+         case ITechGradient.GRADIENT_TYPE_RECT_21_PIC_BOT_LEFT:
+         case ITechGradient.GRADIENT_TYPE_RECT_22_PIC_MID_LEFT:
+            if (arcw == 0 && arch == 0) {
+               size = Math.min(height, width) / 2;
+            } else {
+               size = Math.min(height - arch, width - arcw) / 2;
+            }
             break;
-         case ITechGradient.GRADIENT_TYPE_RECT_14_:
-            size = height / 2;
-            size -= arcw;
+         case ITechGradient.GRADIENT_TYPE_RECT_27_:
+            size = 8;
+            break;
+         case ITechGradient.GRADIENT_TYPE_RECT_28_:
+            size = Math.min(height, width);
+            break;
+         case ITechGradient.GRADIENT_TYPE_RECT_29_TRIG_:
+         case ITechGradient.GRADIENT_TYPE_RECT_30_TRIG:
+         case ITechGradient.GRADIENT_TYPE_RECT_31_:
+         case ITechGradient.GRADIENT_TYPE_RECT_32_:
+         case ITechGradient.GRADIENT_TYPE_RECT_33_:
+         case ITechGradient.GRADIENT_TYPE_RECT_34_:
+         case ITechGradient.GRADIENT_TYPE_RECT_35_:
+         case ITechGradient.GRADIENT_TYPE_RECT_36_:
+         case ITechGradient.GRADIENT_TYPE_RECT_37_:
+         case ITechGradient.GRADIENT_TYPE_RECT_38_:
+            size = Math.min(height, width);
             break;
          default:
             if (arcw == 0 && arch == 0) {
@@ -179,6 +210,14 @@ public class GradientOperator extends BOAbstractOperator implements ITechGradien
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_05_LEFT_FLAMME:
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_06_RIGHT_FLAMME:
             return h / 2;
+
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_07_CLOCHE_TOP:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_08_CLOCHE_BOT:
+            return h;
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_09_CLOCHE_LEFT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_10_CLOCHE_RIGHT:
+            return w;
+
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_11_WATER_DROP_TOP:
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_12_WATER_DROP_BOT:
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_31_WATER_DROP_TOP:
@@ -201,6 +240,12 @@ public class GradientOperator extends BOAbstractOperator implements ITechGradien
             return h / 2;
          case GRADIENT_TYPE_ELLIPSE_20_T:
             return 360;
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_45_OBUS_TOP:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_46_OBUS_BOT:
+            return Math.min(h, w) / 2;
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_47_OBUS_LEFT:
+         case ITechGradient.GRADIENT_TYPE_ELLIPSE_48_OBUS_RIGHT:
+            return Math.min(h, w) / 2;
       }
       return Math.min(h, w) / 2;
    }

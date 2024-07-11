@@ -112,6 +112,14 @@ public interface ITechGradient extends ITech {
 
    public static final int GRADIENT_TYPE_ELLIPSE_44_WATER_DROP_RIGHT = 44;
 
+   public static final int GRADIENT_TYPE_ELLIPSE_45_OBUS_TOP         = 45;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_46_OBUS_BOT         = 46;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_47_OBUS_LEFT        = 47;
+
+   public static final int GRADIENT_TYPE_ELLIPSE_48_OBUS_RIGHT       = 48;
+
    public static final int GRADIENT_TYPE_ELLIPSE_MAX_CK              = 18;
 
    public static final int GRADIENT_TYPE_ELLIPSE_MAX_MODULO          = 19;
@@ -183,35 +191,65 @@ public interface ITechGradient extends ITech {
 
    public static final int GRADIENT_TYPE_RECT_10_L_RIGHT             = 10;
 
-   /**
-    * 
-    */
-   public static final int GRADIENT_TYPE_RECT_11_TRIG_TOP_LEFT       = 11;
+   public static final int GRADIENT_TYPE_RECT_11_L_THIN_TOP          = 11;
 
-   /**
-    * 
-    */
-   public static final int GRADIENT_TYPE_RECT_12_TRIG_BOT_LEFT       = 12;
+   public static final int GRADIENT_TYPE_RECT_12_L_THIN_BOT          = 12;
 
-   public static final int GRADIENT_TYPE_RECT_13_                    = 13;
+   public static final int GRADIENT_TYPE_RECT_13_L_THIN_LEFT         = 13;
 
-   public static final int GRADIENT_TYPE_RECT_14_                    = 14;
+   public static final int GRADIENT_TYPE_RECT_14_L_THIN_RIGHT        = 14;
 
-   public static final int GRADIENT_TYPE_RECT_15_                    = 15;
+   public static final int GRADIENT_TYPE_RECT_15_PIC_TOP_LEFT        = 15;
 
-   public static final int GRADIENT_TYPE_RECT_16_                    = 16;
+   public static final int GRADIENT_TYPE_RECT_16_PIC_TOP_MID         = 16;
 
-   public static final int GRADIENT_TYPE_RECT_17_                    = 17;
+   public static final int GRADIENT_TYPE_RECT_17_PIC_TOP_RIGHT       = 17;
 
-   public static final int GRADIENT_TYPE_RECT_18_                    = 18;
+   public static final int GRADIENT_TYPE_RECT_18_PIC_MID_RIGHT       = 18;
 
-   public static final int GRADIENT_TYPE_RECT_19_                    = 19;
+   public static final int GRADIENT_TYPE_RECT_19_PIC_BOT_RIGHT       = 19;
 
-   public static final int GRADIENT_TYPE_RECT_20_SQUARE_THIN         = 20;
+   public static final int GRADIENT_TYPE_RECT_20_PIC_BOT_MID         = 20;
 
-   public static final int GRADIENT_TYPE_RECT_MAX_CK                 = 10;
+   public static final int GRADIENT_TYPE_RECT_21_PIC_BOT_LEFT        = 21;
 
-   public static final int GRADIENT_TYPE_RECT_MAX_MODULO             = 11;
+   public static final int GRADIENT_TYPE_RECT_22_PIC_MID_LEFT        = 22;
+
+   public static final int GRADIENT_TYPE_RECT_23_WIN_TOP             = 23;
+
+   public static final int GRADIENT_TYPE_RECT_24_WIN_BOT             = 24;
+
+   public static final int GRADIENT_TYPE_RECT_25_WIN_LEFT            = 25;
+
+   public static final int GRADIENT_TYPE_RECT_26_WIN_RIGHT           = 26;
+
+   public static final int GRADIENT_TYPE_RECT_27_                    = 27;
+
+   public static final int GRADIENT_TYPE_RECT_28_                    = 28;
+
+   public static final int GRADIENT_TYPE_RECT_29_TRIG_               = 29;
+
+   public static final int GRADIENT_TYPE_RECT_30_TRIG                    = 30;
+
+   public static final int GRADIENT_TYPE_RECT_31_                    = 31;
+
+   public static final int GRADIENT_TYPE_RECT_32_                    = 32;
+
+   public static final int GRADIENT_TYPE_RECT_33_                    = 33;
+
+   public static final int GRADIENT_TYPE_RECT_34_                    = 34;
+
+   public static final int GRADIENT_TYPE_RECT_35_                    = 35;
+
+   public static final int GRADIENT_TYPE_RECT_36_                    = 36;
+
+   public static final int GRADIENT_TYPE_RECT_37_                    = 37;
+
+   public static final int GRADIENT_TYPE_RECT_38_                    = 38;
+
+   public static final int GRADIENT_TYPE_RECT_MAX_CK                 = 26;
+
+   public static final int GRADIENT_TYPE_RECT_MAX_MODULO             = 27;
 
    /**
     * The normal gradient

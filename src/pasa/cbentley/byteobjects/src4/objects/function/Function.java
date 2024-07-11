@@ -387,6 +387,7 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
     * Up values
     * Up and Down values
     * Postop is used for Alpha value pixels. It is a function in itself
+    * 
     * @param x
     * @return
     */
@@ -590,7 +591,8 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
    public void reset(ByteObject def) {
       resetFields();
       this.def = def;
-      setLooping(def.hasFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_3_LOOPING));
+      boolean isLooping = def.hasFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_3_LOOPING);
+      setLooping(isLooping);
       postOp = def.get1(FUN_OFFSET_08_POST_OPERATOR1);
       typeFct = def.get1(FUN_OFFSET_01_TYPE1);
       setupAcceptor(def);

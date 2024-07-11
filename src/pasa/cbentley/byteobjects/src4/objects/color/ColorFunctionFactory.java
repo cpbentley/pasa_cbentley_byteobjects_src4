@@ -207,6 +207,16 @@ public class ColorFunctionFactory extends BOAbstractFactory implements ITechColo
       return getColorFunction(fun, alpha, red, green, blue);
    }
 
+   public ByteObject getColorFunction(int[] values, boolean isLooping) {
+      ByteObject fun = boc.getFunctionFactory().getFunctionValues(values);
+      fun.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_3_LOOPING, isLooping);
+
+      fun.setFlag(FUN_OFFSET_02_FLAG, FUN_FLAG_6_EXTENSION, true);
+      fun.setValue(FUN_OFFSET_09_EXTENSION_TYPE2, IBOTypesExtendedBOC.TYPE_057_COLOR_FUNCTION, 1);
+      
+      return fun;
+   }
+
    public ByteObject getColorFunction(ByteObject fun, boolean alpha, boolean red, boolean green, boolean blue) {
       fun.setFlag(FUN_OFFSET_03_FLAGP, FUN_FLAGP_4_CHANNELS, true);
       fun.setFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_5_ALPHA, alpha);

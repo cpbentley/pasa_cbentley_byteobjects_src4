@@ -21,6 +21,7 @@ import pasa.cbentley.byteobjects.src4.core.LitteralManager;
 import pasa.cbentley.byteobjects.src4.core.LockManager;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.objects.color.ColorFunctionFactory;
+import pasa.cbentley.byteobjects.src4.objects.color.ColorOperator;
 import pasa.cbentley.byteobjects.src4.objects.color.FilterFactory;
 import pasa.cbentley.byteobjects.src4.objects.color.FilterOperator;
 import pasa.cbentley.byteobjects.src4.objects.color.GradientFactory;
@@ -249,6 +250,8 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    private EventBusArray eventBus;
 
+   private ColorOperator colorOperator;
+
    public FactoryByteObject getFactoryByteObject() {
       if (factoryByteObject == null) {
          factoryByteObject = new FactoryByteObject();
@@ -355,6 +358,13 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
          gradientOperator = new GradientOperator(this);
       }
       return gradientOperator;
+   }
+   
+   public ColorOperator getColorOperator() {
+      if(colorOperator == null) {
+         colorOperator = new ColorOperator(this);
+      }
+      return colorOperator;
    }
 
    public ColorFunctionFactory getColorFunctionFactory() {

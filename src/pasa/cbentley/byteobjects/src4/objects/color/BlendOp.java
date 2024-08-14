@@ -289,10 +289,6 @@ public class BlendOp extends ObjectBoc implements IStringable {
       return ((px >> 24) & 0xFF);
    }
 
-   private static int getBlue(int px) {
-      return ((px >> 0) & 0xFF);
-   }
-
    /**
     * 
     * @param base
@@ -311,6 +307,20 @@ public class BlendOp extends ObjectBoc implements IStringable {
       return getAlphaFixed(base, blend, baseAlpha, blendAlpha, baseRed, baseGreen, baseBlue, redResult, greenResult, blueResult);
    }
 
+   /**
+    * 
+    * @param base
+    * @param blend
+    * @param baseAlpha
+    * @param blendAlpha
+    * @param baseRed
+    * @param baseGreen
+    * @param baseBlue
+    * @param redResult
+    * @param greenResult
+    * @param blueResult
+    * @return
+    */
    protected static int getAlphaFixed(int base, int blend, int baseAlpha, int blendAlpha, int baseRed, int baseGreen, int baseBlue, int redResult, int greenResult, int blueResult) {
       int alphaResult16 = 0;
       if (blendAlpha == 0) {
@@ -331,6 +341,20 @@ public class BlendOp extends ObjectBoc implements IStringable {
       //values are computed in base 16.
       int val = (alphaResult16 << 16) + (redResult << 16) + (greenResult << 8) + (blueResult);
       return val;
+   }
+
+   public static int getAverage(int r, int g, int b) {
+      int total = r + g + b;
+      return total / 3;
+
+   }
+
+   private static int getBlue(int px) {
+      return ((px >> 0) & 0xFF);
+   }
+
+   private static int getGreen(int px) {
+      return ((px >> 8) & 0xFF);
    }
 
    /**
@@ -359,12 +383,88 @@ public class BlendOp extends ObjectBoc implements IStringable {
       return (int) (dest + (src - dest) * alpha) & 0xFF;
    }
 
-   private static int getGreen(int px) {
-      return ((px >> 8) & 0xFF);
-   }
-
    private static int getRed(int px) {
       return (px >> 16 & 0xFF);
+   }
+
+   public static int mergeAlpha(int base, int blend, int alphaOp, int redResult, int greenResult, int blueResult) {
+      switch (alphaOp) {
+         case ITechBlend.ALPHA_0_OVER:
+            return mergeAlpha00_Over(base, blend, redResult, greenResult, blueResult);
+         case ITechBlend.ALPHA_1_255:
+            return ColorUtils.getRGBInt(255, redResult, greenResult, blueResult);
+         case ITechBlend.ALPHA_2_INVERSE:
+            return mergeAlpha02_Inverse(base, blend, redResult, greenResult, blueResult);
+         case ITechBlend.ALPHA_3_MIN:
+            return mergeAlpha03_Min(base, blend, redResult, greenResult, blueResult);
+         case ITechBlend.ALPHA_4_MAX:
+            return mergeAlpha04_Max(base, blend, redResult, greenResult, blueResult);
+         case ITechBlend.ALPHA_5_RGB_AVERAGE:
+            return mergeAlpha05_RGBAverage(base, blend, redResult, greenResult, blueResult);
+         case ITechBlend.ALPHA_6_RGB_AVERAGE_INVERSE:
+            return mergeAlpha06_RGBAverageInverse(base, blend, redResult, greenResult, blueResult);
+         default:
+            throw new IllegalArgumentException();
+      }
+   }
+
+   protected static int mergeAlpha00_Over(int base, int blend, int redResult, int greenResult, int blueResult) {
+      int baseAlpha = ((base >> 24) & 0xFF);
+      int blendAlpha = ((blend >> 24) & 0xFF);
+      int alphaResult16 = 0;
+      if (blendAlpha == 0) {
+         return base;
+      } else {
+         alphaResult16 = ((blendAlpha << 8) + (baseAlpha << 8) - (blendAlpha * baseAlpha)) & 0xFF00;
+      }
+
+      if (blendAlpha != 255) {
+         float alphaFix = (float) blendAlpha / (float) 255;
+         float invAlphaFix = ((float) 1) - alphaFix;
+
+         int baseRed = ((base >> 16) & 0xFF);
+         int baseGreen = ((base >> 8) & 0xFF);
+         int baseBlue = ((base >> 0) & 0xFF);
+
+         redResult = overOperator(baseRed, redResult & 0xFF, alphaFix, invAlphaFix) & 0xFF;
+         greenResult = overOperator(baseGreen, greenResult & 0xFF, alphaFix, invAlphaFix) & 0xFF;
+         blueResult = overOperator(baseBlue, blueResult & 0xFF, alphaFix, invAlphaFix) & 0xFF;
+
+      }
+      //values are computed in base 16.
+      int val = (alphaResult16 << 16) + (redResult << 16) + (greenResult << 8) + (blueResult);
+      return val;
+   }
+
+   protected static int mergeAlpha02_Inverse(int base, int blend, int redResult, int greenResult, int blueResult) {
+      int baseAlpha = ((base >> 24) & 0xFF);
+      int blendAlpha = ((blend >> 24) & 0xFF);
+      int alpha = fctInverse(baseAlpha, blendAlpha);
+      return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
+   }
+
+   protected static int mergeAlpha03_Min(int base, int blend, int redResult, int greenResult, int blueResult) {
+      int baseAlpha = ((base >> 24) & 0xFF);
+      int blendAlpha = ((blend >> 24) & 0xFF);
+      int alpha = Math.min(baseAlpha, blendAlpha);
+      return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
+   }
+
+   protected static int mergeAlpha04_Max(int base, int blend, int redResult, int greenResult, int blueResult) {
+      int baseAlpha = ((base >> 24) & 0xFF);
+      int blendAlpha = ((blend >> 24) & 0xFF);
+      int alpha = Math.max(baseAlpha, blendAlpha);
+      return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
+   }
+
+   protected static int mergeAlpha05_RGBAverage(int base, int blend, int redResult, int greenResult, int blueResult) {
+      int alpha = getAverage(redResult, greenResult, blueResult);
+      return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
+   }
+
+   protected static int mergeAlpha06_RGBAverageInverse(int base, int blend, int redResult, int greenResult, int blueResult) {
+      int alpha = getAverage(255 - redResult, 255 - greenResult, 255 - blueResult);
+      return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
    }
 
    /**
@@ -373,7 +473,7 @@ public class BlendOp extends ObjectBoc implements IStringable {
     * @param blend
     * @return
     */
-   public static int mergeDarken(int base, int blend) {
+   public static int mergeDarken(int base, int blend, int alphaOp) {
 
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
@@ -387,7 +487,7 @@ public class BlendOp extends ObjectBoc implements IStringable {
       int greenResult = fctDarken(blendGreen, baseGreen);
       int blueResult = fctDarken(blendBlue, baseBlue);
 
-      return getAlphaFixed(base, blend, baseRed, baseGreen, baseBlue, redResult, greenResult, blueResult);
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
    public static int mergeLighten(int base, int blend, int alphaOp) {
@@ -404,48 +504,7 @@ public class BlendOp extends ObjectBoc implements IStringable {
       int greenResult = Math.max(blendGreen, baseGreen);
       int blueResult = Math.max(blendBlue, baseBlue);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
-      int blendAlpha = ((blend >> 24) & 0xFF);
-
-      if (alphaOp == ITechBlend.ALPHA_0_OVER) {
-         return getAlphaFixed(base, blend, baseAlpha, blendAlpha, baseRed, baseGreen, baseBlue, redResult, greenResult, blueResult);
-      } else if (alphaOp == ITechBlend.ALPHA_1_MERGE) {
-         int alpha = Math.max(baseAlpha, blendAlpha);
-         return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
-      } else {
-         return mergeAlpha(alphaOp, baseAlpha, blendAlpha, redResult, greenResult, blueResult);
-      }
-   }
-
-   private static int mergeAlpha(int alphaOp, int baseAlpha, int blendAlpha, int redResult, int greenResult, int blueResult) {
-      int alpha = 255;
-      switch (alphaOp) {
-         case ITechBlend.ALPHA_4_INVERSE:
-            alpha = fctInverse(baseAlpha, blendAlpha);
-            break;
-         case ITechBlend.ALPHA_5_MAX:
-            alpha = Math.max(baseAlpha, blendAlpha);
-            break;
-         case ITechBlend.ALPHA_6_MIN:
-            alpha = Math.min(baseAlpha, blendAlpha);
-            break;
-         case ITechBlend.ALPHA_5_RGB_AVERAGE:
-            alpha = getAverage(redResult, greenResult, blueResult);
-            break;
-         case ITechBlend.ALPHA_5_RGB_AVERAGE_INVERSE:
-            alpha = getAverage(255 - redResult, 255 - greenResult, 255 - blueResult);
-            break;
-
-         default:
-            break;
-      }
-      return ColorUtils.getRGBInt(alpha, redResult, greenResult, blueResult);
-   }
-
-   public static int getAverage(int r, int g, int b) {
-      int total = r + g + b;
-      return total / 3;
-
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
    /**
@@ -483,124 +542,100 @@ public class BlendOp extends ObjectBoc implements IStringable {
       return val;
    }
 
-   public static int mergePixelsDifference(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
+   public static int mergePixelsColorBurn(int base, int blend, int alphaOp) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
       int baseRed = ((base >> 16) & 0xFF);
       int baseGreen = ((base >> 8) & 0xFF);
       int baseBlue = ((base >> 0) & 0xFF);
 
-      int alphaResult = fctDifference(baseAlpha, blendAlpha);
+      int redResult = fctColorBurn(baseRed, blendRed);
+      int greenResult = fctColorBurn(baseGreen, blendGreen);
+      int blueResult = fctColorBurn(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsColorDodge(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
+      int redResult = fctColorDodge(baseRed, blendRed);
+      int greenResult = fctColorDodge(baseGreen, blendGreen);
+      int blueResult = fctColorDodge(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsDifference(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
       int redResult = fctDifference(baseRed, blendRed);
       int greenResult = fctDifference(baseGreen, blendGreen);
       int blueResult = fctDifference(baseBlue, blendBlue);
-      int val = (alphaResult << 16) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-      return val;
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
-   public static int mergePixelsDissolve(int base, int blend, Random r) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
+   public static int mergePixelsDissolve(int base, int blend, int alphaOp, Random r) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
       int baseRed = ((base >> 16) & 0xFF);
       int baseGreen = ((base >> 8) & 0xFF);
       int baseBlue = ((base >> 0) & 0xFF);
 
-      int alphaResult = fctDissolve(blendAlpha, baseAlpha, r);
       int redResult = fctDissolve(blendRed, baseRed, r);
       int greenResult = fctDissolve(blendGreen, baseGreen, r);
       int blueResult = fctDissolve(blendBlue, baseBlue, r);
-      int val = (alphaResult << 16) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-      return val;
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
-   public static int mergePixelsDivide(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
+   public static int mergePixelsDivide(int base, int blend, int alphaOp) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
       int baseRed = ((base >> 16) & 0xFF);
       int baseGreen = ((base >> 8) & 0xFF);
       int baseBlue = ((base >> 0) & 0xFF);
 
-      int alphaResult = fctDivideSrc(blendAlpha, baseAlpha);
       int redResult = fctDivideSrc(blendRed, baseRed);
       int greenResult = fctDivideSrc(blendGreen, baseGreen);
       int blueResult = fctDivideSrc(blendBlue, baseBlue);
-      int val = (alphaResult << 16) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-      return val;
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
-   public static int mergePixelsHardMix(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
+   public static int mergePixelsHardMix(int base, int blend, int alphaOp) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
       int baseRed = ((base >> 16) & 0xFF);
       int baseGreen = ((base >> 8) & 0xFF);
       int baseBlue = ((base >> 0) & 0xFF);
 
-      int alphaResult = fctHardMix(blendAlpha, baseAlpha);
       int redResult = fctHardMix(blendRed, baseRed);
       int greenResult = fctHardMix(blendGreen, baseGreen);
       int blueResult = fctHardMix(blendBlue, baseBlue);
 
-      int val = (alphaResult << 24) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-
-      return val;
-   }
-
-   public static int mergePixelsMathSubstract(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
-      int blendRed = ((blend >> 16) & 0xFF);
-      int blendGreen = ((blend >> 8) & 0xFF);
-      int blendBlue = ((blend >> 0) & 0xFF);
-
-      int baseAlpha = ((base >> 24) & 0xFF);
-      int baseRed = ((base >> 16) & 0xFF);
-      int baseGreen = ((base >> 8) & 0xFF);
-      int baseBlue = ((base >> 0) & 0xFF);
-
-      int alphaResult = fctSubstract(baseAlpha, blendAlpha);
-      int redResult = fctSubstract(baseRed, blendRed);
-      int greenResult = fctSubstract(baseGreen, blendGreen);
-      int blueResult = fctSubstract(baseBlue, blendBlue);
-
-      int val = (alphaResult << 24) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-
-      return val;
-   }
-
-   public static int mergePixelsMathAdd(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
-      int blendRed = ((blend >> 16) & 0xFF);
-      int blendGreen = ((blend >> 8) & 0xFF);
-      int blendBlue = ((blend >> 0) & 0xFF);
-
-      int baseAlpha = ((base >> 24) & 0xFF);
-      int baseRed = ((base >> 16) & 0xFF);
-      int baseGreen = ((base >> 8) & 0xFF);
-      int baseBlue = ((base >> 0) & 0xFF);
-
-      int alphaResult = fctAddition(baseAlpha, blendAlpha);
-      int redResult = fctAddition(baseRed, blendRed);
-      int greenResult = fctAddition(baseGreen, blendGreen);
-      int blueResult = fctAddition(baseBlue, blendBlue);
-
-      int val = (alphaResult << 24) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-
-      return val;
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
    /**
@@ -667,7 +702,7 @@ public class BlendOp extends ObjectBoc implements IStringable {
 
    }
 
-   public static int mergePixelsInverse(int base, int blend) {
+   public static int mergePixelsInverse(int base, int blend, int alphaOp) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
@@ -680,65 +715,87 @@ public class BlendOp extends ObjectBoc implements IStringable {
       int greenResult = fctInverse(baseGreen, blendGreen);
       int blueResult = fctInverse(baseBlue, blendBlue);
 
-      return getAlphaFixed(base, blend, baseRed, baseGreen, baseBlue, redResult, greenResult, blueResult);
-
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
-   public static int mergePixelsMultiply(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
+   public static int mergePixelsLinearBurn(int base, int blend, int alphaOp) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
       int baseRed = ((base >> 16) & 0xFF);
       int baseGreen = ((base >> 8) & 0xFF);
       int baseBlue = ((base >> 0) & 0xFF);
 
-      int alphaResult = fctMultiply(baseAlpha, blendAlpha);
+      int redResult = fctLinearBurn(baseRed, blendRed);
+      int greenResult = fctLinearBurn(baseGreen, blendGreen);
+      int blueResult = fctLinearBurn(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsLinearDodge(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
+      int redResult = fctLinearDodge(baseRed, blendRed);
+      int greenResult = fctLinearDodge(baseGreen, blendGreen);
+      int blueResult = fctLinearDodge(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsMathAdd(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
+      int redResult = fctAddition(baseRed, blendRed);
+      int greenResult = fctAddition(baseGreen, blendGreen);
+      int blueResult = fctAddition(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsMathSubstract(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
+      int redResult = fctSubstract(baseRed, blendRed);
+      int greenResult = fctSubstract(baseGreen, blendGreen);
+      int blueResult = fctSubstract(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsMultiply(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
       int redResult = fctMultiply(baseRed, blendRed);
       int greenResult = fctMultiply(baseGreen, blendGreen);
       int blueResult = fctMultiply(baseBlue, blendBlue);
-      int val = (alphaResult << 16) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-      return val;
-   }
 
-   public static int mergePixelsOverlay(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
-      int blendRed = ((blend >> 16) & 0xFF);
-      int blendGreen = ((blend >> 8) & 0xFF);
-      int blendBlue = ((blend >> 0) & 0xFF);
-
-      int baseAlpha = ((base >> 24) & 0xFF);
-      int baseRed = ((base >> 16) & 0xFF);
-      int baseGreen = ((base >> 8) & 0xFF);
-      int baseBlue = ((base >> 0) & 0xFF);
-
-      int alphaResult = fctOverlaySrc(baseAlpha, blendAlpha);
-      int redResult = fctOverlaySrc(baseRed, blendRed);
-      int greenResult = fctOverlaySrc(baseGreen, blendGreen);
-      int blueResult = fctOverlaySrc(baseBlue, blendBlue);
-      int val = (alphaResult << 16) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-      return val;
-   }
-
-   public static int mergePixelsOverlayDest(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
-      int blendRed = ((blend >> 16) & 0xFF);
-      int blendGreen = ((blend >> 8) & 0xFF);
-      int blendBlue = ((blend >> 0) & 0xFF);
-
-      int baseAlpha = ((base >> 24) & 0xFF);
-      int baseRed = ((base >> 16) & 0xFF);
-      int baseGreen = ((base >> 8) & 0xFF);
-      int baseBlue = ((base >> 0) & 0xFF);
-
-      int alphaResult = fctOverlayDest(baseAlpha, blendAlpha);
-      int redResult = fctOverlayDest(baseRed, blendRed);
-      int greenResult = fctOverlayDest(baseGreen, blendGreen);
-      int blueResult = fctOverlayDest(baseBlue, blendBlue);
-      int val = (alphaResult << 16) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-      return val;
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
    /**
@@ -814,26 +871,52 @@ public class BlendOp extends ObjectBoc implements IStringable {
       }
    }
 
-   public static int mergePixelsScreen(int base, int blend) {
-      int blendAlpha = ((blend >> 24) & 0xFF);
+   public static int mergePixelsOverlay(int base, int blend, int alphaOp) {
       int blendRed = ((blend >> 16) & 0xFF);
       int blendGreen = ((blend >> 8) & 0xFF);
       int blendBlue = ((blend >> 0) & 0xFF);
 
-      int baseAlpha = ((base >> 24) & 0xFF);
       int baseRed = ((base >> 16) & 0xFF);
       int baseGreen = ((base >> 8) & 0xFF);
       int baseBlue = ((base >> 0) & 0xFF);
 
-      int alphaResult = fctScreenFct(baseAlpha, blendAlpha);
+      int redResult = fctOverlaySrc(baseRed, blendRed);
+      int greenResult = fctOverlaySrc(baseGreen, blendGreen);
+      int blueResult = fctOverlaySrc(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsOverlayDest(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
+
+      int redResult = fctOverlayDest(baseRed, blendRed);
+      int greenResult = fctOverlayDest(baseGreen, blendGreen);
+      int blueResult = fctOverlayDest(baseBlue, blendBlue);
+
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
+   }
+
+   public static int mergePixelsScreenDodge(int base, int blend, int alphaOp) {
+      int blendRed = ((blend >> 16) & 0xFF);
+      int blendGreen = ((blend >> 8) & 0xFF);
+      int blendBlue = ((blend >> 0) & 0xFF);
+
+      int baseRed = ((base >> 16) & 0xFF);
+      int baseGreen = ((base >> 8) & 0xFF);
+      int baseBlue = ((base >> 0) & 0xFF);
 
       int redResult = fctScreenFct(baseRed, blendRed);
       int greenResult = fctScreenFct(baseGreen, blendGreen);
       int blueResult = fctScreenFct(baseBlue, blendBlue);
 
-      int val = (alphaResult << 24) + (redResult << 16) + (greenResult << 8) + (blueResult << 0);
-
-      return val;
+      return mergeAlpha(base, blend, alphaOp, redResult, greenResult, blueResult);
    }
 
    /**
@@ -943,8 +1026,8 @@ public class BlendOp extends ObjectBoc implements IStringable {
     * 
     * <li> {@link ITechBlend#ALPHA_0_OVER}
     * <li> {@link ITechBlend#ALPHA_1_MERGE}
-    * <li> {@link ITechBlend#ALPHA_2_255}
-    * <li> {@link ITechBlend#ALPHA_4_INVERSE}
+    * <li> {@link ITechBlend#ALPHA_1_255}
+    * <li> {@link ITechBlend#ALPHA_2_INVERSE}
     */
    protected int     modeAlpa;
 
@@ -1035,7 +1118,7 @@ public class BlendOp extends ObjectBoc implements IStringable {
             newPixel = src;
             break;
          case ITechBlend.BLENDING_02_DARKEN:
-            newPixel = mergeDarken(dest, src);
+            newPixel = mergeDarken(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_03_LIGHTEN:
             newPixel = mergeLighten(dest, src, modeAlpa);
@@ -1044,10 +1127,10 @@ public class BlendOp extends ObjectBoc implements IStringable {
             newPixel = mergePixelsARGB(dest, src);
             break;
          case ITechBlend.BLENDING_07_INVERSE:
-            newPixel = mergePixelsInverse(dest, src);
+            newPixel = mergePixelsInverse(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_08_DISSOLVE:
-            newPixel = mergePixelsDissolve(dest, src, r);
+            newPixel = mergePixelsDissolve(dest, src, modeAlpa, r);
             break;
          case ITechBlend.BLENDING_10_HUE:
             newPixel = mergePixelsHSBHue(dest, src, baseRS, blendRS);
@@ -1068,22 +1151,34 @@ public class BlendOp extends ObjectBoc implements IStringable {
             newPixel = mergePixelsHSBLum(dest, src, baseRS, blendRS);
             break;
          case ITechBlend.BLENDING_16_MULTIPLY_BURN:
-            newPixel = mergePixelsMultiply(dest, src);
+            newPixel = mergePixelsMultiply(dest, src, modeAlpa);
+            break;
+         case ITechBlend.BLENDING_17_COLOR_BURN:
+            newPixel = mergePixelsColorBurn(dest, src, modeAlpa);
+            break;
+         case ITechBlend.BLENDING_18_LINEAR_BURN:
+            newPixel = mergePixelsLinearBurn(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_19_SCREEN_DODGE:
-            newPixel = mergePixelsScreen(dest, src);
+            newPixel = mergePixelsScreenDodge(dest, src, modeAlpa);
+            break;
+         case ITechBlend.BLENDING_20_COLOR_DODGE:
+            newPixel = mergePixelsColorDodge(dest, src, modeAlpa);
+            break;
+         case ITechBlend.BLENDING_21_LINEAR_DODGE:
+            newPixel = mergePixelsLinearDodge(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_22_HARD_MIX:
-            newPixel = mergePixelsHardMix(dest, src);
+            newPixel = mergePixelsHardMix(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_23_ADDITION:
-            newPixel = mergePixelsMathAdd(dest, src);
+            newPixel = mergePixelsMathAdd(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_24_DIFFERENCE:
-            newPixel = mergePixelsMathSubstract(dest, src);
+            newPixel = mergePixelsMathSubstract(dest, src, modeAlpa);
             break;
          case ITechBlend.BLENDING_25_DIVIDE:
-            newPixel = mergePixelsDivide(dest, src);
+            newPixel = mergePixelsDivide(dest, src, modeAlpa);
             break;
          default:
             //SystemLog.printDraw("#BlendOp WARNING Unknown Blend Operator " + mode + " Returning Base Value");
@@ -1374,6 +1469,15 @@ public class BlendOp extends ObjectBoc implements IStringable {
       return Dctx.toString1Line(this);
    }
 
+   public void toString1Line(Dctx dc) {
+      dc.root1Line(this, "BlendOp");
+      toStringPrivate(dc);
+   }
+
+   public UCtx toStringGetUCtx() {
+      return boc.getUC();
+   }
+
    private void toStringPrivate(Dctx sb) {
       sb.append("#BlendOp ");
       sb.append(ToStringStaticBO.toStringBlend(mode));
@@ -1386,15 +1490,6 @@ public class BlendOp extends ObjectBoc implements IStringable {
       sb.nl();
       sb.append("PorterAlpha=" + isPorterAlpha);
       sb.append(" AlphaSwap=" + isAlphaSwap);
-   }
-
-   public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "BlendOp");
-      toStringPrivate(dc);
-   }
-
-   public UCtx toStringGetUCtx() {
-      return boc.getUC();
    }
 
    //#enddebug

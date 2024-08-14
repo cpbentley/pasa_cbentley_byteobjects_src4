@@ -8,7 +8,6 @@ import pasa.cbentley.byteobjects.src4.core.BOAbstractOperator;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.Dctx;
 
@@ -154,8 +153,6 @@ public class PointerOperator extends BOAbstractOperator implements IBOPointer {
 
    }
 
-   //#enddebug
-
    /**
     * Because
     * @param pointer
@@ -169,25 +166,16 @@ public class PointerOperator extends BOAbstractOperator implements IBOPointer {
    }
 
    //#mdebug
-   public String toString() {
-      return Dctx.toString(this);
-   }
-
    public void toString(Dctx dc) {
-      dc.root(this, "Pointer");
-   }
-
-   public String toString1Line() {
-      return Dctx.toString1Line(this);
+      dc.root(this, PointerOperator.class, 172);
+      toStringPrivate(dc);
+      super.toString(dc.sup());
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, "Pointer");
-   }
-
-
-   public UCtx toStringGetUCtx() {
-      return boc.getUC();
+      dc.root1Line(this, PointerOperator.class, 172);
+      toStringPrivate(dc);
+      super.toString1Line(dc.sup1Line());
    }
 
    public void toStringPointer(ByteObject pointer, StringBBuilder sb, String nl) {
@@ -210,6 +198,10 @@ public class PointerOperator extends BOAbstractOperator implements IBOPointer {
          sb.append(" ValueSize = " + pointer.get1(POINTER_OFFSET_03_SIZE_OR_FLAG1));
       }
       sb.append(" Type=" + pointer.get1(POINTER_OFFSET_04_TYPE1));
+   }
+
+   private void toStringPrivate(Dctx dc) {
+
    }
    //#enddebug
 }

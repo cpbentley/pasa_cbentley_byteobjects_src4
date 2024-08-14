@@ -313,7 +313,7 @@ public class ByteObject implements IByteObject, IStringable {
          return 0;
       } else {
          //the flag is already set
-         param = boc.getBOU().increaseCapacity(param, 1);
+         increaseCapacityParams(1);
          param[param.length - 1] = bo;
          return param.length - 1;
       }
@@ -321,8 +321,6 @@ public class ByteObject implements IByteObject, IStringable {
 
    /**
     * Adds non null {@link ByteObject}s.
-    * <br>
-    * <br>
     * 
     * @param bos
     */
@@ -340,8 +338,14 @@ public class ByteObject implements IByteObject, IStringable {
       this.setFlag(flagOffset, flag, true);
    }
 
+   public void addByteObjectsNullsTrimmed(ByteObject[] bos) {
+      immutableCheck();
+      bos = boc.getBOU().getTrim(bos);
+      addByteObjectWithNulls(bos);
+   }
+
    /**
-    * Replace existing {@link ByteObject} that has the same type.
+    * Replace the first existing {@link ByteObject} that has the same type.
     * <p>
     * When {@link ByteObject} is null, nothing happens and return -1;
     * </p>
@@ -367,7 +371,7 @@ public class ByteObject implements IByteObject, IStringable {
             }
          }
          //the flag is already set
-         param = boc.getBOU().increaseCapacity(param, 1);
+         increaseCapacityParams(1);
          param[param.length - 1] = bo;
          return param.length - 1;
       }
@@ -386,9 +390,29 @@ public class ByteObject implements IByteObject, IStringable {
          return 0;
       } else {
          //the flag is already set
-         param = boc.getBOU().increaseCapacity(param, 1);
+         increaseCapacityParams(1);
          param[param.length - 1] = bo;
          return param.length - 1;
+      }
+   }
+
+   /**
+    * Direct copy of the array. no inside null checks
+    * @param bos
+    */
+   public void addByteObjectWithNulls(ByteObject[] bos) {
+      if (bos == null) {
+         return;
+      }
+      if (param == null) {
+         param = bos;
+         setFlag(A_OBJECT_OFFSET_2_FLAG, A_OBJECT_FLAG_5_HAS_SUBS, true);
+      } else {
+         //the flag is already set
+         int len = bos.length;
+         int lenB = param.length;
+         increaseCapacityParams(len);
+         System.arraycopy(bos, 0, param, lenB, len);
       }
    }
 
@@ -791,6 +815,14 @@ public class ByteObject implements IByteObject, IStringable {
          }
       }
       return true;
+   }
+
+   public void flagToggle(int index, int flag) {
+      if (hasFlag(index, flag)) {
+         setFlag(index, flag, false);
+      } else {
+         setFlag(index, flag, true);
+      }
    }
 
    /**
@@ -1398,32 +1430,25 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
-    * Returns the num_th object whose type is type, and whose value at index of size size is equal
-    * to the given value
+    * Append at offset
+    * @param ar
+    * @param offset
     * @param type
-    * @param subType
-    * @param index
-    * @param size
-    * @param num 0 means first
     * @return
+    * @throws ArrayIndexOutOfBoundsException if ar is not big enough
     */
-   public ByteObject getSubSub(int type, int subType, int index, int size, int num) {
-      if (param == null)
-         return null;
-      int count = 0;
+   public int getSubAppend(ByteObject[] ar, int offset, int type) {
+      if (param == null) {
+         return 0;
+      }
+      int count = offset;
       for (int i = 0; i < param.length; i++) {
-         ByteObject subObject = param[i];
-         if (subObject != null && subObject.getType() == type) {
-            int value = subObject.getValue(index, size);
-            if (value == subType) {
-               if (count == num) {
-                  return subObject;
-               }
-               count++;
-            }
+         if (param[i] != null && param[i].getType() == type) {
+            ar[count] = param[i];
+            count++;
          }
       }
-      return null;
+      return count - offset;
    }
 
    public ByteObject getSubAtIndex(int index) {
@@ -1475,18 +1500,6 @@ public class ByteObject implements IByteObject, IStringable {
    public ByteObject getSubFirst(int type) {
       ByteObject p = getSubOrder(type, 0);
       return p;
-   }
-
-   /**
-    * 
-    * @param type
-    * @param subtype
-    * @param index
-    * @param size
-    * @return
-    */
-   public ByteObject getSubSubFirst(int type, int subtype, int index, int size) {
-      return getSubSub(type, subtype, index, size, 0);
    }
 
    public ByteObject getSubFirstEx(int type, int typeEx) {
@@ -1577,23 +1590,6 @@ public class ByteObject implements IByteObject, IStringable {
       for (int i = 0; i < param.length; i++) {
          if (param[i] != null && param[i].getType() == type) {
             count++;
-         }
-      }
-      return count;
-   }
-
-   public int getSubSubNum(int type, int subTypeOffset, int subTypeSize, int subType) {
-      if (param == null) {
-         return 0;
-      }
-      int count = 0;
-      for (int i = 0; i < param.length; i++) {
-         ByteObject subObject = param[i];
-         if (subObject != null && subObject.getType() == type) {
-            int value = subObject.getValue(subTypeOffset, subTypeSize);
-            if (value == subType) {
-               count++;
-            }
          }
       }
       return count;
@@ -1699,38 +1695,62 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public ByteObject[] getSubs(int type) {
       int num = getSubNum(type);
-      ByteObject[] p = new ByteObject[num];
+      ByteObject[] results = new ByteObject[num];
       int count = 0;
-      for (int i = 0; i < p.length; i++) {
+      for (int i = 0; i < param.length; i++) {
          //will not enter loop when param is null since num is zero
          if (param[i] != null && param[i].getType() == type) {
-            p[count] = param[i];
+            results[count] = param[i];
             count++;
          }
       }
-      return p;
+      return results;
+   }
+
+   public ByteObject[] getSubsRange(int index, int len) {
+      ByteObject[] ar = new ByteObject[len];
+      System.arraycopy(param, index, ar, 0, len);
+      return ar;
    }
 
    /**
-    * Append at offset
-    * @param ar
-    * @param offset
-    * @param type
+    * Includes last index.
+    * @param indexStart
+    * @param indexEnd
     * @return
-    * @throws ArrayIndexOutOfBoundsException if ar is not big enough
     */
-   public int getSubAppend(ByteObject[] ar, int offset, int type) {
-      if (param == null) {
-         return 0;
-      }
-      int count = offset;
+   public ByteObject[] getSubsRangeStartEnd(int indexStart, int indexEnd) {
+      int len = indexEnd - indexStart + 1;
+      return getSubsRange(indexStart, len);
+   }
+
+   /**
+    * Returns the num_th object whose type is type, and whose value at index of size size is equal
+    * to the given value
+    * @param type
+    * @param subType
+    * @param index
+    * @param size
+    * @param num 0 means first
+    * @return
+    */
+   public ByteObject getSubSub(int type, int subType, int index, int size, int num) {
+      if (param == null)
+         return null;
+      int count = 0;
       for (int i = 0; i < param.length; i++) {
-         if (param[i] != null && param[i].getType() == type) {
-            ar[count] = param[i];
-            count++;
+         ByteObject subObject = param[i];
+         if (subObject != null && subObject.getType() == type) {
+            int value = subObject.getValue(index, size);
+            if (value == subType) {
+               if (count == num) {
+                  return subObject;
+               }
+               count++;
+            }
          }
       }
-      return count - offset;
+      return null;
    }
 
    /**
@@ -1759,6 +1779,35 @@ public class ByteObject implements IByteObject, IStringable {
          }
       }
       return count - offset;
+   }
+
+   /**
+    * 
+    * @param type
+    * @param subtype
+    * @param index
+    * @param size
+    * @return
+    */
+   public ByteObject getSubSubFirst(int type, int subtype, int index, int size) {
+      return getSubSub(type, subtype, index, size, 0);
+   }
+
+   public int getSubSubNum(int type, int subTypeOffset, int subTypeSize, int subType) {
+      if (param == null) {
+         return 0;
+      }
+      int count = 0;
+      for (int i = 0; i < param.length; i++) {
+         ByteObject subObject = param[i];
+         if (subObject != null && subObject.getType() == type) {
+            int value = subObject.getValue(subTypeOffset, subTypeSize);
+            if (value == subType) {
+               count++;
+            }
+         }
+      }
+      return count;
    }
 
    /**
@@ -2169,6 +2218,10 @@ public class ByteObject implements IByteObject, IStringable {
       }
    }
 
+   private void increaseCapacityParams(int incr) {
+      param = boc.getBOU().increaseCapacity(param, incr);
+   }
+
    /**
     * Versioning does not work on value objects.
     * <br>
@@ -2389,6 +2442,11 @@ public class ByteObject implements IByteObject, IStringable {
       set4(index, intf);
    }
 
+   public void set4To(ByteObject bo, int index) {
+      int value = this.get4(index);
+      bo.set4(index, value);
+   }
+
    public void set8Double(int index, double v) {
       long intf = Double.doubleToLongBits(v);
       setLong(index, intf);
@@ -2427,6 +2485,11 @@ public class ByteObject implements IByteObject, IStringable {
    public void setByteObjects(ByteObject[] bos) {
       immutableCheck();
       this.param = bos;
+   }
+
+   public void setByteObjectsTrimmed(ByteObject[] bos) {
+      immutableCheck();
+      this.param = boc.getBOU().getTrim(bos);
    }
 
    public void setDynBOParamValues(int index, int[] values) {
@@ -3115,15 +3178,6 @@ public class ByteObject implements IByteObject, IStringable {
       return boc.toDLog();
    }
 
-   public void toggleFlag(int index, int flag) {
-      if (hasFlag(index, flag)) {
-         setFlag(index, flag, false);
-      } else {
-         setFlag(index, flag, true);
-      }
-   }
-
-   //#mdebug
    public String toString() {
       return Dctx.toString(this);
    }
@@ -3296,7 +3350,9 @@ public class ByteObject implements IByteObject, IStringable {
     * @return null if unknown
     */
    public String toStringType() {
-      return boc.getBOModuleManager().toStringType(this.getType());
+      BOModulesManager boModuleManager = boc.getBOModuleManager();
+      int type = this.getType();
+      return boModuleManager.toStringType(type);
    }
 
    public void toStringTypeDebugMsg(Dctx dc) {

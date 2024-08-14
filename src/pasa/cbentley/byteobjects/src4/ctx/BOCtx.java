@@ -35,7 +35,7 @@ import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralIntFactory;
 import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralIntOperator;
 import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralStringFactory;
 import pasa.cbentley.byteobjects.src4.objects.litteral.LitteralStringOperator;
-import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
+import pasa.cbentley.byteobjects.src4.objects.pointer.MergeFactory;
 import pasa.cbentley.byteobjects.src4.objects.pointer.PointerFactory;
 import pasa.cbentley.byteobjects.src4.objects.pointer.PointerOperator;
 import pasa.cbentley.byteobjects.src4.sources.RootSource;
@@ -96,15 +96,15 @@ import pasa.cbentley.core.src4.logging.IStringable;
 public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToStringsDIDsBoc, IEventsBO {
 
    //what about sub classing? isA relationship.. subclass must keep the same ID
-   public static final int          CTX_ID  = 6;
+   public static final int          CTX_ID  = 2;
 
    private AcceptorFactory          acceptorC;
 
    private AcceptorOperator         acceptorStatic;
 
-   private ActionOperator           actionOp;
-
    private ActionFactory            actionFactory;
+
+   private ActionOperator           actionOp;
 
    private ByteObjectUtilz          boU;
 
@@ -114,8 +114,23 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    private ByteObjectManagedFactory byteObjectManagedFactory;
 
+   private ColorFunctionFactory colorFunctionFactory;
 
-   private FunctionFactory          functionC;
+   private ColorOperator        colorOperator;
+
+   private EventBusArray        eventBus;
+
+   private FactoryByteObject    factoryByteObject;
+
+   private FilterFactory        filterFactory;
+
+   private FilterOperator       filterOperator;
+
+   private FunctionFactory          functionFac;
+
+   private GradientFactory      gradientFactory;
+
+   private GradientOperator     gradientOperator;
 
    private LitteralManager          litteral;
 
@@ -129,7 +144,7 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    private LockManager              lockManager;
 
-   private MergeMaskFactory         mergeMask;
+   private MergeFactory             mergeMask;
 
    /**
     * Know specifics about {@link ByteObject}
@@ -163,22 +178,22 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    private ValuesInArrayReader      valueReadCache;
 
-   public BOCtx(UCtx uc) {
-      super(uc);
+   public BOCtx(IConfigBOC config, UCtx uc) {
+      super(config, uc);
       moduleManager = new BOModulesManager(this);
       lockManager = new LockManager(this);
       boU = new ByteObjectUtilz(this);
       litteral = new LitteralManager(this);
       pointerOperator = new PointerOperator(this);
       pointerFactory = new PointerFactory(this);
-      functionC = new FunctionFactory(this);
+      functionFac = new FunctionFactory(this);
       acceptorC = new AcceptorFactory(this);
 
       module = new BOModuleCore(this);
 
       acceptorStatic = new AcceptorOperator(this);
       byteObjectC = new ByteObjectFactory(this);
-      mergeMask = new MergeMaskFactory(this);
+      mergeMask = new MergeFactory(this);
 
       CtxManager c = uc.getCtxManager();
 
@@ -191,8 +206,12 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBoc.A_DID_OFFSET_A_BOC, IToStringsDIDsBoc.A_DID_OFFSET_Z_BOC);
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBocFun.A_DID_OFFSET_A_BOC_FUN, IToStringsDIDsBocFun.A_DID_OFFSET_Z_BOC_FUN);
       toDLog().pInit("", this, BOCtx.class, "Created@192", LVL_04_FINER, true);
-      
+
       //#enddebug
+   }
+
+   public BOCtx(UCtx uc) {
+      this(new ConfigBOCDefault(), uc);
    }
 
    public AcceptorFactory getAcceptorFactory() {
@@ -203,18 +222,18 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       return acceptorStatic;
    }
 
-   public ActionOperator getActionOp() {
-      if (actionOp == null) {
-         actionOp = new ActionOperator(this);
-      }
-      return actionOp;
-   }
-
    public ActionFactory getActionFactory() {
       if (actionFactory == null) {
          actionFactory = new ActionFactory(this);
       }
       return actionFactory;
+   }
+
+   public ActionOperator getActionOp() {
+      if (actionOp == null) {
+         actionOp = new ActionOperator(this);
+      }
+      return actionOp;
    }
 
    /**
@@ -236,29 +255,6 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       return boU;
    }
 
-   private FactoryByteObject    factoryByteObject;
-
-   private ColorFunctionFactory colorFunctionFactory;
-
-   private GradientOperator     gradientOperator;
-
-   private GradientFactory      gradientFactory;
-
-   private FilterFactory        filterFactory;
-
-   private FilterOperator       filterOperator;
-
-   private EventBusArray eventBus;
-
-   private ColorOperator colorOperator;
-
-   public FactoryByteObject getFactoryByteObject() {
-      if (factoryByteObject == null) {
-         factoryByteObject = new FactoryByteObject();
-      }
-      return factoryByteObject;
-   }
-
    public ByteControllerFactory getByteControllerFactory() {
       if (byteControllerFactory == null) {
          byteControllerFactory = new ByteControllerFactory(this);
@@ -277,12 +273,30 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       return byteObjectManagedFactory;
    }
 
+   public ColorFunctionFactory getColorFunctionFactory() {
+      if (colorFunctionFactory == null) {
+         colorFunctionFactory = new ColorFunctionFactory(this);
+      }
+      return colorFunctionFactory;
+   }
+
+   public ColorOperator getColorOperator() {
+      if (colorOperator == null) {
+         colorOperator = new ColorOperator(this);
+      }
+      return colorOperator;
+   }
+
    public IConfig getConfig() {
       return null;
    }
 
    public int getCtxID() {
       return CTX_ID;
+   }
+
+   public IDebugStringable getDIDer() {
+      return getBOModuleManager();
    }
 
    public int[] getEventBaseTopology() {
@@ -299,16 +313,43 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       return eventBus;
    }
 
+   public FactoryByteObject getFactoryByteObject() {
+      if (factoryByteObject == null) {
+         factoryByteObject = new FactoryByteObject();
+      }
+      return factoryByteObject;
+   }
+
+   public FilterFactory getFilterFactory() {
+      if (filterFactory == null) {
+         filterFactory = new FilterFactory(this);
+      }
+      return filterFactory;
+   }
+
+   public FilterOperator getFilterOperator() {
+      if (filterOperator == null) {
+         filterOperator = new FilterOperator(this);
+      }
+      return filterOperator;
+   }
+
    public FunctionFactory getFunctionFactory() {
-      return functionC;
+      return functionFac;
    }
 
-   public Random getRandom() {
-      return uc.getRandom();
+   public GradientFactory getGradientFactory() {
+      if (gradientFactory == null) {
+         gradientFactory = new GradientFactory(this);
+      }
+      return gradientFactory;
    }
 
-   public IDebugStringable getDIDer() {
-      return getBOModuleManager();
+   public GradientOperator getGradientOperator() {
+      if (gradientOperator == null) {
+         gradientOperator = new GradientOperator(this);
+      }
+      return gradientOperator;
    }
 
    public LitteralIntFactory getLitteralIntFactory() {
@@ -332,48 +373,6 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       return litteralStringFactory;
    }
 
-   public FilterFactory getFilterFactory() {
-      if (filterFactory == null) {
-         filterFactory = new FilterFactory(this);
-      }
-      return filterFactory;
-   }
-
-   public FilterOperator getFilterOperator() {
-      if (filterOperator == null) {
-         filterOperator = new FilterOperator(this);
-      }
-      return filterOperator;
-   }
-
-   public GradientFactory getGradientFactory() {
-      if (gradientFactory == null) {
-         gradientFactory = new GradientFactory(this);
-      }
-      return gradientFactory;
-   }
-
-   public GradientOperator getGradientOperator() {
-      if (gradientOperator == null) {
-         gradientOperator = new GradientOperator(this);
-      }
-      return gradientOperator;
-   }
-   
-   public ColorOperator getColorOperator() {
-      if(colorOperator == null) {
-         colorOperator = new ColorOperator(this);
-      }
-      return colorOperator;
-   }
-
-   public ColorFunctionFactory getColorFunctionFactory() {
-      if (colorFunctionFactory == null) {
-         colorFunctionFactory = new ColorFunctionFactory(this);
-      }
-      return colorFunctionFactory;
-   }
-
    public LitteralStringOperator getLitteralStringOperator() {
       if (litteralStringOperator == null) {
          litteralStringOperator = new LitteralStringOperator(this);
@@ -385,13 +384,9 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       return lockManager;
    }
 
-   public MergeMaskFactory getMergeMaskFactory() {
+   public MergeFactory getMergeFactory() {
       return mergeMask;
    }
-
-   //   public LitteralManager getLitteral() {
-   //      return litteral;
-   //   }
 
    /**
     * The {@link BOModuleAbstract} handling definitions of {@link ByteObject} with {@link BOCtx} 
@@ -401,6 +396,10 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
    public BOModuleAbstract getModule() {
       return module;
    }
+
+   //   public LitteralManager getLitteral() {
+   //      return litteral;
+   //   }
 
    public PointerFactory getPointerFactory() {
       return pointerFactory;
@@ -416,6 +415,10 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
     */
    public PointerOperator getPointerOperator() {
       return pointerOperator;
+   }
+
+   public Random getRandom() {
+      return uc.getRandom();
    }
 
    /**
@@ -448,15 +451,6 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       dc.nlLvl(valueReadCache, "valueReadCache");
    }
 
-   public String toStringStaticID(int staticID) {
-      switch (staticID) {
-         case IStaticIDsBO.SID_BYTEOBJECT_TYPES:
-            return "BoTypes";
-         default:
-            return null;
-      }
-   }
-
    public void toString1Line(Dctx dc) {
       dc.root1Line(this, BOCtx.class);
       toStringPrivate(dc);
@@ -467,5 +461,14 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
 
    }
    //#enddebug
+
+   public String toStringStaticID(int staticID) {
+      switch (staticID) {
+         case IStaticIDsBO.SID_BYTEOBJECT_TYPES:
+            return "BoTypes";
+         default:
+            return null;
+      }
+   }
 
 }

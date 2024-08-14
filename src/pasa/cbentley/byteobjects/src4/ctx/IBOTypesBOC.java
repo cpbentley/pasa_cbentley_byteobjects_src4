@@ -9,8 +9,8 @@ import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IBOCtxSettings;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.objects.color.GradientFunction;
-import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
-import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMergeMask;
+import pasa.cbentley.byteobjects.src4.objects.function.IBOFunction;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMerge;
 import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
 
 /**
@@ -120,34 +120,10 @@ public interface IBOTypesBOC {
    public static final int TYPE_010_POINTER              = 10;
 
    /**
-    * Describes an incomplete {@link ByteObject}. See {@link IBOMergeMask}.
-    * <br>
-    * <br>
-    * It tells which flags and values are opaque/defined in a description.
-    * <br>
-    * Starts with 4 bytes for up to 4 flags<br>
-    * <li>1st byte codes for the first flag
-    * <li>2nd byte codes for the 2nd flag
-    * <li>3..
-    * <li>4...
-    * <br>
-    * We also have 2 bytes for up to 16 values
-    * <li>5th byte code for 8 values
-    * <li>6th byte codes for another 8 values.
-    * <br>
-    * <br>
-    * The merge mask lighten up the descriptions who don't have to reserve byte data for the task.
-    * <br>
-    * And since incomplete ByteObject are at most 50% of the total population.
-    * <br>
-    * <br>
-    * Some types like ANCHOR don't need Merge Mask because they have enough space to code to data transparency.
-    * <br>
-    * Types that don't need a Merge Mask:
-    * <li> {@link ByteObject#TYPE_ANCHOR}
-    * <br>
-    * <br>
-    * Figures have to use a Merge Mask.
+    * See {@link IBOMerge}.
+    * <p>
+    * Container for additional merge data that cannot be coded in the type ByteObject definition.
+    * </p>
     */
    public static final int TYPE_011_MERGE_MASK           = 11;
 
@@ -161,6 +137,8 @@ public interface IBOTypesBOC {
     * 
     */
    public static final int TYPE_013_TEMPLATE             = 13;
+
+   public static final int TYPE_014_                     = 14;
 
    /**
     * Special type saying that the given byte object is not really a {@link ByteObject} but a reference
@@ -178,6 +156,8 @@ public interface IBOTypesBOC {
     * 
     */
    public static final int TYPE_017_REFERENCE_OBJECT     = 17;
+
+   public static final int TYPE_018_                     = 18;
 
    public static final int TYPE_019_RELATIONSHIP         = 19;
 
@@ -200,12 +180,16 @@ public interface IBOTypesBOC {
     */
    public static final int TYPE_022_ACCEPTOR             = 22;
 
+   public static final int TYPE_023_                     = 23;
+
+   public static final int TYPE_024_                     = 24;
+
    /**
     * Action on Pointers. 
     * <br>
     * <li> Toggles a flag of a {@link ByteObject}
     * <li> Swap values from 2 {@link ByteObject} with a {@link IBOPointer}.
-    * <li> Applies a {@link ITechFunction} to a {@link ByteObject}.
+    * <li> Applies a {@link IBOFunction} to a {@link ByteObject}.
     */
    public static final int TYPE_025_ACTION               = 25;
 
@@ -244,6 +228,15 @@ public interface IBOTypesBOC {
     * 
     */
    public static final int TYPE_029_ARRAY_MAP            = 29;
+
+   /**
+    * Definition of a 
+    */
+   public static final int TYPE_030_ANIM                 = 30;
+
+   public static final int TYPE_031                      = 31;
+
+   public static final int TYPE_032                      = 32;
 
    /**
     * Max 65k
@@ -295,6 +288,8 @@ public interface IBOTypesBOC {
     */
    public static final int TYPE_038_GRADIENT             = 38;
 
+   public static final int TYPE_039_BLENDER              = 39;
+
    /**
     * Filters a RGB array (RgbImage or Image) using a given function.
     * An important category is Translucent filters that work on the alpha channel
@@ -316,7 +311,13 @@ public interface IBOTypesBOC {
 
    public static final int TYPE_041_COLOR_RANDOM         = 41;
 
-   public static final int TYPE_039_BLENDER              = 39;
+   public static final int TYPE_042                      = 42;
+
+   public static final int TYPE_043                      = 43;
+
+   public static final int TYPE_044                      = 44;
+
+   public static final int TYPE_045                      = 45;
 
    public static final int TYPE_255_RESERVED             = 255;
 

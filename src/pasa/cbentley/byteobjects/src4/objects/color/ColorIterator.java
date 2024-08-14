@@ -122,7 +122,7 @@ public class ColorIterator extends ObjectBoc implements IStringable {
     * The size in pixels of an iteration step.
     * <br>
     * <br>
-    * {@link IBOGradient#GRADIENT_OFFSET_07_STEP1}.
+    * {@link IBOGradient#GRADIENT_OFFSET_08_STEP1}.
     */
    int         stepPixelValue = 1;
 

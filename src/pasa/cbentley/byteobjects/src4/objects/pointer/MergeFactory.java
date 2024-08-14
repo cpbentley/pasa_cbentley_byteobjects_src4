@@ -24,9 +24,9 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  * @author Charles Bentley
  *
  */
-public class MergeMaskFactory extends BOAbstractFactory implements IBOMergeMask {
+public class MergeFactory extends BOAbstractFactory implements IBOMerge {
 
-   public MergeMaskFactory(BOCtx boc) {
+   public MergeFactory(BOCtx boc) {
       super(boc);
    }
 
@@ -43,22 +43,42 @@ public class MergeMaskFactory extends BOAbstractFactory implements IBOMergeMask 
       o.setValue(offset, value, size);
       ByteObject mm = o.getSubFirst(IBOTypesBOC.TYPE_011_MERGE_MASK);
       if (mm == null) {
-         mm = new ByteObject(boc, IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_MASK_BASIC_SIZE);
+         mm = new ByteObject(boc, IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_BASIC_SIZE);
          o.addByteObject(mm);
       }
       mm.setFlag(mmoffset, mmflag, true);
    }
 
-   public int mergeFlag(ByteObject root, ByteObject merge, ByteObject mm, int pointer, int mergePointer) {
-      int flag = root.get1(pointer);
-      int flagM = merge.get1(pointer);
-      int flagMM = mm.get1(mergePointer);
-      for (int i = 1; i <= 8; i++) {
-         if (BitUtils.isBitSet(flagMM, i)) {
-            flag = BitUtils.setBit(flag, i, BitUtils.getBit(i, flagM));
-         }
+   public ByteObject createMerge() {
+      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_BASIC_SIZE);
+      return p;
+   }
+   
+   public boolean isOpaque(ByteObject merge, int offset, int flag) {
+      boolean isReverse = merge.hasFlag(MERGE_MASK_OFFSET_01_FLAG1, MERGE_FLAG_2_REVERSE);
+      boolean isFlagSet = merge.hasFlag(offset, flag);
+      if(isReverse) {
+         return !isFlagSet;
+      } else {
+         return isFlagSet;
       }
-      return flag;
+   }
+   
+   /**
+    *  {@link IBOMerge#MERGE_FLAG_2_REVERSE}
+    * @param merge
+    * @param offset
+    * @param flag
+    * @return
+    */
+   public boolean isTransparent(ByteObject merge, int offset, int flag) {
+      boolean isReverse = merge.hasFlag(MERGE_MASK_OFFSET_01_FLAG1, MERGE_FLAG_2_REVERSE);
+      boolean isFlagSet = merge.hasFlag(offset, flag);
+      if(isReverse) {
+         return isFlagSet;
+      } else {
+         return !isFlagSet;
+      }
    }
 
    /**
@@ -79,10 +99,21 @@ public class MergeMaskFactory extends BOAbstractFactory implements IBOMergeMask 
     * @see ByteObject
     */
    public ByteObject createMergeMask(int pointer, int flag) {
-      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_MASK_BASIC_SIZE);
+      ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_BASIC_SIZE);
       p.setFlag(pointer, flag, true);
       return p;
    }
+
+   /**
+    * The {@link IBOMerge} tells what field is Transparent
+    * @return
+    */
+   public ByteObject createMergeReverse() {
+      ByteObject m = createMerge();
+      m.setFlag(MERGE_MASK_OFFSET_01_FLAG1, MERGE_FLAG_2_REVERSE, true);
+      return m;
+   }
+
    /**
     * Create a mask over a single flag.
     * <br>
@@ -101,9 +132,25 @@ public class MergeMaskFactory extends BOAbstractFactory implements IBOMergeMask 
     * @see ByteObject
     */
    public ByteObject getMergeMask(int pointer, int flag) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_MASK_BASIC_SIZE);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_011_MERGE_MASK, MERGE_BASIC_SIZE);
       p.setFlag(pointer, flag, true);
       return p;
+   }
+
+   public int mergeFlag(ByteObject root, ByteObject merge, ByteObject mm, int pointer, int mergePointer) {
+      int flag = root.get1(pointer);
+      int flagM = merge.get1(pointer);
+      int flagMM = mm.get1(mergePointer);
+      for (int i = 1; i <= 8; i++) {
+         if (BitUtils.isBitSet(flagMM, i)) {
+            flag = BitUtils.setBit(flag, i, BitUtils.getBit(i, flagM));
+         }
+      }
+      return flag;
+   }
+
+   public void setFlag2(ByteObject merge) {
+      merge.setFlag(MERGE_MASK_OFFSET_05_VALUES1, MERGE_MASK_FLAG5_2, true);
    }
 
    /**
@@ -119,37 +166,27 @@ public class MergeMaskFactory extends BOAbstractFactory implements IBOMergeMask 
       obj.addByteObjectUniqueType(mm);
    }
 
-   /**
-    * Sets the Incomplete Flag to true and adds the merge mask to the ByteObject array
-    * @param mm
-    * @param o
-    */
-   public void setMergeMask(ByteObject mm, ByteObject o) {
-      //only accept one mm
-      o.addByteObjectUniqueType(mm);
-   }
-
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, MergeMaskFactory.class, 113);
+      dc.root(this, MergeFactory.class, 113);
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, MergeMaskFactory.class);
-   }
-
-   public void toStringMergeMask(Dctx sb, ByteObject bo) {
-      sb.rootN(bo, "MergeMask");
-      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_1FLAG1, "Flag1");
-      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_2FLAG1, "Flag2");
-      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_3FLAG1, "Flag3");
-      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_4FLAG1, "Flag4");
-      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_5VALUES1, "Values1");
-      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_6VALUES1, "Values2");
+      dc.root1Line(this, MergeFactory.class);
    }
 
    public void toString1Line(Dctx dc, ByteObject bo) {
       dc.append("#MergeMask");
+   }
+
+   public void toStringMergeMask(Dctx sb, ByteObject bo) {
+      sb.rootN(bo, "MergeMask");
+      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_01_FLAG1, "Flag1");
+      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_02_FLAGX1, "Flag2");
+      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_03_FLAGY1, "Flag3");
+      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_04_FLAGZ1, "Flag4");
+      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_05_VALUES1, "Values1");
+      toStringMMFlag(sb, bo, MERGE_MASK_OFFSET_06_VALUES1, "Values2");
    }
 
    private void toStringMMFlag(Dctx sb, ByteObject bo, int offsetFlag, String name) {

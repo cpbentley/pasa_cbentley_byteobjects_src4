@@ -9,6 +9,10 @@ public class ObjectBoc implements IStringable  {
 
    protected final BOCtx boc;
 
+   //#debug
+   private String         toStringName;
+
+   
    public ObjectBoc(BOCtx boc) {
       this.boc = boc;
    }
@@ -30,6 +34,14 @@ public class ObjectBoc implements IStringable  {
       return Dctx.toString(this);
    }
 
+   public void toStringSetName(String name) {
+      if (toStringName == null) {
+         toStringName = name;
+      } else {
+         toStringName = toStringName + " - " + name;
+      }
+   }
+   
    public void toString(Dctx dc) {
       dc.root(this, ObjectBoc.class, "@line5");
       toStringPrivate(dc);
@@ -40,7 +52,9 @@ public class ObjectBoc implements IStringable  {
    }
 
    private void toStringPrivate(Dctx dc) {
-
+      if(toStringName != null) {
+         dc.appendWithSpace(toStringName);
+      }
    }
 
    public void toString1Line(Dctx dc) {

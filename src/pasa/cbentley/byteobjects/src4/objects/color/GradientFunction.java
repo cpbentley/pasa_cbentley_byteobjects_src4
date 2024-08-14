@@ -340,7 +340,7 @@ public class GradientFunction extends Function {
       }
       this.grad = grad;
       initColors(primaryColor, grad);
-      int stepping = grad.get1(IBOGradient.GRADIENT_OFFSET_07_STEP1);
+      int stepping = grad.get1(IBOGradient.GRADIENT_OFFSET_08_STEP1);
       int size12 = totalSize;
       if (stepping > 1) {
          stepLeftOver = totalSize % stepping;
@@ -353,7 +353,7 @@ public class GradientFunction extends Function {
       if (size12 >= 0) {
          numSteps = size12;
       }
-      int maxSec = grad.get1(IBOGradient.GRADIENT_OFFSET_05_CURSOR1);
+      int maxSec = grad.get1(IBOGradient.GRADIENT_OFFSET_06_CURSOR1);
       //divide in two. 3 cases: 1st part only, 2nd part only, or 1st and 2nd parts.
       double ratio = (double) maxSec / (double) 100;
       sizePart1 = (int) (size12 * ratio);
@@ -376,7 +376,7 @@ public class GradientFunction extends Function {
 
    private void initColors(int primaryColor, ByteObject grad) {
       color_1 = primaryColor;
-      color_2 = grad.get4(IBOGradient.GRADIENT_OFFSET_04_COLOR4);
+      color_2 = grad.get4(IBOGradient.GRADIENT_OFFSET_05_COLOR4);
       if (grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_8_REVERSE)) {
          if (grad.hasFlag(IBOGradient.GRADIENT_OFFSET_01_FLAG, IBOGradient.GRADIENT_FLAG_3_THIRD_COLOR)) {
             ByteObject p = grad.getSubFirst(IBOTypesBOC.TYPE_002_LIT_INT);

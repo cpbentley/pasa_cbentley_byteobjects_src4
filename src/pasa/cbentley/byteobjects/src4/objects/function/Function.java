@@ -52,7 +52,7 @@ import pasa.cbentley.core.src4.utils.BitUtils;
  *
  * @see DrwParam
  */
-public class Function extends ObjectBoc implements ITechFunction, IStringable {
+public class Function extends ObjectBoc implements IBOFunction, IStringable {
 
    public static final int FCT_FLAG_1_FINISHED = 1;
 
@@ -86,7 +86,7 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
     * Operator for value index and
     * Meaning depends on type
     * <li> {@link ITechFunction#FUN_TYPE_01_VALUES} operates on the index
-    * <li> {@link ITechFunction#FUNCTION_TYPE_4TICK} operates on the tick input value
+    * <li> {@link IBOFunction#FUNCTION_TYPE_4TICK} operates on the tick input value
     */
    private int             auxOperator;
 
@@ -104,7 +104,6 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
     */
    private boolean         countRejection;
 
-   //#enddebug
 
    /**
     * keep reference for flags
@@ -233,13 +232,13 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
    /**
     * Depending on the Function type, 
     * <li>returns next value for {@link ITechFunction#FUN_TYPE_01_VALUES}
-    * <li>Returns counter value {@link ITechFunction#FUNCTION_TYPE_4TICK}
+    * <li>Returns counter value {@link IBOFunction#FUNCTION_TYPE_4TICK}
     * @return for ticking function, return the number of calls 1 based [1-max]
     */
    public int fx() {
-      if (typeFct == FUN_TYPE_01_VALUES) {
+      if (typeFct == ITechFunction.FUN_TYPE_01_VALUES) {
          return fValues();
-      } else if (typeFct == FUN_TYPE_03_RANDOM_INT) {
+      } else if (typeFct == ITechFunction.FUN_TYPE_03_RANDOM_INT) {
          return randomInterval();
       } else {
          //assumed to TICK
@@ -263,19 +262,19 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
    public int fx(int x) {
       int result = x;
       switch (typeFct) {
-         case FUN_TYPE_00_AXC:
+         case ITechFunction.FUN_TYPE_00_AXC:
             result = normAxC(result);
             break;
-         case FUN_TYPE_01_VALUES:
+         case ITechFunction.FUN_TYPE_01_VALUES:
             result = fxValues(result);
             break;
-         case FUN_TYPE_03_RANDOM_INT:
+         case ITechFunction.FUN_TYPE_03_RANDOM_INT:
             result = randomInterval();
             break;
-         case FUN_TYPE_04_TICK:
+         case ITechFunction.FUN_TYPE_04_TICK:
             result = fxTick(result);
             break;
-         case FUN_TYPE_07_MATH_OPERATOR:
+         case ITechFunction.FUN_TYPE_07_MATH_OPERATOR:
             result = opArithmetic(x);
             break;
          default:
@@ -451,17 +450,17 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
       int res = 0;
       //value index operator
       switch (auxOperator) {
-         case FUN_COUNTER_OP_0_ASC:
+         case ITechFunction.FUN_COUNTER_OP_0_ASC:
             res = values[counter];
             break;
-         case FUN_COUNTER_OP_1_DESC:
+         case ITechFunction.FUN_COUNTER_OP_1_DESC:
             int indexd = numValues - 1 - counter;
             res = values[indexd];
             break;
-         case FUN_COUNTER_OP_2_RANDOM:
+         case ITechFunction.FUN_COUNTER_OP_2_RANDOM:
             res = values[getRandom().nextInt(numValues)];
             break;
-         case FUN_COUNTER_OP_3_UP_DOWN:
+         case ITechFunction.FUN_COUNTER_OP_3_UP_DOWN:
             int mod = counter % numValues;
             int num = counter / numValues;
             int index = mod;
@@ -597,28 +596,28 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
       typeFct = def.get1(FUN_OFFSET_01_TYPE1);
       setupAcceptor(def);
       switch (typeFct) {
-         case FUN_TYPE_04_TICK:
+         case ITechFunction.FUN_TYPE_04_TICK:
             this.numValues = def.get2(FUN_OFFSET_05_A2);
             this.auxOperator = def.get1(FUN_OFFSET_07_AUX_OPERATOR1);
-            typeFct = FUN_TYPE_04_TICK;
-            if (auxOperator == FUN_COUNTER_OP_3_UP_DOWN) {
+            typeFct = ITechFunction.FUN_TYPE_04_TICK;
+            if (auxOperator == ITechFunction.FUN_COUNTER_OP_3_UP_DOWN) {
                max = numValues * 2;
             } else {
                max = numValues;
             }
             break;
-         case FUN_TYPE_02_ID:
+         case ITechFunction.FUN_TYPE_02_ID:
             throw new IllegalArgumentException("Cannot call reset on a Subclass Function");
-         case FUN_TYPE_03_RANDOM_INT:
+         case ITechFunction.FUN_TYPE_03_RANDOM_INT:
             int at = def.getValue(FUN_OFFSET_05_A2, 2);
             int ct = def.getValue(FUN_OFFSET_06_C2, 2);
             a = Math.min(at, ct);
             c = Math.max(at, ct);
-         case FUN_TYPE_00_AXC:
+         case ITechFunction.FUN_TYPE_00_AXC:
             a = def.getValue(FUN_OFFSET_05_A2, 2);
             c = def.getValue(FUN_OFFSET_06_C2, 2);
             break;
-         case FUN_TYPE_01_VALUES:
+         case ITechFunction.FUN_TYPE_01_VALUES:
             //buffer must be big enough
             auxOperator = def.get1(FUN_OFFSET_07_AUX_OPERATOR1);
             values = boc.getLitteralIntOperator().getLitteralArray(def.getSubFirst(IBOTypesBOC.TYPE_007_LIT_ARRAY_INT));
@@ -628,7 +627,7 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
                setFctFlag(FCT_FLAG_1_FINISHED, true);
             } else {
                //maximum number of time
-               if (auxOperator == FUN_COUNTER_OP_3_UP_DOWN) {
+               if (auxOperator == ITechFunction.FUN_COUNTER_OP_3_UP_DOWN) {
                   max = (numValues * 2) - 1;
                } else {
                   max = numValues - 1;
@@ -647,7 +646,7 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
     * @param values
     */
    private void reset(int[] values) {
-      typeFct = FUN_TYPE_01_VALUES;
+      typeFct = ITechFunction.FUN_TYPE_01_VALUES;
       this.values = values;
    }
 
@@ -747,10 +746,6 @@ public class Function extends ObjectBoc implements ITechFunction, IStringable {
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }
-
-   //#enddebug
-   
-
 
    //#enddebug
 

@@ -9,7 +9,7 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.ObjectBoc;
 import pasa.cbentley.byteobjects.src4.objects.pointer.IBOPointer;
-import pasa.cbentley.byteobjects.src4.objects.pointer.MergeMaskFactory;
+import pasa.cbentley.byteobjects.src4.objects.pointer.MergeFactory;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.logging.Dctx;
 import pasa.cbentley.core.src4.logging.IDebugStringable;
@@ -119,7 +119,7 @@ public abstract class BOModuleAbstract extends ObjectBoc implements IByteObject,
     * Usually <code>merge</code> will be incomplete (transparent).
     * 
     * That will depends on implementation.
-    * It might means a {@link MergeMaskFactory} is present. or a specific flag is set 
+    * It might means a {@link MergeFactory} is present. or a specific flag is set 
     * <br>
     * When <code>merge</code> is opaque, a carbon copy is returned or
     * 
@@ -127,7 +127,7 @@ public abstract class BOModuleAbstract extends ObjectBoc implements IByteObject,
     * <br>
     * <br>
     * 
-    * This method with {@link MergeMaskFactory} allow {@link ByteObject} to represent CSS styles
+    * This method with {@link MergeFactory} allow {@link ByteObject} to represent CSS styles
     * that are applied in cascade
     * 
     * @param root not null and of same type
@@ -136,15 +136,6 @@ public abstract class BOModuleAbstract extends ObjectBoc implements IByteObject,
     */
    public abstract ByteObject merge(ByteObject root, ByteObject merge);
 
-   /**
-    * 
-    * @param root
-    * @param merge
-    * @return
-    */
-   ByteObject mergeNoCheck(ByteObject root, ByteObject merge) {
-      return merge(root, merge);
-   }
 
    /**
     * Called by the {@link BOModulesManager} when module registers.
@@ -227,7 +218,6 @@ public abstract class BOModuleAbstract extends ObjectBoc implements IByteObject,
       return boc.getBOModuleManager().toStringGetDynamicDIDMax();
    }
 
-   //#enddebug
 
    /**
     * For specification see {@link BOModulesManager#toStringLink(int)}

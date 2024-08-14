@@ -13,7 +13,7 @@ import pasa.cbentley.byteobjects.src4.ctx.IBOTypesExtendedBOC;
 import pasa.cbentley.byteobjects.src4.ctx.IToStringsDIDsBocFun;
 import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.byteobjects.src4.objects.color.GradientFunction;
-import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
+import pasa.cbentley.byteobjects.src4.objects.function.IBOFunction;
 import pasa.cbentley.core.src4.ctx.ICtx;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -49,7 +49,7 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
       switch (type) {
          case IBOTypesBOC.TYPE_021_FUNCTION:
             //check the def if gradient create
-            int ftype = def.get1(ITechFunction.FUN_OFFSET_09_EXTENSION_TYPE2);
+            int ftype = def.get1(IBOFunction.FUN_OFFSET_09_EXTENSION_TYPE2);
             switch (ftype) {
                case IBOTypesExtendedBOC.TYPE_057_COLOR_FUNCTION:
                   return boc.getColorFunctionFactory().createColorFunction(def);
@@ -135,7 +135,6 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
    }
 
    //#mdebug
-
    public void toString(Dctx dc) {
       dc.root(this, BOModuleCore.class, 70);
       toStringPrivate(dc);
@@ -309,7 +308,7 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
    }
 
    private void toString1LineMergeMask(Dctx dc, ByteObject bo) {
-      boc.getMergeMaskFactory().toStringMergeMask(dc, bo);
+      boc.getMergeFactory().toStringMergeMask(dc, bo);
    }
 
    private void toString1LineCtxSettings(Dctx dc, ByteObject bo) {
@@ -409,6 +408,8 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
             return "Index";
          case TYPE_027_CONFIG:
             return "Config";
+         case TYPE_030_ANIM:
+            return "Anim";
          case TYPE_033_TUPLE:
             return "Tuple";
          case TYPE_034_ARRAY_BIG:
@@ -417,6 +418,16 @@ public class BOModuleCore extends BOModuleAbstract implements IBOTypesBOC, IToSt
             return "ObjectManaged";
          case TYPE_036_BYTE_CONTROLLER:
             return "ByteController";
+         case TYPE_037_CLASS_STATE:
+            return "ClassState";
+         case TYPE_038_GRADIENT:
+            return "Gradient";
+         case TYPE_039_BLENDER:
+            return "Blender";
+         case TYPE_040_COLOR_FILTER:
+            return "ColorFilter";
+         case TYPE_041_COLOR_RANDOM:
+            return "ColorRandom";
          default:
             return null;
       }

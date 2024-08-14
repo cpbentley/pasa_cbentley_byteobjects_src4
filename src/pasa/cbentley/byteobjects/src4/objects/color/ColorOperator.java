@@ -12,7 +12,7 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesExtendedBOC;
 import pasa.cbentley.core.src4.utils.interfaces.ITechColor;
 
-public class ColorOperator extends BOAbstractOperator implements ITechColor, ITechColorFunction {
+public class ColorOperator extends BOAbstractOperator implements ITechColor, IBOColorFunction {
 
    public ColorOperator(BOCtx drc) {
       super(drc);

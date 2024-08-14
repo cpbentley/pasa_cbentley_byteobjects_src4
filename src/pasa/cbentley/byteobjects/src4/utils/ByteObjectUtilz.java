@@ -10,8 +10,6 @@ import pasa.cbentley.byteobjects.src4.core.ByteObjectManaged;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IJavaObjectFactory;
 import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
-import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
-import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.io.BADataIS;
 import pasa.cbentley.core.src4.io.BADataOS;
 import pasa.cbentley.core.src4.logging.Dctx;
@@ -67,7 +65,7 @@ public class ByteObjectUtilz implements IByteObject {
     * @see ArrayUtils#getTrim(Object[])
     */
    public ByteObject[] getTrim(ByteObject[] ar) {
-      return (ByteObject[]) boc.getUC().getAU().getTrim(ar, boc.getFactoryByteObject()) ;
+      return (ByteObject[]) boc.getUC().getAU().getTrim(ar, boc.getFactoryByteObject());
    }
 
    /**
@@ -183,17 +181,6 @@ public class ByteObjectUtilz implements IByteObject {
       return nar;
    }
 
-   public ByteObject mergeByteObjects(ByteObject root, ByteObject merge) {
-      if (root == null) {
-         if (merge == null || merge.getType() == IBOTypesBOC.TYPE_025_ACTION) {
-            return null;
-         }
-         return merge;
-      }
-      return root.mergeByteObject(merge);
-
-   }
-
    /**
     * Simple read of a {@link ByteObject} from {@link DataBAInputStream}.
     * <br>
@@ -249,15 +236,15 @@ public class ByteObjectUtilz implements IByteObject {
       }
    }
 
-
+   //#mdebug
    public void toStringAppend(Dctx dc, ByteObject bo, String str, int flag) {
       if (bo.hasFlag(A_OBJECT_OFFSET_2_FLAG, flag)) {
          dc.append(' ');
          dc.append(str);
       }
    }
-
-
+   //#enddebug
+   
    /**
     * 
     * @param ar

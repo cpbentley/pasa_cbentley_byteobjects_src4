@@ -10,7 +10,7 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.core.src4.logging.Dctx;
 
-public class AcceptorFactory extends BOAbstractFactory implements ITechFunction, ITechAcceptor {
+public class AcceptorFactory extends BOAbstractFactory implements IBOFunction, ITechAcceptor {
 
    public AcceptorFactory(BOCtx boc) {
       super(boc);

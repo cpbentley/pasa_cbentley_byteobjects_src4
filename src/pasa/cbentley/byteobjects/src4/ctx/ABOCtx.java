@@ -123,7 +123,9 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
 
    private void setSettingsFromConfig(IConfigBO configBO) {
       //#debug
-      toDLog().pInit("", configBO, ABOCtx.class, "setSettingsFromConfig@126", LVL_05_FINE, true);
+      String str = "("+ boc.getUC().getStrU().getNameClass(this.getClass()) + ".java:40)";
+      //#debug
+      toDLog().pInit("for class "+ str, configBO, ABOCtx.class, "setSettingsFromConfig@126", LVL_05_FINE, true);
 
       ByteObject settings = createSettingsBOEmpty();
       matchConfig(configBO, settings);

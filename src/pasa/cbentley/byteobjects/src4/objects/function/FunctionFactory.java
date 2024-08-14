@@ -19,7 +19,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public class FunctionFactory extends BOAbstractFactory implements ITechFunction {
+public class FunctionFactory extends BOAbstractFactory implements IBOFunction {
 
    /**
     * keeps custom functions.
@@ -99,7 +99,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
          return null;
       }
       //custom function
-      if (fdefinition.get1(FUN_OFFSET_01_TYPE1) == FUN_TYPE_02_ID) {
+      if (fdefinition.get1(FUN_OFFSET_01_TYPE1) == ITechFunction.FUN_TYPE_02_ID) {
          int id = fdefinition.getValue(FUN_OFFSET_05_ID2, 2);
          return getFunctionFromID(id);
       }
@@ -108,7 +108,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
          return (Function) boModuleManager.createExtension(IBOTypesBOC.TYPE_021_FUNCTION, fdefinition);
       }
       Function f = null;
-      if (fdefinition.get1(FUN_OFFSET_01_TYPE1) == FUN_TYPE_05_MOVE) {
+      if (fdefinition.get1(FUN_OFFSET_01_TYPE1) == ITechFunction.FUN_TYPE_05_MOVE) {
          throw new IllegalArgumentException();
       } else {
          f = new Function(boc, fdefinition);
@@ -167,7 +167,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
     */
    public ByteObject getFunction(int id) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_02_ID, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_02_ID, 1);
       p.setValue(FUN_OFFSET_05_ID2, id, 2);
       return p;
    }
@@ -182,7 +182,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
     */
    public ByteObject getFunctionAxC(int a, int c) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_00_AXC, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_00_AXC, 1);
       p.setValue(FUN_OFFSET_05_A2, a, 2);
       p.setValue(FUN_OFFSET_06_C2, c, 2);
       return p;
@@ -208,7 +208,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
     */
    public ByteObject getFunctionRnd(int low, int hi) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_03_RANDOM_INT, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_03_RANDOM_INT, 1);
       p.setValue(FUN_OFFSET_05_A2, low, 2);
       p.setValue(FUN_OFFSET_06_C2, hi, 2);
       return p;
@@ -216,7 +216,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
 
    public ByteObject getFunctionTick(int num) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_04_TICK, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_04_TICK, 1);
       p.setValue(FUN_OFFSET_05_A2, num, 2);
       return p;
    }
@@ -235,7 +235,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
     */
    public ByteObject getFunctionTick(int num, int auxOp) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.set1(FUN_OFFSET_01_TYPE1, FUN_TYPE_04_TICK);
+      p.set1(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_04_TICK);
       p.set2(FUN_OFFSET_05_A2, num);
       p.set1(FUN_OFFSET_07_AUX_OPERATOR1, num);
       return p;
@@ -243,7 +243,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
 
    public ByteObject getFunctionTouchXY(int a, int c) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_00_AXC, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_00_AXC, 1);
       p.setValue(FUN_OFFSET_05_A2, a, 2);
       p.setValue(FUN_OFFSET_06_C2, c, 2);
       return p;
@@ -287,7 +287,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
     */
    public ByteObject getFunctionValues(int[] values, int indexop) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_01_VALUES, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_01_VALUES, 1);
       p.setValue(FUN_OFFSET_07_AUX_OPERATOR1, indexop, 1);
       p.addByteObject(boc.getLitteralIntFactory().getIntArrayBO(values));
       return p;
@@ -308,7 +308,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
     */
    public ByteObject getFunctionValuesOperand(int[] values, int indexop, int operator) {
       ByteObject p = new ByteObject(boc, IBOTypesBOC.TYPE_021_FUNCTION, FUN_BASIC_SIZE);
-      p.setValue(FUN_OFFSET_01_TYPE1, FUN_TYPE_01_VALUES, 1);
+      p.setValue(FUN_OFFSET_01_TYPE1, ITechFunction.FUN_TYPE_01_VALUES, 1);
       p.setValue(FUN_OFFSET_07_AUX_OPERATOR1, indexop, 1);
       p.setValue(FUN_OFFSET_06_C2, operator, 2);
       p.addByteObject(boc.getLitteralIntFactory().getIntArrayBO(values));
@@ -339,10 +339,10 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
       int a = 0;
       int c = 0;
       switch (type) {
-         case FUN_TYPE_02_ID:
+         case ITechFunction.FUN_TYPE_02_ID:
             sb.append("SUBCLASS ID ");
             break;
-         case FUN_TYPE_03_RANDOM_INT:
+         case ITechFunction.FUN_TYPE_03_RANDOM_INT:
             int at = bo.getValue(FUN_OFFSET_05_A2, 2);
             int ct = bo.getValue(FUN_OFFSET_06_C2, 2);
             a = Math.min(at, ct);
@@ -354,7 +354,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
             sb.append(c);
             sb.append("]");
             break;
-         case FUN_TYPE_00_AXC:
+         case ITechFunction.FUN_TYPE_00_AXC:
             a = bo.getValue(FUN_OFFSET_05_A2, 2);
             c = bo.getValue(FUN_OFFSET_06_C2, 2);
             sb.append("ax+c = ");
@@ -367,7 +367,7 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
                sb.append(c);
             }
             break;
-         case FUN_TYPE_01_VALUES:
+         case ITechFunction.FUN_TYPE_01_VALUES:
             //buffer must be big enough
             ByteObject boFirstOfTypeArrayInt = bo.getSubFirst(IBOTypesBOC.TYPE_007_LIT_ARRAY_INT);
             int[] values = boc.getLitteralIntOperator().getLitteralArray(boFirstOfTypeArrayInt);
@@ -386,4 +386,5 @@ public class FunctionFactory extends BOAbstractFactory implements ITechFunction 
    public UCtx toStringGetUCtx() {
       return boc.getUC();
    }
+   //#enddebug
 }

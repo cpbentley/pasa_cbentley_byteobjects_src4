@@ -5,7 +5,7 @@ import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 /**
  * Defines how to compute random values of an aRGB color.
  * 
- * Aux of the {@link ColorFunction} and {@link ITechColorFunction}
+ * Aux of the {@link ColorFunction} and {@link IBOColorFunction}
  * 
  * @author Charles Bentley
  *
@@ -127,8 +127,8 @@ public interface IBOColorRnd extends IByteObject {
     * Type of color function
     * <li> {@link IBOColorRnd#RND_COLORS_TYPE_0_RND_32BITS}
     * <li> {@link IBOColorRnd#RND_COLORS_TYPE_1_CHANNEL}
-    * <li> {@link ITechColorFunction#RND_COLORS_TYPE_20_RND_32BITS}
-    * <li> {@link ITechColorFunction#RND_COLORS_TYPE_30_RND_32BITS}
+    * <li> {@link IBOColorFunction#RND_COLORS_TYPE_20_RND_32BITS}
+    * <li> {@link IBOColorFunction#RND_COLORS_TYPE_30_RND_32BITS}
     * <li> {@link IBOColorRnd#RND_COLORS_TYPE_4_GRAYSCALE}
     * 
     */
@@ -230,7 +230,7 @@ public interface IBOColorRnd extends IByteObject {
     * <br>
     * Preset from a Gradient for example. Between root and
     * {@link IBOColorRnd#RND_COLORS_OFFSET_07_ROOTCOLOR4}
-    * {@link IBOGradient#GRADIENT_OFFSET_04_COLOR4}
+    * {@link IBOGradient#GRADIENT_OFFSET_05_COLOR4}
     */
    public static final int RND_COLORS_TYPE_6_PRE_SET            = 6;
 

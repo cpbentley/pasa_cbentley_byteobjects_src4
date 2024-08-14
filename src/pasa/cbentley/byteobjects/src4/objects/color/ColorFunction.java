@@ -20,7 +20,7 @@ import pasa.cbentley.core.src4.utils.interfaces.IColorsStatic;
  * @author Charles-Philip Bentley
  *
  */
-public class ColorFunction extends Function implements ITechColorFunction, IBOColorRnd {
+public class ColorFunction extends Function implements IBOColorFunction, IBOColorRnd {
    private BlendOp           bop;
 
    protected ColorFunction[] colorFunctions       = new ColorFunction[0];
@@ -348,10 +348,10 @@ public class ColorFunction extends Function implements ITechColorFunction, IBOCo
       if (def.hasFlag(FUN_OFFSET_03_FLAGP, FUN_FLAGP_4_CHANNELS)) {
          switchMode = ITechColorFunction.MODE_2_ARGB_CHANNELS;
          int cflag = def.getValue(FUN_OFFSET_03_FLAGP, 1);
-         isAlphaProcessing = (cflag & ITechColorFunction.FUNCTION_FLAGP_5_ALPHA) == ITechColorFunction.FUNCTION_FLAGP_5_ALPHA;
-         isRedProcessing = (cflag & ITechColorFunction.FUNCTION_FLAGP_6_RED) == ITechColorFunction.FUNCTION_FLAGP_6_RED;
-         isGreenProcessing = (cflag & ITechColorFunction.FUNCTION_FLAGP_7_GREEN) == ITechColorFunction.FUNCTION_FLAGP_7_GREEN;
-         isBlueProcessing = (cflag & ITechColorFunction.FUNCTION_FLAGP_8_BLUE) == ITechColorFunction.FUNCTION_FLAGP_8_BLUE;
+         isAlphaProcessing = (cflag & IBOColorFunction.FUNCTION_FLAGP_5_ALPHA) == IBOColorFunction.FUNCTION_FLAGP_5_ALPHA;
+         isRedProcessing = (cflag & IBOColorFunction.FUNCTION_FLAGP_6_RED) == IBOColorFunction.FUNCTION_FLAGP_6_RED;
+         isGreenProcessing = (cflag & IBOColorFunction.FUNCTION_FLAGP_7_GREEN) == IBOColorFunction.FUNCTION_FLAGP_7_GREEN;
+         isBlueProcessing = (cflag & IBOColorFunction.FUNCTION_FLAGP_8_BLUE) == IBOColorFunction.FUNCTION_FLAGP_8_BLUE;
 
          if (isAlphaProcessing) {
             if (!isRedProcessing && !isBlueProcessing && !isGreenProcessing) {

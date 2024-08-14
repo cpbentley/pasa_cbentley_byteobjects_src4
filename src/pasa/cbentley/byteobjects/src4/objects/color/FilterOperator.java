@@ -24,6 +24,10 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
    }
 
    public void applyColorFilter(ByteObject filter, int[] rgb, int offset, int scanlength, int m, int n, int w, int h) {
+      applyColorFilter(filter, rgb, offset, scanlength, m, n, w, h, null);
+   }
+
+   public void applyColorFilter(ByteObject filter, int[] rgb, int offset, int scanlength, int m, int n, int w, int h, int[] rgbExtra) {
       if (filter == null)
          return;
       filter.checkType(IBOTypesBOC.TYPE_040_COLOR_FILTER);
@@ -73,7 +77,13 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
             filterChannelMOD(rgb, offset, scanlength, m, n, w, h, filter);
             break;
          case ITechFilter.FILTER_TYPE_14_BLEND_SELF:
-            filterSelfBlend(rgb, offset, scanlength, m, n, w, h, filter);
+            filterBlendSelf(rgb, offset, scanlength, m, n, w, h, filter);
+            break;
+         case ITechFilter.FILTER_TYPE_15_BLEND_EXTRA:
+            if (rgbExtra == null) {
+               throw new NullPointerException();
+            }
+            filterBlend(rgb, offset, scanlength, m, n, w, h, filter, rgbExtra);
             break;
          default:
             throw new IllegalArgumentException("Unknown Color Filter Type " + type);
@@ -87,8 +97,6 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
       }
       //SystemLog.printDraw(RgbImage.debugAlphas(rgb, w, h));
    }
-
-
 
    protected void filterAlpha(ByteObject filter, int[] rgb, int offset, int scanlength, int m, int n, int w, int h) {
       int val = filter.getValue(FILTER_OFFSET_04_FUNCTION2, 2);
@@ -497,7 +505,50 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
       }
    }
 
+   /**
+    * {@link ITechFilter#FILTER_TYPE_14_BLEND_SELF}.
+    * <br>
+    * Self blends with a slight offset
+    * @param rgb
+    * @param offset
+    * @param scanlength
+    * @param m
+    * @param n
+    * @param w
+    * @param h
+    * @param filter
+    */
+   public void filterBlend(int[] rgb, int offset, int scanlength, int m, int n, int w, int h, ByteObject filter, int[] rgbExtra) {
 
+      if(rgb.length != rgbExtra.length) {
+         throw new IllegalArgumentException();
+      }
+      BlendOp blendOp = null;
+      if (filter.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_2_BLENDER)) {
+         ByteObject blender = filter.getSubFirst(IBOTypesBOC.TYPE_039_BLENDER);
+         blendOp = new BlendOp(boc, blender);
+      } else {
+         int blendop = filter.get1(FILTER_OFFSET_10_BLEND1);
+         int blendAlpa = filter.get1(FILTER_OFFSET_11_BLEND_ALPHA1);
+         blendOp = new BlendOp(boc, blendop, blendAlpa);
+      }
+
+      int transform = filter.get1(FILTER_OFFSET_08_EXTRA1);
+      int wOffset = filter.get2(FILTER_OFFSET_12_W2);
+      int hOffset = filter.get2(FILTER_OFFSET_13_H2);
+
+      int index = 0;
+      for (int i = 0; i < h; i++) {
+         index = offset + m + (scanlength * (n + i));
+         for (int j = 0; j < w; j++) {
+            int rgbSrc = rgbExtra[index];
+            int rgbDest = rgb[index];
+            int resultBlend = blendOp.blendComposite(rgbDest, rgbSrc);
+            rgb[index] = resultBlend;
+            index++;
+         }
+      }
+   }
 
    /**
     * {@link ITechFilter#FILTER_TYPE_14_BLEND_SELF}.
@@ -512,33 +563,42 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
     * @param h
     * @param filter
     */
-   public void filterSelfBlend(int[] rgb, int offset, int scanlength, int m, int n, int w, int h, ByteObject filter) {
+   public void filterBlendSelf(int[] rgb, int offset, int scanlength, int m, int n, int w, int h, ByteObject filter) {
 
       int index = 0;
-      int blendop = filter.get1(FILTER_OFFSET_10_BLEND1);
-      int blendAlpa = filter.get1(FILTER_OFFSET_11_BLEND_ALPHA1);
+      BlendOp blendOp = null;
       if (filter.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_2_BLENDER)) {
          ByteObject blender = filter.getSubFirst(IBOTypesBOC.TYPE_039_BLENDER);
-         if (blender != null) {
-            int transform = filter.get1(FILTER_OFFSET_08_EXTRA1);
-            int wOffset = filter.get2(FILTER_OFFSET_12_W2);
-            int hOffset = filter.get2(FILTER_OFFSET_13_H2);
-            BlendOp bo = new BlendOp(boc, blendop, blendAlpa);
-            int[] rgbTransformed = RgbUtils.getRGBCheck(rgb, offset, scanlength, m, transform, w, h);
-            rgbTransformed = TransformUtils.transform(rgb, w, h, transform);
-            int count = 0;
-            for (int i = 0; i < h; i++) {
-               index = offset + m + (scanlength * (n + i));
-               for (int j = 0; j < w; j++) {
-                  rgb[index] = rgbTransformed[count];
-                  count++;
-                  index++;
-               }
-            }
-
-         }
+         blendOp = new BlendOp(boc, blender);
+      } else {
+         int blendop = filter.get1(FILTER_OFFSET_10_BLEND1);
+         int blendAlpa = filter.get1(FILTER_OFFSET_11_BLEND_ALPHA1);
+         blendOp = new BlendOp(boc, blendop, blendAlpa);
       }
 
+      int transform = filter.get1(FILTER_OFFSET_08_EXTRA1);
+      int wOffset = filter.get2(FILTER_OFFSET_12_W2);
+      int hOffset = filter.get2(FILTER_OFFSET_13_H2);
+
+      int wTrans = w;
+      int hTrans = h;
+
+      int[] rgbTransformed = RgbUtils.getRGBCheck(rgb, offset, scanlength, m, transform, wTrans, hTrans);
+      if (transform != 0) {
+         rgbTransformed = TransformUtils.transform(rgb, w, h, transform);
+      }
+      int count = 0;
+      for (int i = 0; i < h; i++) {
+         index = offset + m + (scanlength * (n + i));
+         for (int j = 0; j < w; j++) {
+            int rgbSrc = rgbTransformed[count];
+            int rgbDest = rgb[index];
+            int resultBlend = blendOp.blendComposite(rgbDest, rgbSrc);
+            rgb[index] = resultBlend;
+            count++;
+            index++;
+         }
+      }
    }
 
    /**
@@ -878,7 +938,6 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
          }
       }
    }
-
 
    /**
     * {@link ITechFilter#FILTER_TYPE_08_TOUCHES}
@@ -1308,8 +1367,6 @@ public class FilterOperator extends BOAbstractOperator implements IBOFilter {
       }
       //SystemLog.printDraw(RgbImage.debugAlphas(source, w, h));
    }
-
-
 
    public void filterTouchFunction(int[] source, int index, int alphaCount, Function fct) {
       int pix = source[index];

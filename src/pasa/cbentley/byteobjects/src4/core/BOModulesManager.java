@@ -13,6 +13,8 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.IToStringsDIDsBoc;
 import pasa.cbentley.byteobjects.src4.ctx.ObjectBoc;
+import pasa.cbentley.byteobjects.src4.objects.function.ActionOperator;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMerge;
 import pasa.cbentley.byteobjects.src4.sources.RootSource;
 import pasa.cbentley.core.src4.ctx.CtxManager;
 import pasa.cbentley.core.src4.ctx.ICtx;
@@ -186,7 +188,6 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
       return null;
    }
 
-   //#enddebug
 
    /**
     * Method to be sub-classed by the Module.
@@ -322,19 +323,24 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
    }
 
    /**
-    * Method to be sub-classed by the Module.
-    * <br>
-    * <br>
-    * Merging with nulls returns the non null object.
-    * <br>
-    * Otherwise the {@link BOModulesManager} queries its {@link BOModuleAbstract} for the type merges.
     * 
-    * Both first types must match, except for .
-    * <br>
-    * When merge is a {@link IBOTypesBOC#TYPE_025_ACTION}, the merge method applies the action on the root object.
+    * Merges <code>merge</code> over <code>root</code>.
     * 
-    * If root object is also an action, then a action merge is executed.
-    * There is on
+    * <p>
+    * <ol>
+    * <li> Merging with one null returns the non null object.
+    * <li> Both first types must match 
+    * <li> Iterates over {@link BOModuleAbstract#merge(ByteObject, ByteObject)} for a non null result.
+    * </ol>
+    *  
+    * </p>
+    * 
+    * <p>
+    * See {@link IBOMerge} on how to implement the merging
+    * 
+    * </p>
+    * 
+    * 
     * @param root
     * @param merge
     * @return
@@ -349,12 +355,13 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
       int typeRoot = root.getType();
       int typeMerge = merge.getType();
       if (typeMerge == IBOTypesBOC.TYPE_025_ACTION && typeRoot != IBOTypesBOC.TYPE_025_ACTION) {
-         return boc.getActionOp().doActionFunctorClone(merge, root);
+         ActionOperator actionOp = boc.getActionOp();
+         return actionOp.doActionFunctorClone(merge, root);
       } else if (typeRoot != typeMerge) {
          throw new IllegalArgumentException("Cannot merge different first types");
       }
       for (int i = 0; i < modules.length; i++) {
-         ByteObject merged = modules[i].mergeNoCheck(root, merge);
+         ByteObject merged = modules[i].merge(root, merge);
          if (merged != null) {
             return merged;
          }
@@ -401,7 +408,6 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
    }
 
    //#mdebug
-
    public void toString(Dctx dc) {
       dc.root(this, BOModulesManager.class);
       dc.appendVarWithSpace("modIndex", modIndex);
@@ -422,7 +428,6 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
       dc.nlLvlArray("SubModules", modules);
    }
 
-   //#mdebug
 
    public void toString(Dctx dc, ByteObject bo) {
       for (int i = 0; i < modules.length; i++) {
@@ -551,8 +556,10 @@ public class BOModulesManager extends ObjectBoc implements IStringable, IDebugSt
     */
    public String toStringType(int type) {
       //asks the registered modules for the string of the type
+      BOModuleAbstract boModuleAbstract = null;
       for (int i = 0; i < modules.length; i++) {
-         String debugType = modules[i].toStringType(type);
+         boModuleAbstract = modules[i];
+         String debugType = boModuleAbstract.toStringType(type);
          if (debugType != null) {
             return debugType;
          }

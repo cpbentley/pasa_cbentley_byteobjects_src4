@@ -3,6 +3,7 @@ package pasa.cbentley.byteobjects.src4.objects.color;
 import pasa.cbentley.byteobjects.src4.core.interfaces.IByteObject;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
+import pasa.cbentley.byteobjects.src4.objects.pointer.IBOMerge;
 import pasa.cbentley.core.src4.interfaces.C;
 
 public interface IBOGradient extends IByteObject, ITechGradient {
@@ -18,7 +19,7 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * 1 byte for stepping
     * 1 byte for directional data
     */
-   public static final int GRADIENT_BASIC_SIZE                  = A_OBJECT_BASIC_SIZE + 18;
+   public static final int GRADIENT_BASIC_SIZE                  = A_OBJECT_BASIC_SIZE + 25;
 
    /**
     * Flags for easily switch between two opposing types. <br>
@@ -50,8 +51,6 @@ public interface IBOGradient extends IByteObject, ITechGradient {
    /**
     * Set when an array of colors {@link IBOTypesBOC#TYPE_007_LIT_ARRAY_INT} is set to the Gradient
     * definition.
-    * <br>
-    * <br>
     * 
     */
    public static final int GRADIENT_FLAG_5_INT_ARRAY            = 16;
@@ -140,22 +139,31 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     */
    public static final int GRADIENT_FLAGK_6_PART2_EXCLUDE_RIGHT = 32;
 
-   public static final int GRADIENT_FLAGX_1_CHAIN               = 1;
+   public static final int GRADIENT_FLAGK_7                     = 1 << 6;
 
-   public static final int GRADIENT_FLAGX_2_CHAIN               = 2;
+   public static final int GRADIENT_FLAGK_8                     = 1 << 7;
+
+   /**
+    * When set, fills the figure area with gradient's first color
+    */
+   public static final int GRADIENT_FLAGX_1_FILL_AREA           = 1 << 0;
+
+   public static final int GRADIENT_FLAGX_2_CHAIN               = 1 << 1;
 
    /**
     * 
     */
    public static final int GRADIENT_FLAGX_3_RAW                 = 1 << 2;
 
+   public static final int GRADIENT_FLAGX_4_                    = 1 << 3;
+
    /**
     * Use wire method instead of fill
     */
-   public static final int GRADIENT_FLAGX_5_WIRE                = 16;
+   public static final int GRADIENT_FLAGX_5_WIRE                = 1 << 4;
 
    /**
-    * enables override with {@link IBOGradient#GRADIENT_OFFSET_08_OFFSET2}
+    * enables override with {@link IBOGradient#GRADIENT_OFFSET_09_OFFSET2}
     */
    public static final int GRADIENT_FLAGX_6_OFFSET              = 1 << 5;
 
@@ -166,6 +174,17 @@ public interface IBOGradient extends IByteObject, ITechGradient {
    public static final int GRADIENT_FLAGX_7_GRADSIZE            = 1 << 6;
 
    public static final int GRADIENT_FLAGX_8_MANY_TYPES          = 1 << 7;
+
+   public static final int GRADIENT_FLAGZ_1_INCOMPLETE          = 1 << 0;
+
+   /**
+    * Result of a merge process
+    */
+   public static final int GRADIENT_FLAGZ_2_MERGED              = 1 << 1;
+
+   public static final int GRADIENT_FLAGZ_3_                    = 1 << 2;
+
+   public static final int GRADIENT_FLAGZ_4_                    = 1 << 3;
 
    /**
     * <li>{@link IBOGradient#GRADIENT_FLAG_1_SWITCH_2TYPES}
@@ -189,12 +208,18 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     */
    public static final int GRADIENT_OFFSET_03_FLAGC_CHANNELS    = A_OBJECT_BASIC_SIZE + 2;
 
+   public static final int GRADIENT_OFFSET_04_FLAGX1            = A_OBJECT_BASIC_SIZE + 3;
+
    /**
     * Secondary color to which the Gradient code will tend.
     * <br>
     * Input Color from Figure will enable to compute Gradient function.
+    * 
+    * <p>
+    * {@link IBOMerge#MERGE_MASK_OFFSET_06_VALUES1} and  {@link IBOMerge#MERGE_MASK_FLAG6_2}
+    * </p>
     */
-   public static final int GRADIENT_OFFSET_04_COLOR4            = A_OBJECT_BASIC_SIZE + 3;
+   public static final int GRADIENT_OFFSET_05_COLOR4            = A_OBJECT_BASIC_SIZE + 4;
 
    /**
     * value between 0 and 100 <br>
@@ -205,13 +230,7 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * second gradient<br>
     * 
     */
-   public static final int GRADIENT_OFFSET_05_CURSOR1           = A_OBJECT_BASIC_SIZE + 7;
-
-   /**
-    * Unless the implicit value is used, this primary value for computing the gradient is used.
-    * 
-    */
-   public static final int GRADIENT_OFFSET_05_PRIMARY_COLOR4    = A_OBJECT_BASIC_SIZE + 3;
+   public static final int GRADIENT_OFFSET_06_CURSOR1           = A_OBJECT_BASIC_SIZE + 8;
 
    /**
     * External value type given by the Gradient's user.
@@ -223,19 +242,22 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * <li> {@link ITechGradient#GRADIENT_TYPE_RECT_00_SQUARE}
     * <li> {@link ITechGradient#GRADIENT_TYPE_TRIG_00_TENT}
     * <li> {@link ITechGradient#GRADIENT_TYPE_TRIG_09_FAT_HALO}
+    * 
+    * <p>
+    *  {@link IBOMerge#MERGE_MASK_OFFSET_06_VALUES1} with 
+    * </p>
     */
-   public static final int GRADIENT_OFFSET_06_TYPE1             = A_OBJECT_BASIC_SIZE + 8;
+   public static final int GRADIENT_OFFSET_07_TYPE1             = A_OBJECT_BASIC_SIZE + 9;
 
    /**
     * Depending on the context:
     * 
     * <li>with input dimension: Number of pixels in each gradient step.
-    * <li>without input dimension = Number of steps
-    * <br>
-    * <br>
+    * <li>without input dimension = Number of steps.
+    * s
     * In the first case, stepping can be made random from an array of choice
     */
-   public static final int GRADIENT_OFFSET_07_STEP1             = A_OBJECT_BASIC_SIZE + 9;
+   public static final int GRADIENT_OFFSET_08_STEP1             = A_OBJECT_BASIC_SIZE + 10;
 
    /**
     * Offset at which to start the gradient. last color will be offset-1 treating the color array
@@ -243,9 +265,7 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * 
     * Flag controlled with {@link IBOGradient#GRADIENT_FLAGX_6_OFFSET}
     */
-   public static final int GRADIENT_OFFSET_08_OFFSET2           = A_OBJECT_BASIC_SIZE + 10;
-
-   public static final int GRADIENT_OFFSET_09_FLAGX1            = A_OBJECT_BASIC_SIZE + 12;
+   public static final int GRADIENT_OFFSET_09_OFFSET2           = A_OBJECT_BASIC_SIZE + 11;
 
    /**
     * Grad Size explicitely defined. Using a {@link ISizer}
@@ -254,7 +274,8 @@ public interface IBOGradient extends IByteObject, ITechGradient {
 
    /**
     * Override the primary grad size for computing color gradient.
-    * <br> Reuse those values according to
+    * 
+    * Reuse those values according to
     * <li>{@link IFunction#FUN_COUNTER_OP_0_ASC}
     * <li>{@link IFunction#FUN_COUNTER_OP_3_UP_DOWN}
     * 
@@ -274,7 +295,7 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * 
     * See 
     */
-   public static final int GRADIENT_OFFSET_12_DIR1              = A_OBJECT_BASIC_SIZE + 15;
+   public static final int GRADIENT_OFFSET_12_DIR1              = A_OBJECT_BASIC_SIZE + 17;
 
    /**
     * Usual suspects are 
@@ -289,8 +310,21 @@ public interface IBOGradient extends IByteObject, ITechGradient {
     * <li> {@link ITechGradient#GRADSIZE_TYPE_07_HALF_MAX_WH}
     * <li> {@link ITechGradient#GRADSIZE_TYPE_08_HALF_MIN_WH}
     */
-   public static final int GRADIENT_OFFSET_13_GRADSIZE_TYPE1    = A_OBJECT_BASIC_SIZE + 16;
+   public static final int GRADIENT_OFFSET_13_GRADSIZE_TYPE1    = A_OBJECT_BASIC_SIZE + 18;
 
-   public static final int GRADIENT_OFFSET_14_GRADSIZE_OP_V1    = A_OBJECT_BASIC_SIZE + 17;
+   /**
+    * 
+    */
+   public static final int GRADIENT_OFFSET_14_GRADSIZE_OP_V1    = A_OBJECT_BASIC_SIZE + 19;
+
+   /**
+    * 
+    * Explicit primary color
+    * Unless the implicit value is used, this primary value for computing the gradient is used.
+    * 
+    */
+   public static final int GRADIENT_OFFSET_15_PRIMARY_COLOR4    = A_OBJECT_BASIC_SIZE + 20;
+
+   public static final int GRADIENT_OFFSET_16_FLAGZ1            = A_OBJECT_BASIC_SIZE + 24;
 
 }

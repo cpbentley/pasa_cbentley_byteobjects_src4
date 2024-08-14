@@ -5,18 +5,42 @@
 package pasa.cbentley.byteobjects.src4.ctx;
 
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
+import pasa.cbentley.byteobjects.src4.objects.color.IBOColorFunction;
 import pasa.cbentley.byteobjects.src4.objects.color.IBOColorRnd;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechBlend;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechColorFunction;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechFilter;
 import pasa.cbentley.byteobjects.src4.objects.color.ITechGradient;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechAcceptor;
+import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechOperator;
+import pasa.cbentley.byteobjects.src4.objects.move.ITechMoveFunction;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.logging.ToStringStaticBase;
 
-public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFunction {
+public class ToStringStaticBO extends ToStringStaticBase implements IBOColorFunction {
 
+   public static String toStringMoveIncrementType(int v) {
+      switch (v) {
+         case ITechMoveFunction.INCREMENT_0_PARAM:
+            return "Linear";
+         case ITechMoveFunction.INCREMENT_1_FIB:
+            return "Fib";
+         default:
+            return "Unknown" + v;
+      }
+   }
+
+   public static String toStringMoveType(int v) {
+      switch (v) {
+         case ITechMoveFunction.TYPE_MOVE_0_ASAP:
+            return "ASAP";
+         case ITechMoveFunction.TYPE_MOVE_1_BRESENHAM:
+            return "Bresenham";
+         default:
+            return "Unknown" + v;
+      }
+   }
    public static String toStringGradEllipse(int value) {
       switch (value) {
          case ITechGradient.GRADIENT_TYPE_ELLIPSE_00_NORMAL:
@@ -429,10 +453,10 @@ public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFu
 
    public static void debugFunctionChannel(StringBBuilder sb, ByteObject f) {
       sb.append("channels=" + f.hasFlag(FUN_OFFSET_03_FLAGP, FUN_FLAGP_4_CHANNELS));
-      sb.append(" a=" + f.hasFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_5_ALPHA));
-      sb.append(" r=" + f.hasFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_6_RED));
-      sb.append(" g=" + f.hasFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_7_GREEN));
-      sb.append(" b=" + f.hasFlag(FUN_OFFSET_03_FLAGP, ITechColorFunction.FUNCTION_FLAGP_8_BLUE));
+      sb.append(" a=" + f.hasFlag(FUN_OFFSET_03_FLAGP, IBOColorFunction.FUNCTION_FLAGP_5_ALPHA));
+      sb.append(" r=" + f.hasFlag(FUN_OFFSET_03_FLAGP, IBOColorFunction.FUNCTION_FLAGP_6_RED));
+      sb.append(" g=" + f.hasFlag(FUN_OFFSET_03_FLAGP, IBOColorFunction.FUNCTION_FLAGP_7_GREEN));
+      sb.append(" b=" + f.hasFlag(FUN_OFFSET_03_FLAGP, IBOColorFunction.FUNCTION_FLAGP_8_BLUE));
    }
 
    public static String toStringRndColorType(int i) {
@@ -469,13 +493,13 @@ public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFu
 
    public static String toStringCounterOp(int type) {
       switch (type) {
-         case FUN_COUNTER_OP_0_ASC:
+         case ITechFunction.FUN_COUNTER_OP_0_ASC:
             return "Ascending";
-         case FUN_COUNTER_OP_1_DESC:
+         case ITechFunction.FUN_COUNTER_OP_1_DESC:
             return "Descending";
-         case FUN_COUNTER_OP_2_RANDOM:
+         case ITechFunction.FUN_COUNTER_OP_2_RANDOM:
             return "Random";
-         case FUN_COUNTER_OP_3_UP_DOWN:
+         case ITechFunction.FUN_COUNTER_OP_3_UP_DOWN:
             return "Up and Down";
          default:
             return "Unknown Counter Op Type" + type;
@@ -484,21 +508,21 @@ public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFu
 
    public static String toStringFunType(int type) {
       switch (type) {
-         case FUN_TYPE_00_AXC:
+         case ITechFunction.FUN_TYPE_00_AXC:
             return "AxC";
-         case FUN_TYPE_01_VALUES:
+         case ITechFunction.FUN_TYPE_01_VALUES:
             return "Preset Values";
-         case FUN_TYPE_02_ID:
+         case ITechFunction.FUN_TYPE_02_ID:
             return "ID";
-         case FUN_TYPE_03_RANDOM_INT:
+         case ITechFunction.FUN_TYPE_03_RANDOM_INT:
             return "Random Int";
-         case FUN_TYPE_04_TICK:
+         case ITechFunction.FUN_TYPE_04_TICK:
             return "Tick";
-         case FUN_TYPE_05_MOVE:
+         case ITechFunction.FUN_TYPE_05_MOVE:
             return "Move";
-         case FUN_TYPE_06_COLOR:
+         case ITechFunction.FUN_TYPE_06_COLOR:
             return "Color";
-         case FUN_TYPE_07_MATH_OPERATOR:
+         case ITechFunction.FUN_TYPE_07_MATH_OPERATOR:
             return "Math Operator";
          default:
             return "Unknown Fun Type" + type;
@@ -525,6 +549,5 @@ public class ToStringStaticBO extends ToStringStaticBase implements ITechColorFu
             return "Unknown Operator" + op;
       }
    }
-   //#enddebug
 
 }

@@ -25,7 +25,7 @@ public class BOAbstractOperator extends ObjectBoc implements IStringable {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, BOAbstractOperator.class, "@line5");
+      dc.root(this, BOAbstractOperator.class, 28);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }

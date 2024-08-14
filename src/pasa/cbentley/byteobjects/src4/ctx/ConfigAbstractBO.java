@@ -28,7 +28,7 @@ public abstract class ConfigAbstractBO extends ConfigAbstract {
 
    //#mdebug
    public void toString(Dctx dc) {
-      dc.root(this, ConfigAbstractBO.class, "@line5");
+      dc.root(this, ConfigAbstractBO.class, 31);
       toStringPrivate(dc);
       super.toString(dc.sup());
    }
@@ -38,7 +38,7 @@ public abstract class ConfigAbstractBO extends ConfigAbstract {
    }
 
    public void toString1Line(Dctx dc) {
-      dc.root1Line(this, ConfigAbstractBO.class);
+      dc.root1Line(this, ConfigAbstractBO.class,41);
       toStringPrivate(dc);
       super.toString1Line(dc.sup1Line());
    }

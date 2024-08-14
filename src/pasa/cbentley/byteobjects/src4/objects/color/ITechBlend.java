@@ -9,53 +9,49 @@ import pasa.cbentley.core.src4.interfaces.ITech;
 public interface ITechBlend extends ITech {
 
    /**
-    * All alphas are treated equally in the blender
-    * and are merged using the OVER function
+    * All alphas are treated equally in the blender and are merged using the OVER function
+    * 
+    * {@link BlendOp#getAlphaFixed(int, int, int, int, int, int, int, int)}
     */
    public static final int ALPHA_0_OVER                   = 0;
-
-   /**
-    * The alphas are merged using the same function as the RGB components
-    */
-   public static final int ALPHA_1_MERGE                  = 1;
 
    /**
     * The merge ignores alpha values.
     * <br>
     * Return pixel's alpha is always 255.
     */
-   public static final int ALPHA_2_255                    = 2;
+   public static final int ALPHA_1_255                    = 1;
 
    /**
     * Inverse function on the alpha
     */
-   public static final int ALPHA_4_INVERSE                = 4;
+   public static final int ALPHA_2_INVERSE                = 2;
+
+   /**
+    * The minimum alpha value between base and blend is taken
+    */
+   public static final int ALPHA_3_MIN                    = 3;
 
    /**
     * The maximum alpha value between base and blend is taken
     */
-   public static final int ALPHA_5_MAX                    = 5;
+   public static final int ALPHA_4_MAX                    = 4;
 
    /**
     * Takes the average of RGB values. Ignores 
     * 
     * light is open, dark is 
     */
-   public static final int ALPHA_5_RGB_AVERAGE            = 8;
+   public static final int ALPHA_5_RGB_AVERAGE            = 5;
 
    /**
     * Takes the average of RGB values and invert it. Ignores 
     * 
     * light is transparent, dark is opaque 
     */
-   public static final int ALPHA_5_RGB_AVERAGE_INVERSE    = 9;
+   public static final int ALPHA_6_RGB_AVERAGE_INVERSE    = 6;
 
-   /**
-    * The minimum alpha value between base and blend is taken
-    */
-   public static final int ALPHA_6_MIN                    = 6;
-
-   public static final int ALPHA_CK_MAX                   = 0;
+   public static final int ALPHA_CK_MAX                   = 7;
 
    /**
     * Blend Opaque pixels replace the base, semi-transparent pixels are merged.
@@ -243,13 +239,12 @@ public interface ITechBlend extends ITech {
     * <li> {@link ITechBlend#BLENDING_12_HUE_LUM}
     * <li> {@link ITechBlend#BLENDING_19_SCREEN_DODGE}
     * 
-    * <br>
-    * <br>
+    * <p>
     * The alpha blending is decided by
     * <li> {@link ITechBlend#ALPHA_0_OVER}
-    * <li> {@link ITechBlend#ALPHA_2_255}
-    * <li> {@link ITechBlend#ALPHA_1_MERGE}
-    * <li> {@link ITechBlend#ALPHA_4_INVERSE}
+    * <li> {@link ITechBlend#ALPHA_1_255}
+    * <li> {@link ITechBlend#ALPHA_2_INVERSE}
+    * </p>
     */
    public static final int OP_00_SRC_OVER                 = 0;
 

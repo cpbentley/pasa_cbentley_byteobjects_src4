@@ -10,8 +10,10 @@ import pasa.cbentley.byteobjects.src4.ctx.BOCtx;
 import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.ToStringStaticBO;
 import pasa.cbentley.byteobjects.src4.objects.function.Function;
+import pasa.cbentley.byteobjects.src4.objects.function.IBOFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechFunction;
 import pasa.cbentley.byteobjects.src4.objects.function.ITechOperator;
+import pasa.cbentley.core.src4.interfaces.ITechTransform;
 import pasa.cbentley.core.src4.logging.Dctx;
 
 /**
@@ -21,13 +23,23 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles-Philip Bentley
  *
  */
-public class FilterFactory extends BOAbstractFactory implements ITechFunction, ITechOperator {
+public class FilterFactory extends BOAbstractFactory implements IBOFunction, ITechOperator, ITechFilter, IBOFilter {
+
+   private final int DEFAULT_FILTER_BG_COLOR = 0;
 
    public FilterFactory(BOCtx drc) {
       super(drc);
    }
 
-   private final int DEFAULT_FILTER_BG_COLOR = 0;
+   private ByteObject createFilter() {
+      return getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, FILTER_BASIC_SIZE);
+   }
+
+   public ByteObject getFilter(int filterType) {
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, filterType, 1);
+      return p;
+   }
 
    /**
     * Simple color filter applying to all pixels
@@ -35,11 +47,11 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterAll(ByteObject fct) {
-      return getFilterFct(ITechFilter.FILTER_TYPE_00_FUNCTION_ALL, fct);
+      return getFilterFct(FILTER_TYPE_00_FUNCTION_ALL, fct);
    }
 
    public ByteObject getFilterAll(Function fct) {
-      return getFilterFct(ITechFilter.FILTER_TYPE_00_FUNCTION_ALL, fct);
+      return getFilterFct(FILTER_TYPE_00_FUNCTION_ALL, fct);
    }
 
    /**
@@ -61,11 +73,39 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterAlphaColor(int color, boolean exact, int alpha) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_03_ALPHA_TO_COLOR, 1);
-      p.setFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_7_EXACT_MATCH, exact);
-      p.setValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, alpha, 2);
-      p.setValue(IBOFilter.FILTER_OFFSET_05_COLOR4, color, 4);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_03_ALPHA_TO_COLOR, 1);
+      p.setFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_7_EXACT_MATCH, exact);
+      p.setValue(FILTER_OFFSET_04_FUNCTION2, alpha, 2);
+      p.setValue(FILTER_OFFSET_05_COLOR4, color, 4);
+      return p;
+   }
+
+   public ByteObject getFilterBlenderExternal(int blender, int blendAlpha, ByteObject figure) {
+      ByteObject p = createFilter();
+      p.set1(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_15_BLEND_EXTRA);
+      p.set1(FILTER_OFFSET_10_BLEND1, blender);
+      p.set1(FILTER_OFFSET_11_BLEND_ALPHA1, blendAlpha);
+      p.setFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_8_EXTRA_BO, true);
+      p.addByteObject(figure);
+      return p;
+   }
+
+   public ByteObject getFilterBlenderSelf(int blender) {
+      return getFilterBlenderSelf(blender, ITechBlend.ALPHA_0_OVER, ITechTransform.TRANSFORM_0_NONE);
+   }
+
+   /**
+    * Apply the blender with a copy of itself
+    * @param blender
+    * @return
+    */
+   public ByteObject getFilterBlenderSelf(int blender, int blendAlpha, int transform) {
+      ByteObject p = createFilter();
+      p.set1(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_14_BLEND_SELF);
+      p.set1(FILTER_OFFSET_08_EXTRA1, transform);
+      p.set1(FILTER_OFFSET_10_BLEND1, blender);
+      p.set1(FILTER_OFFSET_11_BLEND_ALPHA1, blendAlpha);
       return p;
    }
 
@@ -85,17 +125,17 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    ByteObject getFilterFct(int type, ByteObject funDef) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, type, 1);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, type, 1);
       p.addByteObject(funDef);
       return p;
    }
 
    public ByteObject getFilterFct(int type, Function fct) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, type, 1);
-      p.setFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_6_FUNCTION_ID, true);
-      p.setValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, boc.getFunctionFactory().addFunction(fct), 2);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, type, 1);
+      p.setFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_6_FUNCTION_ID, true);
+      p.setValue(FILTER_OFFSET_04_FUNCTION2, boc.getFunctionFactory().addFunction(fct), 2);
       setTBLRFlagPs(p);
       return p;
    }
@@ -109,8 +149,8 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     */
    public Function getFilterFunction(ByteObject filter) {
       filter.checkType(IBOTypesBOC.TYPE_040_COLOR_FILTER);
-      if (filter.hasFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_6_FUNCTION_ID)) {
-         int id = filter.getValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, 2);
+      if (filter.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_6_FUNCTION_ID)) {
+         int id = filter.getValue(FILTER_OFFSET_04_FUNCTION2, 2);
          return boc.getFunctionFactory().getFunctionFromID(id);
       } else {
          ByteObject def = filter.getSubFirst(IBOTypesBOC.TYPE_021_FUNCTION);
@@ -123,8 +163,8 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterGrayScale() {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_01_GRAYSCALE, 1);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_01_GRAYSCALE, 1);
       return p;
    }
 
@@ -132,16 +172,10 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
       return getFilterAlphaColor(color, true, 0);
    }
 
-   public ByteObject getFilter(int filterType) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, filterType, 1);
-      return p;
-   }
-
    public ByteObject getFilterSimpleAlpha(int a) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_04_SIMPLE_ALPHA, 1);
-      p.setValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, a, 2);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_04_SIMPLE_ALPHA, 1);
+      p.setValue(FILTER_OFFSET_04_FUNCTION2, a, 2);
       return p;
    }
 
@@ -151,8 +185,8 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterSmoothStep() {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_06_STEP_SMOOTH, 1);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_06_STEP_SMOOTH, 1);
       return p;
    }
 
@@ -162,16 +196,16 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterStick() {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_09_STICK, 1);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_09_STICK, 1);
       setTBLRFlagPs(p);
       return p;
    }
 
    public ByteObject getFilterStick(int stickColor) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_09_STICK, 1);
-      p.setValue(IBOFilter.FILTER_OFFSET_05_COLOR4, stickColor, 4);
+      ByteObject p = createFilter();
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_09_STICK, 1);
+      p.setValue(FILTER_OFFSET_05_COLOR4, stickColor, 4);
       setTBLRFlagPs(p);
       return p;
    }
@@ -196,13 +230,13 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterTBLR(ByteObject fct, boolean T, boolean B, boolean L, boolean R) {
-      ByteObject p = getFilterFct(ITechFilter.FILTER_TYPE_07_TBLR, fct);
+      ByteObject p = getFilterFct(FILTER_TYPE_07_TBLR, fct);
       setTBLRFlagPs(p, T, B, L, R);
       return p;
    }
 
    public ByteObject getFilterTBLR(Function fct) {
-      return getFilterFct(ITechFilter.FILTER_TYPE_07_TBLR, fct);
+      return getFilterFct(FILTER_TYPE_07_TBLR, fct);
    }
 
    /**
@@ -230,7 +264,7 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @return
     */
    public ByteObject getFilterTBLRAlpha(int size, int start, int end, ByteObject acc) {
-      return getFilterTBLRAlpha(size, start, end, FUN_COUNTER_OP_0_ASC, OP_POST_1_X_MAX, acc);
+      return getFilterTBLRAlpha(size, start, end, ITechFunction.FUN_COUNTER_OP_0_ASC, OP_POST_1_X_MAX, acc);
    }
 
    /**
@@ -245,7 +279,7 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     */
    public ByteObject getFilterTBLRAlpha(int size, int start, int end, int maskColor, boolean doMask) {
       ByteObject acc = boc.getAcceptorFactory().getAcceptor(maskColor, false, doMask);
-      return getFilterTBLRAlpha(size, start, end, FUN_COUNTER_OP_0_ASC, OP_POST_1_X_MAX, acc);
+      return getFilterTBLRAlpha(size, start, end, ITechFunction.FUN_COUNTER_OP_0_ASC, OP_POST_1_X_MAX, acc);
    }
 
    /**
@@ -307,25 +341,27 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
       return getFilterTouch(touchColor, or48, null, fct);
    }
 
+   public ByteObject getFilterTouch(int touchColor, boolean or48, Function f) {
+      return getFilterTouch(touchColor, or48, f, null);
+   }
+
    private ByteObject getFilterTouch(int touchColor, boolean or48, Function f, ByteObject fct) {
-      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, IBOFilter.FILTER_TOUCH_BASIC_SIZE);
-      p.setValue(IBOFilter.FILTER_OFFSET_01_TYPE1, ITechFilter.FILTER_TYPE_08_TOUCHES, 1);
-      p.setFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_5_OR48, or48);
-      p.setValue(IBOFilter.FILTER_OFFSET_05_COLOR4, touchColor, 4);
+      ByteObject p = getBOFactory().createByteObject(IBOTypesBOC.TYPE_040_COLOR_FILTER, FILTER_TOUCH_BASIC_SIZE);
+      p.setValue(FILTER_OFFSET_01_TYPE1, FILTER_TYPE_08_TOUCHES, 1);
+      p.setFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_5_OR48, or48);
+      p.setValue(FILTER_OFFSET_05_COLOR4, touchColor, 4);
       if (f != null) {
-         p.setFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_6_FUNCTION_ID, true);
-         p.setValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, boc.getFunctionFactory().addFunction(f), 2);
+         p.setFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_6_FUNCTION_ID, true);
+         p.setValue(FILTER_OFFSET_04_FUNCTION2, boc.getFunctionFactory().addFunction(f), 2);
       } else {
          p.addByteObject(fct);
       }
       return p;
    }
 
-   public ByteObject getFilterTouch(int touchColor, boolean or48, Function f) {
-      return getFilterTouch(touchColor, or48, f, null);
+   void setTBLRFlagPs(ByteObject p) {
+      setTBLRFlagPs(p, true, true, true, true);
    }
-
-
 
    /**
     * Set switches for TBLR filter.
@@ -336,74 +372,71 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
     * @param R
     */
    void setTBLRFlagPs(ByteObject filter, boolean T, boolean B, boolean L, boolean R) {
-      filter.setFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_1_TOP, T);
-      filter.setFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_2_BOT, B);
-      filter.setFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_3_LEFT, L);
-      filter.setFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_4_RIGHT, R);
+      filter.setFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_1_TOP, T);
+      filter.setFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_2_BOT, B);
+      filter.setFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_3_LEFT, L);
+      filter.setFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_4_RIGHT, R);
    }
 
-   void setTBLRFlagPs(ByteObject p) {
-      setTBLRFlagPs(p, true, true, true, true);
-   }
-   
+   //#mdebug
    public void toStringFilter(ByteObject bo, Dctx dc) {
-      dc.rootN(bo,"ColorFilter");
+      dc.rootN(bo, "ColorFilter");
       ByteObject rawString = bo.getSubFirst(IBOTypesBOC.TYPE_003_LIT_STRING);
       if (rawString != null) {
          dc.append(boc.getLitteralStringOperator().getLitteralString(rawString));
       }
-      final int type = bo.get1(IBOFilter.FILTER_OFFSET_01_TYPE1);
+      final int type = bo.get1(FILTER_OFFSET_01_TYPE1);
       switch (type) {
-         case ITechFilter.FILTER_TYPE_00_FUNCTION_ALL:
+         case FILTER_TYPE_00_FUNCTION_ALL:
             dc.append("All Pixels ");
             break;
-         case ITechFilter.FILTER_TYPE_03_ALPHA_TO_COLOR:
+         case FILTER_TYPE_03_ALPHA_TO_COLOR:
             dc.append("Alpha Color ");
             dc.nl();
-            dc.append("Exact = " + bo.hasFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_7_EXACT_MATCH));
-            dc.append(" Alpha=" + bo.getValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, 2));
-            dc.append(" Color=" + ToStringStaticBO.toStringColor(bo.get4(IBOFilter.FILTER_OFFSET_05_COLOR4)));
+            dc.append("Exact = " + bo.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_7_EXACT_MATCH));
+            dc.append(" Alpha=" + bo.getValue(FILTER_OFFSET_04_FUNCTION2, 2));
+            dc.append(" Color=" + ToStringStaticBO.toStringColor(bo.get4(FILTER_OFFSET_05_COLOR4)));
             break;
-         case ITechFilter.FILTER_TYPE_07_TBLR:
+         case FILTER_TYPE_07_TBLR:
             dc.append("TBLR");
             dc.nl();
-            boolean T = bo.hasFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_1_TOP);
-            boolean B = bo.hasFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_2_BOT);
-            boolean L = bo.hasFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_3_LEFT);
-            boolean R = bo.hasFlag(IBOFilter.FILTER_OFFSET_03_FLAGP1, IBOFilter.FILTER_FLAGP_4_RIGHT);
+            boolean T = bo.hasFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_1_TOP);
+            boolean B = bo.hasFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_2_BOT);
+            boolean L = bo.hasFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_3_LEFT);
+            boolean R = bo.hasFlag(FILTER_OFFSET_03_FLAGP1, FILTER_FLAGP_4_RIGHT);
             dc.append("T=" + T);
             dc.append(" B=" + B);
             dc.append(" L=" + L);
             dc.append(" R=" + R);
             break;
-         case ITechFilter.FILTER_TYPE_04_SIMPLE_ALPHA:
+         case FILTER_TYPE_04_SIMPLE_ALPHA:
             dc.append("SIMPLE ALPHA To All Pixels ");
             break;
-         case ITechFilter.FILTER_TYPE_08_TOUCHES:
+         case FILTER_TYPE_08_TOUCHES:
             dc.append("Touches");
             dc.nl();
-            dc.append("TouchColor=" + ToStringStaticBO.toStringColor(bo.get4(IBOFilter.FILTER_OFFSET_05_COLOR4)));
-            dc.append("or48=" + bo.hasFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_5_OR48));
-            dc.append("FunctionID=" + bo.hasFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_6_FUNCTION_ID));
+            dc.append("TouchColor=" + ToStringStaticBO.toStringColor(bo.get4(FILTER_OFFSET_05_COLOR4)));
+            dc.append("or48=" + bo.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_5_OR48));
+            dc.append("FunctionID=" + bo.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_6_FUNCTION_ID));
             break;
-         case ITechFilter.FILTER_TYPE_09_STICK:
+         case FILTER_TYPE_09_STICK:
             dc.append("Stick");
             break;
-         case ITechFilter.FILTER_TYPE_01_GRAYSCALE:
+         case FILTER_TYPE_01_GRAYSCALE:
             dc.append("GrayScale");
             break;
-         case ITechFilter.FILTER_TYPE_02_BILINEAR:
+         case FILTER_TYPE_02_BILINEAR:
             dc.append("Bilinear");
             break;
-         case ITechFilter.FILTER_TYPE_06_STEP_SMOOTH:
+         case FILTER_TYPE_06_STEP_SMOOTH:
             dc.append("Smooth Step");
             break;
          default:
             throw new IllegalArgumentException("Unknown Filter Type");
       }
-      if (bo.hasFlag(IBOFilter.FILTER_OFFSET_02_FLAG1, IBOFilter.FILTER_FLAG_6_FUNCTION_ID)) {
+      if (bo.hasFlag(FILTER_OFFSET_02_FLAG1, FILTER_FLAG_6_FUNCTION_ID)) {
          dc.nl();
-         int id = bo.getValue(IBOFilter.FILTER_OFFSET_04_FUNCTION2, 2);
+         int id = bo.getValue(FILTER_OFFSET_04_FUNCTION2, 2);
          Function f = boc.getFunctionFactory().getFunctionFromID(id);
          if (f != null) {
             dc.nlLvl("", f);
@@ -414,5 +447,5 @@ public class FilterFactory extends BOAbstractFactory implements ITechFunction, I
          //don't draw here it will be handled by the toString of DrwParam
       }
    }
-
+   //#enddebug
 }

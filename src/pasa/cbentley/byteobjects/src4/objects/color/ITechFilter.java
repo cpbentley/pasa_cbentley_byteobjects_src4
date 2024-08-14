@@ -120,13 +120,14 @@ public interface ITechFilter extends ITech {
    public static final int FILTER_TYPE_13_CHANNEL_MOD        = 13;
 
    /**
-    * 
     * Blend itself with a transformation
     * <br>
     * <li>{@link IBOFilter#FILTER_OFFSET_04_FUNCTION2} is blendop
     * <li>{@link IBOFilter#FILTER_OFFSET_08_EXTRA1} is the trans
     */
    public static final int FILTER_TYPE_14_BLEND_SELF         = 14;
+
+   public static final int FILTER_TYPE_15_BLEND_EXTRA        = 15;
 
    public static final int FILTER_TYPE_CK_MAX                = 14;
 

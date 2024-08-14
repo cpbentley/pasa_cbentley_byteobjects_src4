@@ -177,15 +177,17 @@ public interface IByteObject {
    public static final int  A_OBJECT_OFFSET_2_FLAG               = 1;
 
    /**
-    * Only used by {@link ByteObject} of type {@link ByteObject#A_OBJECT_OFFSET_1_TYPE1} equal to  {@link IBOTypesBOC#TYPE_015_REFERENCE_32}
-    * <br>
-    * <br>
+    * Used by {@link IBOTypesBOC#TYPE_015_REFERENCE_32}
+    * 
+    * <p>
     * References are special byte object whose size is 5 bytes. They are used to point to another byte object
     * using another referential than the one provided by the JVM.
-    * <br>
-    * <br>
+    * </p>
+    * 
+    * <p>
     * For example when serializing several {@link ByteObject}, the type {@link IBOTypesBOC#TYPE_015_REFERENCE_32} is used make
     * references to other byte objects
+    * </p>
     */
    public static final int  A_OBJECT_OFFSET_2_REFERENCE4         = 1;
 

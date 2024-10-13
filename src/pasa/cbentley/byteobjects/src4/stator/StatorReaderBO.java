@@ -45,7 +45,7 @@ public class StatorReaderBO extends StatorReader implements ITechStatorBO {
    }
 
    /**
-    * inverse of {@link StatorWriterBO#writeByteObject(ByteObject)}
+    * inverse of {@link StatorWriterBO#dataWriteByteObject(ByteObject)}
     * @return
     */
    public ByteObject readByteObject() {

@@ -205,8 +205,7 @@ public class BOCtx extends ACtx implements ICtx, IByteObject, IStringable, IToSt
       //#mdebug
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBoc.A_DID_OFFSET_A_BOC, IToStringsDIDsBoc.A_DID_OFFSET_Z_BOC);
       c.registerStaticRange(this, IStaticIDs.SID_DIDS, IToStringsDIDsBocFun.A_DID_OFFSET_A_BOC_FUN, IToStringsDIDsBocFun.A_DID_OFFSET_Z_BOC_FUN);
-      toDLog().pCreate("", this, BOCtx.class, "Created@192", LVL_04_FINER, true);
-
+      toDLog().pCreate("", this, BOCtx.class, "Created@208", LVL_05_FINE, true);
       //#enddebug
    }
 

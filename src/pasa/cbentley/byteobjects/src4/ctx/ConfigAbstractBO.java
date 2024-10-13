@@ -16,7 +16,7 @@ import pasa.cbentley.core.src4.logging.Dctx;
  * @author Charles Bentley
  *
  */
-public abstract class ConfigAbstractBO extends ConfigAbstract {
+public abstract class ConfigAbstractBO extends ConfigAbstract implements IConfigBO {
 
    public ConfigAbstractBO(UCtx uc) {
       super(uc);

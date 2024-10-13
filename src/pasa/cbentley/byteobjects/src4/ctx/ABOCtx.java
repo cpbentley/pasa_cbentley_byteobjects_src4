@@ -104,7 +104,8 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
 
          setSettingsFromConfig(configBO);
       } else {
-         Stator statorInitFor = getUC().getCtxManager().getStatorInitFor(this);
+         CtxManager ctxManager = uc.getCtxManager();
+         Stator statorInitFor = ctxManager.getStatorInitFor(this);
          if (statorInitFor == null) {
             setSettingsFromConfig(configBO);
          } else {
@@ -164,7 +165,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
    public void stateOwnerWrite(Stator stator) {
       StatorWriterBO swbo = (StatorWriterBO) stator.getActiveWriter();
       ByteObject settings = getBOCtxSettings();
-      swbo.writeByteObject(settings);
+      swbo.dataWriteByteObject(settings);
    }
 
    /**

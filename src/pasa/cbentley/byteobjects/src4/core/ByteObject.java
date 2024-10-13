@@ -1530,8 +1530,13 @@ public class ByteObject implements IByteObject, IStringable {
       return ar;
    }
 
-   public ByteObject getSubIndexed1(int index) {
-      int parami = get1(index);
+   /**
+    * Returns subbed {@link ByteObject} by reading offset byte for its index in the array.
+    * @param offset
+    * @return {@link ByteObject} located at index read at offset or null;
+    */
+   public ByteObject getSubIndexed1(int offset) {
+      int parami = get1(offset);
       if (param != null && parami < param.length) {
          return param[parami];
       }
@@ -1539,12 +1544,12 @@ public class ByteObject implements IByteObject, IStringable {
    }
 
    /**
-    * address of {@link ByteObject}  in param array is stored at index 
-    * @param index
-    * @return
+    * Returns subbed {@link ByteObject} by reading offset 2 bytes for its index in the array.
+    * @param offset
+    * @return {@link ByteObject} located at index read at offset or null;
     */
-   public ByteObject getSubIndexed2(int index) {
-      int parami = get2(index);
+   public ByteObject getSubIndexed2(int offset) {
+      int parami = get2(offset);
       if (param != null && parami < param.length) {
          return param[parami];
       }
@@ -2862,6 +2867,24 @@ public class ByteObject implements IByteObject, IStringable {
       }
       int index = getTailFlagIndex();
       setFlag(index, flag, b);
+   }
+
+   /**
+    * Sets to val1 unless value is already val1, then val2
+    * @param offset
+    * @param val1
+    * @param val2
+    * @return the value that was set at offset
+    */
+   public int setToggle1(int offset, int val1, int val2) {
+      int val = this.get1(offset);
+      if (val == val1) {
+         val = val2;
+      } else {
+         val = val1;
+      }
+      this.set1(offset, val);
+      return val;
    }
 
    /**

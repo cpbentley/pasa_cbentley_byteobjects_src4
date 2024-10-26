@@ -10,7 +10,7 @@ import pasa.cbentley.byteobjects.src4.ctx.IBOTypesBOC;
 import pasa.cbentley.byteobjects.src4.ctx.IToStringFlagsBO;
 import pasa.cbentley.byteobjects.src4.utils.ByteObjectUtilz;
 import pasa.cbentley.byteobjects.src4.utils.ValuesInArrayReader;
-import pasa.cbentley.core.src4.ctx.IToStringFlags;
+import pasa.cbentley.core.src4.ctx.IToStringFlagsUC;
 import pasa.cbentley.core.src4.ctx.UCtx;
 import pasa.cbentley.core.src4.helpers.StringBBuilder;
 import pasa.cbentley.core.src4.io.BADataIS;
@@ -3219,7 +3219,7 @@ public class ByteObject implements IByteObject, IStringable {
       dc.append("]");
       dc.appendVarWithSpace("getLength", getLength());
       dc.appendVarWithSpace("lenByteField", get2(A_OBJECT_OFFSET_3_LENGTH2));
-      if (dc.hasFlagData(boc.getUC(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (dc.hasFlagToStringUC(IToStringFlagsUC.FLAG_UC_05_NO_ABSOLUTES)) {
          dc.append(" [Absolutes Ignored]");
       } else {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
@@ -3233,14 +3233,14 @@ public class ByteObject implements IByteObject, IStringable {
       dc.appendWithSpaceArrayNullOnly(param, "Params");
 
       //check if flag wants to hide actual content of byte object
-      if (dc.hasFlagData(boc, IToStringFlagsBO.TOSTRING_FLAG_3_IGNORE_CONTENT)) {
+      if (dc.hasFlagToString(boc, IToStringFlagsBO.TOSTRING_FLAG_3_IGNORE_CONTENT)) {
          dc.append("[BOModuleManager.String Ignored]");
       } else {
          dc.nl();
          boc.getBOModuleManager().toString(dc, this); //stringing the actual content of the byte object
       }
 
-      if (dc.hasFlagData(boc, IToStringFlagsBO.TOSTRING_FLAG_2_IGNORE_PARAMS)) {
+      if (dc.hasFlagToString(boc, IToStringFlagsBO.TOSTRING_FLAG_2_IGNORE_PARAMS)) {
          dc.nlArrayRaw(param, "Params Ignored");
       } else {
          dc.nlLvlArrayNullIgnore(param, "Params");
@@ -3262,7 +3262,7 @@ public class ByteObject implements IByteObject, IStringable {
     */
    public void toStringBackUp(Dctx dc) {
       dc.append("Header Type=" + get1(A_OBJECT_OFFSET_1_TYPE1) + " Length=" + getLength() + " [ByteField=" + get2(A_OBJECT_OFFSET_3_LENGTH2) + "]");
-      if (!dc.hasFlagData(boc.getUC(), IToStringFlags.FLAG_DATA_05_NO_ABSOLUTES)) {
+      if (!dc.hasFlagToStringUC(IToStringFlagsUC.FLAG_UC_05_NO_ABSOLUTES)) {
          dc.append(" #Index=" + index + " Len=" + data.length + " ");
       }
       this.toStringFlags(dc);
@@ -3355,7 +3355,7 @@ public class ByteObject implements IByteObject, IStringable {
       bou.toStringAppend(sb, this, "IntraRef", A_OBJECT_TAIL_FLAG_6_INTRA_REFERENCE);
       bou.toStringAppend(sb, this, "Immutable", A_OBJECT_FLAG_7_IMMUTABLE);
       //
-      if (sb.hasFlagData(boc, IToStringFlagsBO.TOSTRING_FLAG_1_SERIALIZE)) {
+      if (sb.hasFlagToString(boc, IToStringFlagsBO.TOSTRING_FLAG_1_SERIALIZE)) {
          bou.toStringAppend(sb, this, "Serialized", A_OBJECT_FLAG_4_SERIALIZED);
       }
    }

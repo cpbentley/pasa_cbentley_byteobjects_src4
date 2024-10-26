@@ -526,7 +526,7 @@ public class ColorIterator extends ObjectBoc implements IStringable {
       
       dc.append("#colors = " + colors.length);
 
-      if (dc.hasFlagData(boc, IToStringFlagsBO.DATA_FLAG_21_MANY_COLORS)) {
+      if (dc.hasFlagToString(boc, IToStringFlagsBO.DATA_FLAG_21_MANY_COLORS)) {
          ColorUtils cu = toStringGetUCtx().getColorU();
          for (int i = 0; i < colors.length; i++) {
             dc.nl();

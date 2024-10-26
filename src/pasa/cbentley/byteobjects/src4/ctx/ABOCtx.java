@@ -223,7 +223,7 @@ public abstract class ABOCtx extends ACtx implements IAInitable, IStatorOwner {
       int size = getBOCtxSettingSize();
       //#mdebug
       if (size < 4 || size > 1024) {
-         throw new IllegalStateException(size + " is probably an invalid size. Make sure implementation returns the value");
+         throw new IllegalStateException(size + " is probably an invalid size. Make sure implementation returns the value in getBOCtxSettingSize");
       }
       //#enddebug
       int type = IBOTypesBOC.TYPE_012_CTX_SETTINGS;

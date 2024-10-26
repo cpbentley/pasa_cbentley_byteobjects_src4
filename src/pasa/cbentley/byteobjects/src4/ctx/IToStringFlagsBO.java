@@ -7,14 +7,17 @@ package pasa.cbentley.byteobjects.src4.ctx;
 import pasa.cbentley.byteobjects.src4.core.BOModulesManager;
 import pasa.cbentley.byteobjects.src4.core.ByteController;
 import pasa.cbentley.byteobjects.src4.core.ByteObject;
-import pasa.cbentley.core.src4.ctx.IToStringFlags;
+import pasa.cbentley.core.src4.ctx.IToStringFlagsUC;
+import pasa.cbentley.core.src4.ctx.UCtx;
+import pasa.cbentley.core.src4.interfaces.IToStringFlags;
 
 /**
- * Defines the flags to help debugging ByteObject modules.
+ * Defines the flags to configure {@link BOCtx}.
  * 
- * @see IToStringFlags for master definition
  * 
  * @author Charles Bentley
+ * 
+ * @see IToStringFlagsUC for {@link UCtx}
  *
  */
 public interface IToStringFlagsBO extends IToStringFlags {
@@ -49,6 +52,6 @@ public interface IToStringFlagsBO extends IToStringFlags {
 
    public static final int D_FLAG_29_NULLS                  = 0;
 
-   int DATA_FLAG_21_MANY_COLORS = 20 << 1;
+   public static final int DATA_FLAG_21_MANY_COLORS         = 20 << 1;
 
 }
